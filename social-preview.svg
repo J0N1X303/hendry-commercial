@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="g1" cx="0.12" cy="0.06" r="0.5">
+      <stop offset="0" stop-color="#2f8050" stop-opacity=".30"/>
+      <stop offset="1" stop-color="#08110c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="0.92" cy="0.72" r="0.45">
+      <stop offset="0" stop-color="#2f8050" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#08110c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#08110c"/>
+  <rect width="1200" height="630" fill="url(#g1)"/>
+  <rect width="1200" height="630" fill="url(#g2)"/>
+
+  <g opacity=".72" fill="none" stroke="#63d995">
+    <circle cx="1112" cy="80" r="285" stroke-width="2"/>
+  </g>
+  <g opacity=".45" fill="none" stroke="#2f8b54" stroke-width="1.6">
+    <path d="M720 565 L1210 410"/>
+    <path d="M720 565 L1210 442"/>
+    <path d="M720 565 L1210 474"/>
+    <path d="M720 565 L1210 506"/>
+    <path d="M720 565 L1210 538"/>
+  </g>
+
+  <g transform="translate(70 62)">
+    <rect width="54" height="54" rx="12" fill="#0c1710" stroke="#3f5e49"/>
+    <rect x="27" width="27" height="54" rx="0" fill="#63d995"/>
+    <text x="13.5" y="35" text-anchor="middle" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="16">H</text>
+    <text x="40.5" y="35" text-anchor="middle" fill="#07120b" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="16">C</text>
+    <text x="75" y="34" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="18" letter-spacing="4">HENDRY COMMERCIAL</text>
+  </g>
+
+  <g fill="#8da095" font-family="Arial, Helvetica, sans-serif" font-size="14" letter-spacing="3">
+    <text x="965" y="92">QUESTION</text>
+    <text x="965" y="122">SIMPLIFY</text>
+    <text x="965" y="152">BUILD</text>
+    <text x="965" y="182">GROW</text>
+  </g>
+  <rect x="965" y="207" width="42" height="3" rx="1.5" fill="#63d995"/>
+
+  <text x="70" y="270" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="70" letter-spacing="-2">Jonathan Hendry</text>
+  <text x="72" y="330" fill="#63d995" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="31">Commercial Leader · Builder</text>
+  <text x="72" y="410" fill="#d7dfd9" font-family="Arial, Helvetica, sans-serif" font-size="23" letter-spacing="8">BUY  ·  SELL  ·  BUILD</text>
+  <rect x="72" y="505" width="64" height="3" rx="1.5" fill="#63d995"/>
+  <text x="72" y="555" fill="#b8c4bc" font-family="Arial, Helvetica, sans-serif" font-size="21">hendrycommercial.co.uk</text>
+</svg>
