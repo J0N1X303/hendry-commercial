@@ -1,11 +1,12 @@
 name: Generate social preview
 
 on:
-  workflow_dispatch:
   push:
+    branches: [main]
     paths:
-      - "scripts/generate-og.py"
-      - ".github/workflows/generate-social-preview.yml"
+      - 'social-preview.svg'
+      - '.github/workflows/generate-social-preview.yml'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,12 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install pillow
-      - run: python scripts/generate-og.py
-      - name: Commit preview image
+      - name: Install SVG renderer
+        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+      - name: Generate Open Graph PNG
+        run: rsvg-convert -w 1200 -h 630 social-preview.svg -o social-preview.png
+      - name: Commit generated image
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
