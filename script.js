@@ -120,6 +120,66 @@
     });
   }
 
+
+  const cvModal = document.querySelector('[data-cv-modal]');
+  const cvForm = document.querySelector('[data-cv-form]');
+  const cvStatus = document.querySelector('[data-cv-status]');
+  const cvOpeners = document.querySelectorAll('[data-open-cv]');
+  const cvClosers = document.querySelectorAll('[data-close-cv]');
+
+  function openCvModal() {
+    if (!cvModal) return;
+    cvModal.classList.add('is-open');
+    cvModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    const firstInput = cvModal.querySelector('input:not([type="hidden"]):not(.form-honey)');
+    window.setTimeout(() => firstInput?.focus(), 120);
+  }
+
+  function closeCvModal() {
+    if (!cvModal) return;
+    cvModal.classList.remove('is-open');
+    cvModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  cvOpeners.forEach((button) => button.addEventListener('click', openCvModal));
+  cvClosers.forEach((button) => button.addEventListener('click', closeCvModal));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && cvModal?.classList.contains('is-open')) closeCvModal();
+  });
+
+  if (cvForm) {
+    cvForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submit = cvForm.querySelector('.form-submit');
+      if (cvStatus) {
+        cvStatus.textContent = 'Sending…';
+        cvStatus.classList.remove('is-error');
+      }
+      if (submit) submit.disabled = true;
+
+      try {
+        const response = await fetch(cvForm.action, {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(cvForm)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.success === false) throw new Error('Submission failed');
+        cvForm.reset();
+        if (cvStatus) cvStatus.textContent = 'Thanks — your request has been sent. I’ll review it and reply directly.';
+      } catch (error) {
+        if (cvStatus) {
+          cvStatus.innerHTML = 'Something went wrong. Please <a href="mailto:jonny@hendrycommercial.co.uk?subject=CV%20request">email me directly</a>.';
+          cvStatus.classList.add('is-error');
+        }
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+  }
+
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
   updateScrollEffects();
