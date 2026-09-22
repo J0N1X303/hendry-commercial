@@ -88,7 +88,7 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   }
 }
 
-.button-reset{font-family:inherit;cursor:pointer}
+.button-reset{font-family:inherit;cursor:pointer;color:var(--text);background:rgba(12,23,16,.76);border:1px solid var(--line)}.button-reset:hover{color:var(--accent);border-color:#4e7059}
 .client-experience-rail{margin-top:-1px}
 .contact-actions{align-items:center}
 .contact-text-link{color:#b8c4bc;font-size:13px;font-weight:700;border-bottom:1px solid #33483a;padding-bottom:2px;margin-left:4px}
