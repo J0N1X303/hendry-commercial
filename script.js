@@ -121,38 +121,44 @@
   }
 
 
-  const cvModal = document.querySelector('[data-cv-modal]');
+  const cvDialog = document.querySelector('[data-cv-dialog]');
   const cvForm = document.querySelector('[data-cv-form]');
   const cvStatus = document.querySelector('[data-cv-status]');
   const cvOpeners = document.querySelectorAll('[data-open-cv]');
   const cvClosers = document.querySelectorAll('[data-close-cv]');
 
-  function openCvModal() {
-    if (!cvModal) return;
-    cvModal.classList.add('is-open');
-    cvModal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('modal-open');
-    const firstInput = cvModal.querySelector('input:not([type="hidden"]):not(.form-honey)');
-    window.setTimeout(() => firstInput?.focus(), 120);
+  function openCvDialog() {
+    if (!cvDialog) return;
+    if (typeof cvDialog.showModal === 'function') {
+      cvDialog.showModal();
+    } else {
+      cvDialog.setAttribute('open', '');
+    }
+    const firstInput = cvDialog.querySelector('input:not([type="hidden"]):not(.form-honey)');
+    window.setTimeout(() => firstInput?.focus(), 80);
   }
 
-  function closeCvModal() {
-    if (!cvModal) return;
-    cvModal.classList.remove('is-open');
-    cvModal.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('modal-open');
+  function closeCvDialog() {
+    if (!cvDialog) return;
+    if (typeof cvDialog.close === 'function') {
+      cvDialog.close();
+    } else {
+      cvDialog.removeAttribute('open');
+    }
   }
 
-  cvOpeners.forEach((button) => button.addEventListener('click', openCvModal));
-  cvClosers.forEach((button) => button.addEventListener('click', closeCvModal));
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && cvModal?.classList.contains('is-open')) closeCvModal();
+  cvOpeners.forEach((button) => button.addEventListener('click', openCvDialog));
+  cvClosers.forEach((button) => button.addEventListener('click', closeCvDialog));
+
+  cvDialog?.addEventListener('click', (event) => {
+    if (event.target === cvDialog) closeCvDialog();
   });
 
   if (cvForm) {
     cvForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       const submit = cvForm.querySelector('.form-submit');
+
       if (cvStatus) {
         cvStatus.textContent = 'Sending…';
         cvStatus.classList.remove('is-error');
@@ -167,8 +173,9 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || data.success === false) throw new Error('Submission failed');
+
         cvForm.reset();
-        if (cvStatus) cvStatus.textContent = 'Thanks — your request has been sent. I’ll review it and reply directly.';
+        if (cvStatus) cvStatus.textContent = 'Thanks — I’ve received your request and will review it directly.';
       } catch (error) {
         if (cvStatus) {
           cvStatus.innerHTML = 'Something went wrong. Please <a href="mailto:jonny@hendrycommercial.co.uk?subject=CV%20request">email me directly</a>.';
