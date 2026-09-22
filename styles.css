@@ -137,6 +137,27 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   .cv-form-footer,.form-status{grid-column:auto}
   .cv-form-footer{align-items:flex-start;flex-direction:column}
   .contact-text-link{margin-left:0}
+
+  .about{
+    padding-top:82px;
+    padding-bottom:58px;
+  }
+  .work{
+    padding-top:76px;
+    padding-bottom:62px;
+  }
+  .experience{
+    padding-top:68px;
+    padding-bottom:66px;
+  }
+  .ventures{
+    padding-top:72px;
+    padding-bottom:42px;
+  }
+  .contact{
+    padding-top:54px;
+    padding-bottom:96px;
+  }
 }
 
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.reveal{opacity:1;transform:none}.timeline-item{opacity:1;transform:none}.marquee-track{animation:none}.pulse-dot{animation:none}}
