@@ -39,11 +39,13 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 
 
 
-.hero-photo.pointer-reactive img{
+.hero-photo.pointer-reactive img,
+.about-photo.pointer-reactive img{
   transition:transform .32s cubic-bezier(.2,.7,.2,1),filter .25s ease;
   transform:translate(var(--image-shift-x,0px),var(--image-shift-y,0px)) scale(1);
 }
-.hero-photo.pointer-reactive:hover img{
+.hero-photo.pointer-reactive:hover img,
+.about-photo.pointer-reactive:hover img{
   transform:translate(var(--image-shift-x,0px),var(--image-shift-y,0px)) scale(1.025);
   filter:contrast(1.02) saturate(1.02);
 }
@@ -78,7 +80,8 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   will-change:auto;
   transition:border-color .22s ease,box-shadow .22s ease;
 }
-.hero-photo.pointer-reactive::before{
+.hero-photo.pointer-reactive::before,
+.about-photo.pointer-reactive::before{
   content:"";
   position:absolute;
   inset:0;
@@ -88,11 +91,13 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   background:radial-gradient(circle 170px at var(--pointer-x) var(--pointer-y),rgba(255,255,255,.18),rgba(99,217,149,.075) 40%,transparent 72%);
   transition:opacity .22s ease;
 }
-.hero-photo.pointer-reactive:hover{
+.hero-photo.pointer-reactive:hover,
+.about-photo.pointer-reactive:hover{
   border-color:#52705c;
   box-shadow:0 22px 62px rgba(0,0,0,.30),0 0 0 1px rgba(99,217,149,.08);
 }
-.hero-photo.pointer-reactive:hover::before{opacity:1}
+.hero-photo.pointer-reactive:hover::before,
+.about-photo.pointer-reactive:hover::before{opacity:1}
 .proof-card.pointer-reactive{
   overflow:hidden;
 }
