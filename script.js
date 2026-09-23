@@ -100,6 +100,20 @@
   }
 
   if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll('.pointer-reactive').forEach((surface) => {
+      surface.addEventListener('pointermove', (event) => {
+        const rect = surface.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
+        const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(1);
+        surface.style.setProperty('--pointer-x', x + '%');
+        surface.style.setProperty('--pointer-y', y + '%');
+      });
+      surface.addEventListener('pointerleave', () => {
+        surface.style.setProperty('--pointer-x', '50%');
+        surface.style.setProperty('--pointer-y', '50%');
+      });
+    });
+
     document.querySelectorAll('.tilt-card').forEach((card) => {
       card.addEventListener('pointermove', (event) => {
         const rect = card.getBoundingClientRect();
