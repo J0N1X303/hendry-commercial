@@ -20,12 +20,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
       - name: Generate Open Graph PNG
         run: |
-          rsvg-convert -w 1200 -h 630 social-preview.svg -o social-preview.png
-          rsvg-convert -w 2400 -h 1260 social-preview.svg -o social-preview-v2.png
+          rsvg-convert -w 1200 -h 627 social-preview.svg -o linkedin-preview-20260923.png
+          rsvg-convert -w 2400 -h 1254 social-preview.svg -o social-preview-v3.png
       - name: Commit generated image
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add social-preview.png social-preview-v2.png
-          git diff --cached --quiet || git commit -m "Generate social preview image"
+          git add linkedin-preview-20260923.png social-preview-v3.png
+          git diff --cached --quiet || git commit -m "Generate crisp social preview images"
           git push
