@@ -109,7 +109,10 @@
         const y = (yRatio * 100).toFixed(1);
         surface.style.setProperty('--pointer-x', x + '%');
         surface.style.setProperty('--pointer-y', y + '%');
-        if (surface.classList.contains('hero-photo') || surface.classList.contains('about-photo')) {
+        if (surface.classList.contains('about-photo')) {
+          surface.style.setProperty('--image-shift-x', ((xRatio - 0.5) * 12).toFixed(2) + 'px');
+          surface.style.setProperty('--image-shift-y', ((yRatio - 0.5) * 8).toFixed(2) + 'px');
+        } else if (surface.classList.contains('hero-photo')) {
           surface.style.setProperty('--image-shift-x', ((xRatio - 0.5) * 8).toFixed(2) + 'px');
           surface.style.setProperty('--image-shift-y', ((yRatio - 0.5) * 6).toFixed(2) + 'px');
         }
