@@ -285,6 +285,31 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 .contact-path p{margin:0;color:var(--muted);font-size:14px;line-height:1.6}
 .contact .contact-actions{position:relative;z-index:1;margin-top:28px}
 
+/* Stronger cursor glow for the three contact pathway cards */
+.contact-path.pointer-glow{
+  position:relative;
+  overflow:hidden;
+}
+.contact-path.pointer-glow::before{
+  content:"";
+  position:absolute;
+  z-index:0;
+  pointer-events:none;
+  width:230px;
+  height:230px;
+  left:var(--glow-x);
+  top:var(--glow-y);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  background:rgba(99,217,149,.13);
+  filter:blur(46px);
+  transition:opacity .2s ease;
+}
+.contact-path.pointer-glow:hover::before{opacity:1}
+.contact-path.pointer-glow>*{position:relative;z-index:1}
+
+
 .button-reset{font-family:inherit;cursor:pointer;color:var(--text);background:rgba(12,23,16,.76);border:1px solid var(--line)}.button-reset:hover{color:var(--accent);border-color:#4e7059}
 .client-experience-rail{margin-top:-1px}
 .contact-actions{align-items:center}
