@@ -25,11 +25,13 @@
   </g>
 
   <g transform="translate(70 62)">
-    <rect width="54" height="54" rx="12" fill="#0c1710" stroke="#3f5e49"/>
-    <rect x="27" width="27" height="54" rx="0" fill="#63d995"/>
-    <text x="13.5" y="35" text-anchor="middle" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="16">H</text>
-    <text x="40.5" y="35" text-anchor="middle" fill="#07120b" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="16">C</text>
-    <text x="75" y="34" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="18" letter-spacing="4">HENDRY COMMERCIAL</text>
+    <g transform="scale(1.23)">
+      <path d="M4 36L10 10L25 4L21.4 14.4C16.5 15.8 13.4 18.8 13 22.8C12.6 26.3 14.8 29.1 18.4 29.9L15.4 37Z" fill="#63d995"/>
+      <path d="M13 22.8C13.5 19.1 16.4 16.2 21.4 14.4L18.7 22.2L13.7 29.4C12.9 27.4 12.7 25.1 13 22.8Z" fill="#39b870" opacity=".72"/>
+      <path d="M20.2 37L25.3 14.4L39 8.2L33.4 32.2Z" fill="#f3f4ef"/>
+    </g>
+    <text x="75" y="34" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="18" letter-spacing="2">HENDRY</text>
+    <text x="166" y="34" fill="#e5e9e6" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="18" letter-spacing="2">COMMERCIAL</text>
   </g>
 
   <g fill="#8da095" font-family="Arial, Helvetica, sans-serif" font-size="14" letter-spacing="3">
