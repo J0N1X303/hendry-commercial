@@ -409,4 +409,82 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   }
 }
 
+
+/* Final mobile contact layout — must remain after desktop/contact base rules */
+@media(max-width:620px){
+  .contact{
+    padding-top:58px;
+    padding-bottom:72px;
+  }
+
+  .contact-intro{
+    max-width:none;
+  }
+
+  .contact-intro h2{
+    font-size:clamp(38px,12vw,50px);
+  }
+
+  .contact-intro>p:last-child{
+    margin-top:16px;
+    font-size:16px;
+    line-height:1.55;
+  }
+
+  .contact-paths{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    width:100%;
+    gap:12px;
+    margin-top:26px;
+  }
+
+  .contact-path{
+    width:100%;
+    min-width:0;
+    min-height:0;
+    padding:20px 20px 24px;
+  }
+
+  .contact-path h3{
+    width:auto;
+    max-width:none;
+    margin:24px 0 10px;
+    font-size:24px;
+    line-height:1.08;
+    letter-spacing:-.035em;
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+
+  .contact-path p{
+    width:auto;
+    max-width:none;
+    font-size:14px;
+    line-height:1.55;
+    overflow-wrap:normal;
+    word-break:normal;
+  }
+
+  .contact .contact-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 12px;
+    margin-top:24px;
+    align-items:stretch;
+  }
+
+  .contact .contact-actions .button{
+    grid-column:1/-1;
+    width:100%;
+    min-height:50px;
+  }
+
+  .contact .contact-actions .contact-text-link{
+    margin:4px 0 0;
+    justify-self:start;
+    font-size:13px;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.reveal{opacity:1;transform:none}.timeline-item{opacity:1;transform:none}.marquee-track{animation:none}.pulse-dot{animation:none}}
