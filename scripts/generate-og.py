@@ -25,12 +25,15 @@ def font(size,bold=False):
     path="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     return ImageFont.truetype(path,size)
 
-# HC mark
-d.rounded_rectangle((70,62,124,116),radius=11,fill=(13,23,16),outline=(62,92,72),width=1)
-d.rectangle((97,62,124,116),fill=ACCENT)
-d.text((78,77),"H",font=font(18,True),fill=TEXT)
-d.text((103,77),"C",font=font(18,True),fill=(6,18,11))
-d.text((145,75),"HENDRY COMMERCIAL",font=font(19,True),fill=TEXT)
+# Hendry Commercial ribbon mark
+# Green ribbon / implied C
+d.polygon([(70,108),(77,72),(100,62),(95,78),(87,82),(82,89),(81,96),(85,102),(91,104),(87,110)],fill=ACCENT)
+# Fold detail
+d.polygon([(81,96),(82,89),(87,82),(95,78),(91,91),(84,104)],fill=(57,184,112))
+# White forward blade
+d.polygon([(91,110),(98,79),(118,70),(110,103)],fill=TEXT)
+d.text((140,76),"HENDRY",font=font(19,True),fill=TEXT)
+d.text((229,76),"COMMERCIAL",font=font(19),fill=(229,233,230))
 
 # right-hand operating words
 for i,t in enumerate(["QUESTION","SIMPLIFY","BUILD","GROW"]):
