@@ -100,6 +100,20 @@
   }
 
   if (!reduceMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    document.querySelectorAll('.pointer-glow').forEach((surface) => {
+      surface.addEventListener('pointermove', (event) => {
+        const rect = surface.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
+        const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(1);
+        surface.style.setProperty('--glow-x', x + '%');
+        surface.style.setProperty('--glow-y', y + '%');
+      });
+      surface.addEventListener('pointerleave', () => {
+        surface.style.setProperty('--glow-x', '50%');
+        surface.style.setProperty('--glow-y', '50%');
+      });
+    });
+
     document.querySelectorAll('.pointer-reactive').forEach((surface) => {
       surface.addEventListener('pointermove', (event) => {
         const rect = surface.getBoundingClientRect();
