@@ -103,14 +103,22 @@
     document.querySelectorAll('.pointer-reactive').forEach((surface) => {
       surface.addEventListener('pointermove', (event) => {
         const rect = surface.getBoundingClientRect();
-        const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
-        const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(1);
+        const xRatio = (event.clientX - rect.left) / rect.width;
+        const yRatio = (event.clientY - rect.top) / rect.height;
+        const x = (xRatio * 100).toFixed(1);
+        const y = (yRatio * 100).toFixed(1);
         surface.style.setProperty('--pointer-x', x + '%');
         surface.style.setProperty('--pointer-y', y + '%');
+        if (surface.classList.contains('hero-photo')) {
+          surface.style.setProperty('--image-shift-x', ((xRatio - 0.5) * 8).toFixed(2) + 'px');
+          surface.style.setProperty('--image-shift-y', ((yRatio - 0.5) * 6).toFixed(2) + 'px');
+        }
       });
       surface.addEventListener('pointerleave', () => {
         surface.style.setProperty('--pointer-x', '50%');
         surface.style.setProperty('--pointer-y', '50%');
+        surface.style.setProperty('--image-shift-x', '0px');
+        surface.style.setProperty('--image-shift-y', '0px');
       });
     });
 
