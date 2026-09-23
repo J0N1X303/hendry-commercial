@@ -134,6 +134,57 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   border-color:rgba(99,217,149,.22);
 }
 
+
+/* Cursor-following glow for interactive tiles */
+.pointer-glow{
+  --glow-x:50%;
+  --glow-y:50%;
+  position:relative;
+  isolation:isolate;
+}
+.pointer-glow::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  opacity:0;
+  background:radial-gradient(circle 230px at var(--glow-x) var(--glow-y),rgba(99,217,149,.14),rgba(99,217,149,.045) 42%,transparent 72%);
+  transition:opacity .2s ease;
+}
+.pointer-glow:hover::before{opacity:1}
+.pointer-glow>*{position:relative;z-index:1}
+
+.hero-terms .pointer-glow{
+  overflow:hidden;
+}
+.hero-terms .pointer-glow::before{
+  background:radial-gradient(circle 105px at var(--glow-x) var(--glow-y),rgba(99,217,149,.20),rgba(99,217,149,.06) 46%,transparent 74%);
+}
+.hero-terms .pointer-glow:hover{
+  border-color:#4a6a54;
+  box-shadow:inset 0 0 0 1px rgba(99,217,149,.05),0 12px 32px rgba(0,0,0,.12);
+}
+
+.work-card.pointer-glow::before,
+.venture-card.pointer-glow::before{
+  background:radial-gradient(circle 250px at var(--glow-x) var(--glow-y),rgba(99,217,149,.15),rgba(99,217,149,.045) 45%,transparent 72%);
+}
+.work-card.pointer-glow .card-line{z-index:2}
+.venture-card.pointer-glow::after{z-index:2}
+
+.contact.pointer-glow{
+  isolation:isolate;
+}
+.contact.pointer-glow::before{
+  inset:0 -80px;
+  background:radial-gradient(circle 420px at var(--glow-x) var(--glow-y),rgba(99,217,149,.12),rgba(99,217,149,.035) 45%,transparent 73%);
+}
+.contact.pointer-glow>.contact-aura{z-index:0}
+.contact.pointer-glow>p,
+.contact.pointer-glow>h2,
+.contact.pointer-glow>.contact-actions{position:relative;z-index:1}
+
 @media(min-width:981px){
   .hero{
     grid-template-columns:minmax(0,1.24fr) minmax(320px,.76fr);
