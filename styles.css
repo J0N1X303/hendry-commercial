@@ -145,11 +145,17 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 .pointer-glow::before{
   content:"";
   position:absolute;
-  inset:0;
   z-index:0;
   pointer-events:none;
+  width:210px;
+  height:210px;
+  left:var(--glow-x);
+  top:var(--glow-y);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
   opacity:0;
-  background:radial-gradient(circle 230px at var(--glow-x) var(--glow-y),rgba(99,217,149,.14),rgba(99,217,149,.045) 42%,transparent 72%);
+  background:rgba(99,217,149,.12);
+  filter:blur(42px);
   transition:opacity .2s ease;
 }
 .pointer-glow:hover::before{opacity:1}
@@ -159,7 +165,10 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   overflow:hidden;
 }
 .hero-terms .pointer-glow::before{
-  background:radial-gradient(circle 105px at var(--glow-x) var(--glow-y),rgba(99,217,149,.20),rgba(99,217,149,.06) 46%,transparent 74%);
+  width:95px;
+  height:95px;
+  background:rgba(99,217,149,.18);
+  filter:blur(26px);
 }
 .hero-terms .pointer-glow:hover{
   border-color:#4a6a54;
@@ -167,8 +176,12 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 }
 
 .work-card.pointer-glow::before,
-.venture-card.pointer-glow::before{
-  background:radial-gradient(circle 250px at var(--glow-x) var(--glow-y),rgba(99,217,149,.15),rgba(99,217,149,.045) 45%,transparent 72%);
+.venture-card.pointer-glow::before,
+.contact-path.pointer-glow::before{
+  width:230px;
+  height:230px;
+  background:rgba(99,217,149,.13);
+  filter:blur(46px);
 }
 .work-card.pointer-glow .card-line{z-index:2}
 .venture-card.pointer-glow::after{z-index:2}
@@ -177,8 +190,10 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   isolation:isolate;
 }
 .contact.pointer-glow::before{
-  inset:0 -80px;
-  background:radial-gradient(circle 420px at var(--glow-x) var(--glow-y),rgba(99,217,149,.12),rgba(99,217,149,.035) 45%,transparent 73%);
+  width:430px;
+  height:430px;
+  background:rgba(99,217,149,.085);
+  filter:blur(78px);
 }
 .contact.pointer-glow>.contact-aura{position:absolute;z-index:0}
 .contact.pointer-glow>.contact-intro,
@@ -264,7 +279,6 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 .contact-intro>p:last-child{margin:20px 0 0;color:var(--muted);font-size:17px}
 .contact-paths{position:relative;z-index:1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:34px}
 .contact-path{min-height:190px;padding:24px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(155deg,rgba(18,29,21,.93),rgba(10,18,12,.94));overflow:hidden;transition:border-color .2s ease,box-shadow .2s ease}
-.contact-path::before{background:radial-gradient(circle 230px at var(--glow-x) var(--glow-y),rgba(99,217,149,.16),rgba(99,217,149,.045) 44%,transparent 72%)}
 .contact-path:hover{border-color:#44614d;box-shadow:0 18px 42px rgba(0,0,0,.14)}
 .contact-path-no{display:block;color:var(--accent);font:700 10px Manrope,sans-serif;letter-spacing:.12em}
 .contact-path h3{margin:42px 0 14px;font-size:25px;max-width:270px}
