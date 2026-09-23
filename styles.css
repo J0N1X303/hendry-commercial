@@ -362,4 +362,51 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 
 }
 
+
+/* Match contact cards to the interaction language used above */
+.contact-path.tilt-card{
+  transform-style:preserve-3d;
+  will-change:transform;
+}
+.contact-path .contact-card-line{
+  z-index:2;
+}
+.contact-path:hover .contact-card-line{
+  transform:scaleX(1);
+}
+.contact-path h3,
+.contact-path p{
+  min-width:0;
+  overflow-wrap:break-word;
+  word-break:normal;
+}
+
+@media(max-width:620px){
+  .contact-paths{
+    width:100%;
+    min-width:0;
+  }
+  .contact-path{
+    width:100%;
+    min-width:0;
+    padding:20px 18px 22px;
+  }
+  .contact-path h3{
+    width:100%;
+    max-width:none;
+    margin:26px 0 12px;
+    font-size:21px;
+    line-height:1.12;
+    letter-spacing:-.035em;
+    overflow-wrap:anywhere;
+  }
+  .contact-path p{
+    width:100%;
+    max-width:none;
+    font-size:13px;
+    line-height:1.55;
+    overflow-wrap:anywhere;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.reveal{opacity:1;transform:none}.timeline-item{opacity:1;transform:none}.marquee-track{animation:none}.pulse-dot{animation:none}}
