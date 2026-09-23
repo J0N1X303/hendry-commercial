@@ -26,17 +26,17 @@ def font(size,bold=False):
     return ImageFont.truetype(path,size)
 
 # Hendry Commercial approved concept 1 mark
-# Main green folded ribbon
-d.polygon([(70,115),(100,79),(132,64),(123,93),(117,100),(112,111),(109,126),(112,140),(120,151),(133,158),(147,161),(159,161),(176,117),(166,122),(154,127),(145,130),(142,128),(140,123),(143,116),(157,93)],fill=ACCENT)
-# Dark inner turn and green return create the implied C
-d.ellipse((108,113,151,157),fill=(9,42,27))
-d.polygon([(141,122),(149,128),(161,130),(176,117),(170,135),(160,145),(150,147),(142,143),(138,136)],fill=(22,115,71))
+# Continuous green H/C ribbon — no background-coloured break through the crossbar
+d.polygon([(70,115),(92,84),(118,72),(105,101),(100,111),(95,124),(93,139),(98,151),(109,159),(124,163),(139,163),(156,122),(146,128),(135,133),(126,134),(119,131),(115,124),(118,116),(130,105)],fill=ACCENT)
+# Darker green fold remains visibly part of the mark rather than reading as a hole
+d.ellipse((94,111,139,157),fill=(20,94,61))
+d.polygon([(118,116),(130,105),(156,92),(150,107),(140,115),(133,124),(132,134),(139,139),(149,136),(143,151),(130,152),(120,147),(114,137),(113,126)],fill=(44,168,106))
 # White forward blade
-d.polygon([(148,161),(169,100),(203,82),(187,145),(177,153)],fill=TEXT)
+d.polygon([(139,163),(157,104),(189,88),(174,150),(164,157)],fill=TEXT)
 # Divider and stacked wordmark
-d.line((224,65,224,154),fill=(83,102,90),width=1)
-d.text((246,77),"HENDRY",font=font(22,True),fill=TEXT)
-d.text((246,105),"COMMERCIAL",font=font(14),fill=(229,233,230))
+d.line((212,66,212,154),fill=(83,102,90),width=1)
+d.text((234,77),"HENDRY",font=font(22,True),fill=TEXT)
+d.text((234,105),"COMMERCIAL",font=font(14),fill=(229,233,230))
 
 # right-hand operating words
 for i,t in enumerate(["QUESTION","SIMPLIFY","BUILD","GROW"]):
