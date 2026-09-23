@@ -24,15 +24,26 @@
     <path d="M720 565 L1210 538"/>
   </g>
 
-  <g transform="translate(70 50)">
-    <g transform="scale(1.38)">
-      <path d="M4 47L14 12L38 2L32 19C26 20 21 23 20 28C19 33 22 37 28 38L24 51Z" fill="#63d995"/>
-      <path d="M20 28C21 23 25 20 32 19L28 30C27 33 28 35 31 37L28 38C22 37 19 33 20 28Z" fill="#2fae68"/>
-      <path d="M26 51L33 20L52 11L44 43Z" fill="#f3f4ef"/>
+  <g transform="translate(70 42)">
+    <g transform="translate(0 0) scale(.17)">
+      <defs>
+        <linearGradient id="og-hc-green" x1="0.15" y1="0.9" x2="0.85" y2="0.05">
+          <stop offset="0" stop-color="#55d58d"/>
+          <stop offset="1" stop-color="#72e4a2"/>
+        </linearGradient>
+        <linearGradient id="og-hc-white" x1="0.1" y1="1" x2="0.9" y2="0">
+          <stop offset="0" stop-color="#eeede7"/>
+          <stop offset="1" stop-color="#fffefa"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#og-hc-green)" d="M335 61L190 130C169 140 154 153 144 169C124 208 101 267 82 322L45 427L181 362C193 356 201 347 205 336C220 344 237 348 254 349L303 228C289 235 273 244 259 249C256 250 253 249 252 248C250 246 250 243 252 241L294 170Z"/>
+      <path fill="#092a1b" d="M245 207C216 218 193 241 185 267C176 293 184 317 205 331C214 316 221 299 227 281C235 257 248 239 269 226C264 217 256 210 245 207Z"/>
+      <path fill="#167347" d="M252 241C261 250 278 251 303 228L289 264C274 276 258 281 247 276C239 272 238 258 252 241Z"/>
+      <path fill="url(#og-hc-white)" d="M448 160L303 238L199 499L339 433C349 428 357 421 360 415L448 160Z"/>
     </g>
-    <rect x="88" y="3" width="1" height="62" fill="#f3f4ef" opacity=".28"/>
-    <text x="113" y="31" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="25" letter-spacing="1.1">HENDRY</text>
-    <text x="113" y="58" fill="#e5e9e6" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="17" letter-spacing="5.5">COMMERCIAL</text>
+    <rect x="82" y="3" width="1" height="72" fill="#f3f4ef" opacity=".28"/>
+    <text x="108" y="34" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="25" letter-spacing="1.1">HENDRY</text>
+    <text x="108" y="62" fill="#e5e9e6" font-family="Arial, Helvetica, sans-serif" font-weight="400" font-size="17" letter-spacing="5.5">COMMERCIAL</text>
   </g>
 
   <g fill="#8da095" font-family="Arial, Helvetica, sans-serif" font-size="14" letter-spacing="3">
