@@ -25,15 +25,13 @@ def font(size,bold=False):
     path="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     return ImageFont.truetype(path,size)
 
-# Hendry Commercial ribbon mark
-# Green ribbon / implied C
-d.polygon([(70,108),(77,72),(100,62),(95,78),(87,82),(82,89),(81,96),(85,102),(91,104),(87,110)],fill=ACCENT)
-# Fold detail
-d.polygon([(81,96),(82,89),(87,82),(95,78),(91,91),(84,104)],fill=(57,184,112))
-# White forward blade
-d.polygon([(91,110),(98,79),(118,70),(110,103)],fill=TEXT)
-d.text((140,76),"HENDRY",font=font(19,True),fill=TEXT)
-d.text((229,76),"COMMERCIAL",font=font(19),fill=(229,233,230))
+# Hendry Commercial approved concept 1 mark
+d.polygon([(70,115),(82,73),(111,61),(104,81),(96,83),(90,88),(89,95),(93,102),(101,104),(96,120)],fill=ACCENT)
+d.polygon([(89,95),(90,88),(96,83),(104,81),(99,94),(98,99),(102,103),(101,104),(93,102)],fill=(47,174,104))
+d.polygon([(99,120),(107,83),(130,72),(120,110)],fill=TEXT)
+d.line((147,64,147,118),fill=(83,102,90),width=1)
+d.text((166,72),"HENDRY",font=font(20,True),fill=TEXT)
+d.text((166,96),"COMMERCIAL",font=font(14),fill=(229,233,230))
 
 # right-hand operating words
 for i,t in enumerate(["QUESTION","SIMPLIFY","BUILD","GROW"]):
