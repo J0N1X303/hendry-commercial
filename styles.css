@@ -180,7 +180,7 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
   inset:0 -80px;
   background:radial-gradient(circle 420px at var(--glow-x) var(--glow-y),rgba(99,217,149,.12),rgba(99,217,149,.035) 45%,transparent 73%);
 }
-.contact.pointer-glow>.contact-aura{z-index:0}
+.contact.pointer-glow>.contact-aura{position:absolute;z-index:0}
 .contact.pointer-glow>p,
 .contact.pointer-glow>h2,
 .contact.pointer-glow>.contact-actions{position:relative;z-index:1}
