@@ -569,3 +569,23 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 .commercial-map-foot{max-width:860px;margin:24px 0 0;color:#819087;font-size:13px;line-height:1.7}.commercial-map-foot strong{color:#c9d3cc}
 @media(max-width:980px){.engine-map-head{grid-template-columns:1fr;gap:22px}.commercial-map{grid-template-columns:1fr}.commercial-web{min-height:390px}.commercial-panel{min-height:auto}}
 @media(max-width:620px){.engine-map-section{padding-top:70px;padding-bottom:70px}.commercial-web{min-height:auto;padding:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.commercial-web-lines,.commercial-centre{display:none}.commercial-node,.node-buy,.node-sell,.node-build{position:relative;inset:auto;transform:none;width:auto;min-height:84px;padding:11px}.commercial-node:hover,.node-build:hover{transform:none}.commercial-node small{font-size:8px}.commercial-panel{padding:24px}.engine-panel-top{margin-bottom:30px;align-items:flex-start}.engine-panel-columns{grid-template-columns:1fr;gap:16px}.engine-now{grid-template-columns:1fr;gap:5px}}
+
+
+/* Sharper questions + lightweight commercial pressure test */
+.engine-questions>strong{margin-bottom:9px}
+.engine-questions p{margin:0!important;color:#9aa89f!important;font-size:11px!important;line-height:1.45!important;white-space:nowrap}
+.engine-questions p+p{margin-top:7px!important}
+.commercial-pressure{margin-top:26px;padding:26px 28px 28px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(145deg,rgba(17,29,20,.93),rgba(9,17,11,.96))}
+.pressure-head{display:grid;grid-template-columns:minmax(220px,.7fr) minmax(300px,1.3fr);gap:34px;align-items:end}
+.pressure-kicker{display:block;margin-bottom:7px;color:var(--accent);font:800 9px Manrope,sans-serif;letter-spacing:.13em;text-transform:uppercase}
+.pressure-head h3{font-size:25px}
+.pressure-head>p{margin:0;color:#89978e;font-size:12px;line-height:1.55;max-width:520px}
+.pressure-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:23px}
+.pressure-option{min-height:40px;padding:9px 13px;border:1px solid #293d31;border-radius:999px;background:#0b1610;color:#aab6ae;font:650 11px Inter,Arial,sans-serif;cursor:pointer;transition:border-color .18s ease,background .18s ease,color .18s ease}
+.pressure-option:hover,.pressure-option.is-active{border-color:#52755e;background:#132219;color:#edf4ef}
+.pressure-option.is-active{box-shadow:inset 0 0 0 1px rgba(99,217,149,.06)}
+.pressure-result{display:grid;grid-template-columns:125px minmax(0,1fr);gap:24px;align-items:center;margin-top:18px;padding:18px 20px;border-top:1px solid rgba(255,255,255,.07);background:rgba(5,12,8,.26);border-radius:14px}
+.pressure-lens span{display:block;color:#607267;font:800 8px Manrope,sans-serif;letter-spacing:.12em}.pressure-lens strong{display:block;margin-top:5px;color:var(--accent);font:800 17px Manrope,sans-serif;letter-spacing:.08em}
+.pressure-copy p{margin:0}.pressure-question{color:#e1e8e3;font:700 16px/1.35 Manrope,sans-serif;letter-spacing:-.02em}.pressure-first-move{margin-top:7px!important;color:#849289!important;font-size:11px;line-height:1.55}
+@media(max-width:1120px){.engine-questions p{white-space:normal}}
+@media(max-width:620px){.pressure-head{grid-template-columns:1fr;gap:9px}.commercial-pressure{padding:22px 20px}.pressure-options{display:grid;grid-template-columns:1fr}.pressure-option{text-align:left;border-radius:12px}.pressure-result{grid-template-columns:1fr;gap:10px}.pressure-question{font-size:15px}}
