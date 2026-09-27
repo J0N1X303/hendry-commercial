@@ -187,32 +187,38 @@
     const pressureData = {
       conversion: {
         lens: 'SELL',
+        test: 'Progression',
         question: 'At which buyer decision do otherwise qualified opportunities stop progressing?',
         move: 'This separates a conversion problem from vague “we need more pipeline” thinking. Check the last 10 qualified opportunities and identify the last buyer commitment you can actually evidence.'
       },
       forecast: {
         lens: 'SELL',
+        test: 'Forecast integrity',
         question: 'What buyer action proves each forecasted deal belongs in the stage it is in?',
         move: 'This tests forecast integrity. Re-stage any deal supported only by seller activity, elapsed time, or confidence rather than a factual, inspectable buyer commitment.'
       },
       people: {
         lens: 'BUILD',
+        test: 'Repeatability',
         question: 'What does your best performer know or decide that the rest of the system cannot reproduce?',
         move: 'This tests key-person dependency. Compare how top performers select accounts, diagnose needs, progress deals, and negotiate; codify the decision rules, not their personality.'
       },
       tools: {
         lens: 'BUILD',
+        test: 'Productivity',
         question: 'Which seller task actually disappeared after the last tool or AI agent was added?',
         move: 'This tests real productivity. For every tool, name the task removed, time returned, decision improved, or customer friction reduced. If none is measurable, it is probably extra work.'
       },
       difference: {
         lens: 'BUY',
+        test: 'Differentiation',
         question: 'What can a buyer see and verify that makes you a better fit than the obvious alternative?',
         move: 'This tests differentiated value rather than messaging. Compare yourself with two real alternatives against the buyer’s priorities, proof, risk, and buying experience — not your feature list.'
       }
     };
     const options = [...pressureTest.querySelectorAll('[data-pressure]')];
     const lens = pressureTest.querySelector('[data-pressure-lens]');
+    const test = pressureTest.querySelector('[data-pressure-test]');
     const question = pressureTest.querySelector('[data-pressure-question]');
     const move = pressureTest.querySelector('[data-pressure-move]');
     options.forEach((option) => {
@@ -221,6 +227,7 @@
         if (!selected) return;
         options.forEach((item) => item.classList.toggle('is-active', item === option));
         if (lens) lens.textContent = selected.lens;
+        if (test) test.textContent = selected.test || '';
         if (question) question.textContent = selected.question;
         if (move) move.textContent = selected.move;
       });
