@@ -187,28 +187,28 @@
     const pressureData = {
       conversion: {
         lens: 'SELL',
-        question: 'At what buyer decision do good opportunities stop moving?',
-        move: 'Review five wins and five stalled or lost deals against buyer milestones, not seller activity.'
+        question: 'At which buyer decision do otherwise qualified opportunities stop progressing?',
+        move: 'This separates a conversion problem from vague “we need more pipeline” thinking. Check the last 10 qualified opportunities and identify the last buyer commitment you can actually evidence.'
       },
       forecast: {
         lens: 'SELL',
-        question: 'Which deals have buyer evidence — and which are seller optimism?',
-        move: 'Strip the forecast back to observable buyer commitments, next decisions, and genuine commercial risk.'
+        question: 'What buyer action proves each forecasted deal belongs in the stage it is in?',
+        move: 'This tests forecast integrity. Re-stage any deal supported only by seller activity, elapsed time, or confidence rather than a factual, inspectable buyer commitment.'
       },
       people: {
         lens: 'BUILD',
-        question: 'What disappears when your best commercial person is out of the room?',
-        move: 'Separate the judgement only they can provide from the repeatable work, data, and decisions the system should carry.'
+        question: 'What does your best performer know or decide that the rest of the system cannot reproduce?',
+        move: 'This tests key-person dependency. Compare how top performers select accounts, diagnose needs, progress deals, and negotiate; codify the decision rules, not their personality.'
       },
       tools: {
         lens: 'BUILD',
-        question: 'Which hours of commercial work has the technology actually removed?',
-        move: 'Map each tool to a task removed, a decision improved, or a handoff shortened. If it does none, it is overhead.'
+        question: 'Which seller task actually disappeared after the last tool or AI agent was added?',
+        move: 'This tests real productivity. For every tool, name the task removed, time returned, decision improved, or customer friction reduced. If none is measurable, it is probably extra work.'
       },
       difference: {
         lens: 'BUY',
-        question: 'Could a buyer explain why they should choose you without repeating your homepage?',
-        move: 'Compare your public proof with two real alternatives against the questions a serious buyer actually asks.'
+        question: 'What can a buyer see and verify that makes you a better fit than the obvious alternative?',
+        move: 'This tests differentiated value rather than messaging. Compare yourself with two real alternatives against the buyer’s priorities, proof, risk, and buying experience — not your feature list.'
       }
     };
     const options = [...pressureTest.querySelectorAll('[data-pressure]')];
