@@ -50,7 +50,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260927-engine1" />
+  <link rel="stylesheet" href="styles.css?v=20260927-engine2" />
 </head>
 <body>
   <div class="scroll-progress" aria-hidden="true"><span></span></div>
@@ -84,7 +84,7 @@
     </a>
     <nav aria-label="Primary navigation">
       <a href="#about">About</a>
-      <a href="#work">Work</a>
+      <a href="#work">Approach</a>
       <a href="#experience">Experience</a>
       <a href="#ventures">Built</a>
       <a href="#contact" class="nav-cta">Contact</a>
@@ -184,116 +184,75 @@
     </section>
 
 
-    <section class="section engine" aria-labelledby="engine-title">
-      <div class="engine-head reveal">
+
+    <section id="work" class="section engine-map-section" aria-labelledby="commercial-map-title">
+      <div class="engine-map-head reveal">
         <div>
           <p class="eyebrow">How I think</p>
-          <h2 id="engine-title">A commercial engine starts with the customer, not the CRM.</h2>
+          <h2 id="commercial-map-title">Growth works when buying, selling, and the system behind both line up.</h2>
         </div>
-        <p class="engine-intro">Commercial performance is often treated as a sales problem. I think that starts too late. I’ve worked as the buyer, the seller, and the commercial leader responsible for the system around both, so I look at growth through three connected questions.</p>
+        <p>I’ve worked as the buyer, the seller, and the commercial leader responsible for making performance repeatable. The useful questions sit across all three.</p>
       </div>
 
-      <div class="engine-grid" aria-label="Buy, Sell, Build commercial model">
-        <article class="engine-stage reveal">
-          <div class="engine-stage-top">
-            <span class="engine-stage-no">01</span>
-            <strong>BUY</strong>
-          </div>
-          <h3>Make the business easier to choose.</h3>
-          <p>Start outside the organisation. What makes a customer move, what do they need to understand and believe, and what friction exists before sales ever sees them?</p>
-          <p class="engine-proof"><span>Perspective</span> £90m buyer-side procurement exposure, supplier selection, sourcing, and negotiation.</p>
-          <details class="engine-details">
-            <summary>Questions I ask</summary>
-            <ul>
-              <li>What actually triggers the buying decision?</li>
-              <li>What evidence reduces risk and builds trust?</li>
-              <li>Can a buyer understand why this business is different?</li>
-              <li>What are they learning from search, peers, and AI before the first conversation?</li>
-            </ul>
-          </details>
-        </article>
+      <div class="commercial-map reveal" data-commercial-map>
+        <div class="commercial-web" aria-label="Interactive Buy Sell Build commercial map">
+          <svg class="commercial-web-lines" viewBox="0 0 600 430" aria-hidden="true" focusable="false">
+            <line x1="300" y1="216" x2="150" y2="94"></line>
+            <line x1="300" y1="216" x2="450" y2="94"></line>
+            <line x1="300" y1="216" x2="300" y2="356"></line>
+          </svg>
 
-        <article class="engine-stage reveal">
-          <div class="engine-stage-top">
-            <span class="engine-stage-no">02</span>
-            <strong>SELL</strong>
+          <div class="commercial-centre" aria-hidden="true">
+            <span>COMMERCIAL</span>
+            <strong>ENGINE</strong>
           </div>
-          <h3>Turn buyer progress into commercial momentum.</h3>
-          <p>A sales process should reflect what has changed for the customer, not just what the seller has completed.</p>
-          <p class="engine-proof"><span>Perspective</span> £50m+ seller-side P&amp;L ownership, enterprise accounts, pricing, and complex negotiation.</p>
-          <details class="engine-details">
-            <summary>Questions I ask</summary>
-            <ul>
-              <li>Who is genuinely worth pursuing?</li>
-              <li>What evidence tells us the buyer has progressed?</li>
-              <li>Where do qualification, value, price, and negotiation actually break down?</li>
-              <li>Are we helping the customer make a decision or merely moving a CRM stage?</li>
-            </ul>
-          </details>
-        </article>
 
-        <article class="engine-stage reveal">
-          <div class="engine-stage-top">
-            <span class="engine-stage-no">03</span>
-            <strong>BUILD</strong>
-          </div>
-          <h3>Make good performance repeatable.</h3>
-          <p>If growth depends on individual heroics, it is not an engine. People, process, data, and automation should make good commercial judgement easier to repeat.</p>
-          <p class="engine-proof"><span>Perspective</span> Forecasting, pricing, CRM change, commercial process, AI propositions, and ventures built from scratch.</p>
-          <details class="engine-details">
-            <summary>Questions I ask</summary>
-            <ul>
-              <li>Could another strong person run this system?</li>
-              <li>Does the forecast reflect buyer evidence or seller optimism?</li>
-              <li>Are roles, incentives, and rhythms reinforcing the right behaviours?</li>
-              <li>What should people own, and what should technology or AI remove?</li>
-            </ul>
-          </details>
-        </article>
-      </div>
-
-      <div class="engine-join reveal">
-        <div>
-          <span class="engine-kicker">The point</span>
-          <h3>Most commercial problems sit between the boxes.</h3>
+          <button class="commercial-node node-buy is-active" type="button" data-engine-tab="buy" aria-selected="true">
+            <span>01</span><strong>BUY</strong><small>how customers decide</small>
+          </button>
+          <button class="commercial-node node-sell" type="button" data-engine-tab="sell" aria-selected="false">
+            <span>02</span><strong>SELL</strong><small>turn value into momentum</small>
+          </button>
+          <button class="commercial-node node-build" type="button" data-engine-tab="build" aria-selected="false">
+            <span>03</span><strong>BUILD</strong><small>make growth repeatable</small>
+          </button>
         </div>
-        <p><strong>BUY</strong> should shape <strong>SELL</strong>. <strong>SELL</strong> should create evidence <strong>BUILD</strong> can measure and improve. <strong>BUILD</strong> should remove friction from both. Many commercial problems sit in the handoffs, not inside one function.</p>
+
+        <div class="commercial-panel">
+          <article class="engine-panel is-active" data-engine-panel="buy">
+            <div class="engine-panel-top"><span>BUY</span><em>Start outside the organisation</em></div>
+            <h3>Make the business easier to choose.</h3>
+            <p>What makes a customer move, what do they need to understand and believe, and what friction exists before sales ever sees them?</p>
+            <div class="engine-panel-columns">
+              <div><strong>Perspective</strong><p>£90m buyer-side procurement exposure across supplier selection, sourcing, negotiation, and risk.</p></div>
+              <div><strong>Questions I ask</strong><p>What triggers the decision? What reduces risk? Why this business? What has the buyer already learned before speaking to us?</p></div>
+            </div>
+            <div class="engine-now"><span>Exploring now</span><p>How AI changes discovery, comparison, trust, and shortlisting before the first human conversation.</p></div>
+          </article>
+
+          <article class="engine-panel" data-engine-panel="sell" hidden>
+            <div class="engine-panel-top"><span>SELL</span><em>Follow buyer progress, not seller activity</em></div>
+            <h3>Turn buyer progress into commercial momentum.</h3>
+            <p>A sales process should reflect what has changed for the customer, not just what the seller has completed.</p>
+            <div class="engine-panel-columns">
+              <div><strong>Perspective</strong><p>£50m+ seller-side P&amp;L ownership, enterprise accounts, pricing, negotiation, and strategic growth.</p></div>
+              <div><strong>Questions I ask</strong><p>Who is worth pursuing? What proves progress? Where do value, price, qualification, or negotiation break down?</p></div>
+            </div>
+          </article>
+
+          <article class="engine-panel" data-engine-panel="build" hidden>
+            <div class="engine-panel-top"><span>BUILD</span><em>Remove dependence on individual heroics</em></div>
+            <h3>Make good performance repeatable.</h3>
+            <p>People, process, data, and automation should make strong commercial judgement easier to repeat, not bury it in administration.</p>
+            <div class="engine-panel-columns">
+              <div><strong>Perspective</strong><p>Forecasting, pricing, CRM change, commercial process, AI propositions, team leadership, and ventures built from scratch.</p></div>
+              <div><strong>Questions I ask</strong><p>Could another strong person run this? Does the forecast reflect evidence? What should people own, and what should technology remove?</p></div>
+            </div>
+          </article>
+        </div>
       </div>
 
-      <div class="engine-current reveal">
-        <span>WHAT I’M EXPLORING NOW</span>
-        <p>What happens when part of the buying journey is delegated to AI? Can a business be found, understood, and trusted before a human conversation even begins?</p>
-      </div>
-    </section>
-
-    <section id="work" class="section work">
-      <div class="section-intro reveal">
-        <p class="eyebrow">Where I add value</p>
-        <h2>Useful when something commercially important needs to move.</h2>
-      </div>
-
-      <div class="work-grid">
-        <article class="work-card tilt-card pointer-glow reveal">
-          <span class="card-number">01</span>
-          <h3>Grow something established</h3>
-          <p>Revenue growth, strategic accounts, pricing, forecasting, and commercial leadership, alongside developing the people who have to deliver it. I’ve created mentoring initiatives that strengthened commercial capability, confidence, and progression into management roles.</p>
-          <div class="card-line" aria-hidden="true"></div>
-        </article>
-
-        <article class="work-card tilt-card pointer-glow reveal">
-          <span class="card-number">02</span>
-          <h3>Fix something commercially stuck</h3>
-          <p>When growth stalls, margin leaks, the proposition is unclear, or commercial activity isn’t translating into results, I like getting underneath why, challenging the assumptions, and simplifying the route forward.</p>
-          <div class="card-line" aria-hidden="true"></div>
-        </article>
-
-        <article class="work-card tilt-card pointer-glow reveal">
-          <span class="card-number">03</span>
-          <h3>Build something new</h3>
-          <p>New proposition, revenue stream, or early-stage idea: get it in front of customers quickly, use AI where it removes labour or accelerates learning, and invest further only when behaviour justifies it.</p>
-          <div class="card-line" aria-hidden="true"></div>
-        </article>
-      </div>
+      <p class="commercial-map-foot reveal"><strong>The joins matter.</strong> BUY should shape SELL. SELL should create evidence BUILD can measure. BUILD should remove friction from both. Many commercial problems sit in the handoffs.</p>
     </section>
 
     <section id="experience" class="section experience">
