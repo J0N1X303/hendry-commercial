@@ -50,7 +50,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20260927-engine2" />
+  <link rel="stylesheet" href="styles.css?v=20260927-engine3" />
 </head>
 <body>
   <div class="scroll-progress" aria-hidden="true"><span></span></div>
@@ -223,7 +223,11 @@
             <p>What makes a customer move, what do they need to understand and believe, and what friction exists before sales ever sees them?</p>
             <div class="engine-panel-columns">
               <div><strong>Perspective</strong><p>£90m buyer-side procurement exposure across supplier selection, sourcing, negotiation, and risk.</p></div>
-              <div><strong>Questions I ask</strong><p>What triggers the decision? What reduces risk? Why this business? What has the buyer already learned before speaking to us?</p></div>
+              <div class="engine-questions"><strong>Questions I ask</strong>
+                <p>Would a buyer choose you if nobody sold to them?</p>
+                <p>What must they believe before they ever speak to sales?</p>
+                <p>Where does uncertainty push them towards a competitor?</p>
+              </div>
             </div>
             <div class="engine-now"><span>Exploring now</span><p>How AI changes discovery, comparison, trust, and shortlisting before the first human conversation.</p></div>
           </article>
@@ -234,7 +238,11 @@
             <p>A sales process should reflect what has changed for the customer, not just what the seller has completed.</p>
             <div class="engine-panel-columns">
               <div><strong>Perspective</strong><p>£50m+ seller-side P&amp;L ownership, enterprise accounts, pricing, negotiation, and strategic growth.</p></div>
-              <div><strong>Questions I ask</strong><p>Who is worth pursuing? What proves progress? Where do value, price, qualification, or negotiation break down?</p></div>
+              <div class="engine-questions"><strong>Questions I ask</strong>
+                <p>What changed for the buyer, not just in your CRM?</p>
+                <p>Which opportunities deserve time — and which should die?</p>
+                <p>Where are value, price, or risk really stalling the decision?</p>
+              </div>
             </div>
           </article>
 
@@ -244,13 +252,41 @@
             <p>People, process, data, and automation should make strong commercial judgement easier to repeat, not bury it in administration.</p>
             <div class="engine-panel-columns">
               <div><strong>Perspective</strong><p>Forecasting, pricing, CRM change, commercial process, AI propositions, team leadership, and ventures built from scratch.</p></div>
-              <div><strong>Questions I ask</strong><p>Could another strong person run this? Does the forecast reflect evidence? What should people own, and what should technology remove?</p></div>
+              <div class="engine-questions"><strong>Questions I ask</strong>
+                <p>What breaks if your best commercial person leaves?</p>
+                <p>Is your forecast buyer evidence or seller optimism?</p>
+                <p>What should AI remove, rather than merely add?</p>
+              </div>
             </div>
           </article>
         </div>
       </div>
 
-      <p class="commercial-map-foot reveal"><strong>The joins matter.</strong> BUY should shape SELL. SELL should create evidence BUILD can measure. BUILD should remove friction from both. Many commercial problems sit in the handoffs.</p>
+      <div class="commercial-pressure reveal" data-commercial-pressure>
+        <div class="pressure-head">
+          <div>
+            <span class="pressure-kicker">Pressure test the engine</span>
+            <h3>What feels wrong?</h3>
+          </div>
+          <p>Pick the symptom. The first question matters more than the fashionable solution.</p>
+        </div>
+
+        <div class="pressure-options" role="group" aria-label="Commercial pressure test">
+          <button type="button" class="pressure-option is-active" data-pressure="conversion">Interest, but not enough revenue</button>
+          <button type="button" class="pressure-option" data-pressure="forecast">Pipeline looks healthy. Forecast doesn’t.</button>
+          <button type="button" class="pressure-option" data-pressure="people">Growth depends on a few people</button>
+          <button type="button" class="pressure-option" data-pressure="tools">More tools. Not less work.</button>
+          <button type="button" class="pressure-option" data-pressure="difference">Customers don’t see the difference</button>
+        </div>
+
+        <div class="pressure-result" aria-live="polite">
+          <div class="pressure-lens"><span>START WITH</span><strong data-pressure-lens>SELL</strong></div>
+          <div class="pressure-copy">
+            <p class="pressure-question" data-pressure-question>At what buyer decision do good opportunities stop moving?</p>
+            <p class="pressure-first-move" data-pressure-move>Review five wins and five stalled or lost deals against buyer milestones, not seller activity.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="experience" class="section experience">
