@@ -589,3 +589,6 @@ footer{max-width:var(--max);margin:0 auto;padding:30px 28px 50px;border-top:1px 
 .pressure-copy p{margin:0}.pressure-question{color:#e1e8e3;font:700 16px/1.35 Manrope,sans-serif;letter-spacing:-.02em}.pressure-first-move{margin-top:7px!important;color:#849289!important;font-size:11px;line-height:1.55}
 @media(max-width:1120px){.engine-questions p{white-space:normal}}
 @media(max-width:620px){.pressure-head{grid-template-columns:1fr;gap:9px}.commercial-pressure{padding:22px 20px}.pressure-options{display:grid;grid-template-columns:1fr}.pressure-option{text-align:left;border-radius:12px}.pressure-result{grid-template-columns:1fr;gap:10px}.pressure-question{font-size:15px}}
+
+.engine-questions p b{color:#708178;font:800 8px Manrope,sans-serif;letter-spacing:.08em}
+.pressure-lens em{display:block;margin-top:5px;color:#788a7e;font-style:normal;font-size:9px;line-height:1.25}
