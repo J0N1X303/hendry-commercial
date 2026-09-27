@@ -181,6 +181,52 @@
     });
   }
 
+
+  const pressureTest = document.querySelector('[data-commercial-pressure]');
+  if (pressureTest) {
+    const pressureData = {
+      conversion: {
+        lens: 'SELL',
+        question: 'At what buyer decision do good opportunities stop moving?',
+        move: 'Review five wins and five stalled or lost deals against buyer milestones, not seller activity.'
+      },
+      forecast: {
+        lens: 'SELL',
+        question: 'Which deals have buyer evidence — and which are seller optimism?',
+        move: 'Strip the forecast back to observable buyer commitments, next decisions, and genuine commercial risk.'
+      },
+      people: {
+        lens: 'BUILD',
+        question: 'What disappears when your best commercial person is out of the room?',
+        move: 'Separate the judgement only they can provide from the repeatable work, data, and decisions the system should carry.'
+      },
+      tools: {
+        lens: 'BUILD',
+        question: 'Which hours of commercial work has the technology actually removed?',
+        move: 'Map each tool to a task removed, a decision improved, or a handoff shortened. If it does none, it is overhead.'
+      },
+      difference: {
+        lens: 'BUY',
+        question: 'Could a buyer explain why they should choose you without repeating your homepage?',
+        move: 'Compare your public proof with two real alternatives against the questions a serious buyer actually asks.'
+      }
+    };
+    const options = [...pressureTest.querySelectorAll('[data-pressure]')];
+    const lens = pressureTest.querySelector('[data-pressure-lens]');
+    const question = pressureTest.querySelector('[data-pressure-question]');
+    const move = pressureTest.querySelector('[data-pressure-move]');
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        const selected = pressureData[option.dataset.pressure];
+        if (!selected) return;
+        options.forEach((item) => item.classList.toggle('is-active', item === option));
+        if (lens) lens.textContent = selected.lens;
+        if (question) question.textContent = selected.question;
+        if (move) move.textContent = selected.move;
+      });
+    });
+  }
+
   const cvDialog = document.querySelector('[data-cv-dialog]');
   const cvForm = document.querySelector('[data-cv-form]');
   const cvStatus = document.querySelector('[data-cv-status]');
