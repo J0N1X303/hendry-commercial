@@ -160,6 +160,27 @@
   }
 
 
+  const commercialMap = document.querySelector('[data-commercial-map]');
+  if (commercialMap) {
+    const tabs = [...commercialMap.querySelectorAll('[data-engine-tab]')];
+    const panels = [...commercialMap.querySelectorAll('[data-engine-panel]')];
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.engineTab;
+        tabs.forEach((item) => {
+          const active = item === tab;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+          const active = panel.dataset.enginePanel === target;
+          panel.hidden = !active;
+          panel.classList.toggle('is-active', active);
+        });
+      });
+    });
+  }
+
   const cvDialog = document.querySelector('[data-cv-dialog]');
   const cvForm = document.querySelector('[data-cv-form]');
   const cvStatus = document.querySelector('[data-cv-status]');
