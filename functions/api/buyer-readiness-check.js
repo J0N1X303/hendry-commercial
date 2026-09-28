@@ -237,7 +237,10 @@ function keywordPresent(text, rx) {
   return rx.test(text.toLowerCase());
 }
 
-function whyItMatters(dimension) {
+function whyItMatters(dimension, id = "") {
+  if (id === "C20") return "Explicit question-and-answer content gives buyers — and AI-assisted research — a clearer source for common questions instead of making them infer answers across multiple pages.";
+  if (id === "C30") return "A buyer can understand how you deliver the work and still hesitate if they cannot see what happens after first contact, how the opportunity is scoped, or how an engagement actually begins.";
+  if (id === "T20") return "Recognisable logos and testimonials build confidence quickly, but detailed proof helps a cautious buyer verify outcomes before committing you to a shortlist.";
   if (dimension === "discover") return "If a buyer starts with the need or location rather than your name, clear context helps them decide whether you belong on the shortlist.";
   if (dimension === "trust") return "Proof is most useful when a buyer can connect it quickly to the claim or part of the offer they are evaluating.";
   if (dimension === "compare") return "When key answers are spread across pages or documents, buyers — and the tools helping them research — have to assemble the picture themselves.";
@@ -247,7 +250,7 @@ function whyItMatters(dimension) {
 }
 
 function makeFinding(id, dimension, title, observation, evidence) {
-  return { id, dimension, title, observation, why: whyItMatters(dimension), confidence: evidence.length > 1 ? 0.9 : 0.8, evidence };
+  return { id, dimension, title, observation, why: whyItMatters(dimension, id), confidence: evidence.length > 1 ? 0.9 : 0.8, evidence };
 }
 
 function choosePages(allLinks) {
