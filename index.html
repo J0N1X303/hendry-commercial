@@ -61,7 +61,7 @@
     .output-tile h4{font-family:Manrope,sans-serif;font-size:1.12rem;margin:0 0 8px}
     .output-tile p{color:rgba(238,237,231,.66);line-height:1.6;margin:0}
     .output-tile a{display:inline-block;margin-top:14px;color:#9af0bb;text-decoration:none;font-weight:800}
-    .output-note{display:inline-block;margin-top:14px;color:rgba(238,237,231,.45);font-size:.82rem}
+    .output-note{display:inline-block;margin-top:14px;color:rgba(238,237,231,.45);font-size:.82rem}.publication-output{display:grid;grid-template-columns:86px minmax(0,1fr);gap:18px;align-items:start}.output-cover{display:block}.output-cover img{display:block;width:86px;aspect-ratio:5/8;object-fit:cover;border-radius:3px;box-shadow:0 14px 30px rgba(0,0,0,.32);transition:transform .2s ease,box-shadow .2s ease}.output-cover:hover img{transform:translateY(-2px);box-shadow:0 18px 34px rgba(0,0,0,.42)}.publication-output>div{min-width:0}
     .supporting-builds{margin-top:0}
     .quieter-build{opacity:.9}
     .common-thread{padding-top:clamp(28px,6vw,76px)}
@@ -77,6 +77,8 @@
     @media (max-width:860px){
       .narrative-bridge-inner,.common-thread-card{grid-template-columns:1fr}
       .story-outputs{grid-template-columns:1fr}
+      .publication-output{grid-template-columns:72px minmax(0,1fr)}
+      .output-cover img{width:72px}
       .site-header nav{gap:12px}
       .site-header nav a{font-size:.86rem}
     }
@@ -247,11 +249,14 @@
               <p>A live diagnostic that looks at a website from the buyer’s point of view and reports only evidence-backed observations rather than manufacturing a score.</p>
               <a href="/check">Run the check →</a>
             </div>
-            <div class="output-tile">
-              <span class="output-label">PUBLICATION</span>
-              <h4>Before They Call You</h4>
-              <p>The deeper thinking behind the experiment: how discovery, proof, comparison, and AI are changing the buying journey before the first enquiry.</p>
-              <span class="output-note">The thinking behind the experiment</span>
+            <div class="output-tile publication-output">
+              <a class="output-cover" href="/before-they-call-you/" aria-label="Read more about Before They Call You"><img src="/assets/before-they-call-you-book-cover.svg" alt="Cover of Before They Call You by Jonathan Hendry" loading="lazy"></a>
+              <div>
+                <span class="output-label">PUBLICATION</span>
+                <h4>Before They Call You</h4>
+                <p>The deeper thinking behind the experiment: how discovery, proof, comparison, and AI are changing the buying journey before the first enquiry.</p>
+                <a href="/before-they-call-you/">Explore the book →</a>
+              </div>
             </div>
           </div>
         </article>
@@ -269,11 +274,14 @@
               <p>Started as a 60-second game, then evolved into practical job-search tools and resources.</p>
               <a href="https://cvchaos.co.uk" target="_blank" rel="noreferrer">Visit CV Chaos ↗</a>
             </div>
-            <div class="output-tile">
-              <span class="output-label">PUBLISHED</span>
-              <h4>Made Redundant. Now What?</h4>
-              <p>A practical field guide built from the system I developed around evidence, positioning, AI, routes to market, pipeline management, interviews, and decisions.</p>
-              <a href="https://www.amazon.co.uk/dp/B0HKWHMFNP" target="_blank" rel="noreferrer">View the book ↗</a>
+            <div class="output-tile publication-output">
+              <a class="output-cover" href="https://cvchaos.co.uk/redundancy/?utm_source=hendrycommercial&utm_medium=referral&utm_campaign=book" target="_blank" rel="noreferrer" aria-label="Read more about Made Redundant. Now What?"><img src="/assets/made-redundant-book-cover.svg" alt="Cover of Made Redundant. Now What? by Jonathan S. Hendry" loading="lazy"></a>
+              <div>
+                <span class="output-label">PUBLISHED</span>
+                <h4>Made Redundant. Now What?</h4>
+                <p>A practical field guide built from the system I developed around evidence, positioning, AI, routes to market, pipeline management, interviews, and decisions.</p>
+                <a href="https://cvchaos.co.uk/redundancy/?utm_source=hendrycommercial&utm_medium=referral&utm_campaign=book" target="_blank" rel="noreferrer">Explore the book ↗</a>
+              </div>
             </div>
           </div>
         </article>
