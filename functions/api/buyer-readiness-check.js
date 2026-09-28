@@ -445,6 +445,10 @@ async function scanSite(input) {
   const hasFAQ = keywordPresent(combined, /frequently asked|\bfaqs?\b|questions? (we|you)/);
   const hasProcess = keywordPresent(combined, /how it works|our process|what happens next|step 1|step one|viewing|visit|appointment/);
   const hasStrongCTA = keywordPresent(combined, /request a quote|get a quote|book (a|your)|make an enquiry|enquire now|schedule|contact us|speak to|arrange a viewing/);
+
+  const hasDeliveryJourney = /diagnose|discovery.{0,40}design|design.{0,40}deliver|deliver.{0,40}embed|programme design|learning journey delivery|embedding & scale|our approach/i.test(combinedText);
+  const buyerJourneyLinks = allLinks.filter(l => /how-we-work|working-with-us|what-to-expect|getting-started|next-steps|client-journey|buying-process|our-process/i.test((l.label + " " + l.path).toLowerCase()));
+  const buyerJourneyLanguage = /what happens next|from first conversation|after your first call|after the first call|from enquiry|from inquiry|scoping.{0,60}proposal|proposal.{0,60}kickoff|proposal.{0,60}kick-off|contract.{0,60}kickoff|contract.{0,60}kick-off|what to expect when working with us/i.test(combinedText);
   const structured = schema.types.length > 0;
   const proofCount = [hasTestimonials, hasCases, hasAwards].filter(Boolean).length;
   const offerPagesWithProof = offerPages.filter(p => /testimonial|review|case stud|customer story|real wedding|hitched|award|accredit|trusted by|global clients/i.test(textOnly(p.html))).length;
@@ -511,6 +515,24 @@ async function scanSite(input) {
     ));
   }
 
+  if (
+    primary !== "wedding venue" &&
+    hasDeliveryJourney &&
+    buyerJourneyLinks.length === 0 &&
+    !buyerJourneyLanguage
+  ) {
+    findings.push(makeFinding(
+      "C30",
+      "compare",
+      "The delivery journey is clearer than the buying journey.",
+      "The site explains how the work is designed and delivered, but gives less explicit guidance on what a prospective client should expect between first contact and the start of an engagement.",
+      [
+        { fact: "A delivery/process journey is clearly described" },
+        { fact: "No dedicated buyer-journey or what-to-expect route detected" }
+      ]
+    ));
+  }
+
   if (offers.length >= 2 && offerPages.length < 2) {
     findings.push(makeFinding("U02", "understand", "Several offers are mentioned, but few have dedicated space to be understood.", "The site appears to reference multiple services or offers, while giving buyers limited dedicated pages to investigate them individually.", [{ fact: offers.slice(0, 3).join(", ") }, { fact: offerPages.length + " dedicated offer pages found in this scan" }]));
   }
@@ -569,7 +591,9 @@ async function scanSite(input) {
       decision_documents: decisionPdfLinks,
       faq_pages: faqPages.length,
       standalone_faq_links: standaloneFaqLinks.length,
-      deep_proof_links: deepProofLinks.length
+      deep_proof_links: deepProofLinks.length,
+      buyer_journey_links: buyerJourneyLinks.length,
+      buyer_journey_language: buyerJourneyLanguage
     }
   };
 }
