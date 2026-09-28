@@ -1,5 +1,5 @@
 (() => {
-  const state = { website:"", result:null, name:"", email:"" };
+  const state = { website:"", result:null, name:"", email:"", lead_id:"", created_at:"" };
   const screens = [...document.querySelectorAll("[data-screen]")];
   const show = (name) => { screens.forEach(s => { s.hidden = s.dataset.screen !== name; }); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const norm = (v) => { let x=(v||"").trim(); if(!x) return ""; if(!/^https?:\/\//i.test(x)) x="https://"+x; try { return new URL(x).href; } catch { return ""; } };
@@ -7,6 +7,47 @@
   const esc = (s="") => s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
   const STORAGE_KEY = "hcBuyerReadiness";
   const saveState = () => { try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {} };
+  const ensureLeadIdentity = () => {
+    if(!state.lead_id){
+      state.lead_id = (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("lead-"+Date.now()+"-"+Math.random().toString(16).slice(2));
+    }
+    if(!state.created_at) state.created_at = new Date().toISOString();
+  };
+  const handoffPayload = (commercialContext={}) => {
+    ensureLeadIdentity();
+    const r=state.result||{};
+    return {
+      schema_version:"buyer-readiness-lead-1",
+      lead_id:state.lead_id,
+      created_at:state.created_at,
+      updated_at:new Date().toISOString(),
+      source:"hendrycommercial_check",
+      status: commercialContext && Object.values(commercialContext).every(v=>String(v||"").trim()) ? "qualified" : "snapshot",
+      contact:{name:state.name,email:state.email},
+      business:{
+        name:r.business?.name||r.domain||"",
+        website:state.website,
+        domain:r.domain||"",
+        description:r.business?.description||""
+      },
+      snapshot:{
+        strength:r.strength||{},
+        opportunities:r.opportunities||[],
+        buyer_search_examples:r.buyer_search_examples||[],
+        facts:r.facts||{},
+        coverage:r.coverage||{}
+      },
+      commercial_context:commercialContext||{}
+    };
+  };
+  const sendHandoff = (commercialContext={}) => {
+    try{
+      const payload=handoffPayload(commercialContext);
+      const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
+      navigator.sendBeacon("/api/buyer-readiness-store",blob);
+      saveState();
+    }catch{}
+  };
   const restoreState = () => { try { const raw=sessionStorage.getItem(STORAGE_KEY); if(!raw) return false; const saved=JSON.parse(raw); if(saved&&saved.website) Object.assign(state,saved); return !!state.result; } catch { return false; } };
 
   async function runScan(website){
