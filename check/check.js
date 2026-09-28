@@ -52,7 +52,7 @@
     (r.buyer_search_examples||[]).forEach(x=>searches.insertAdjacentHTML("beforeend",'<span>'+esc(x)+'</span>'));
     const count=(r.opportunities||[]).length;
     document.querySelector("[data-finding-count]").textContent=count||"—";
-    document.querySelector(".unlock-card strong").textContent=count===1?"thing worth looking at":count>1?"things worth looking at":"a result worth reviewing";
+    document.querySelector(".unlock-card strong").textContent=count===1?"area worth a closer look":count>1?"areas worth a closer look":"a result worth reviewing";
   }
 
   function renderSnapshot(r){
@@ -79,7 +79,20 @@
   });
 
   document.querySelector("[data-open-capture]")?.addEventListener("click",()=>{
-    const summary=JSON.stringify({domain:state.result?.domain,strength:state.result?.strength?.title,opportunities:(state.result?.opportunities||[]).map(x=>x.title),searches:state.result?.buyer_search_examples||[]});
+    const summary=[
+      "Business: "+(state.result?.business?.name||state.result?.domain||""),
+      "Website: "+state.website,
+      "",
+      "Comes through clearly:",
+      state.result?.strength?.title||"",
+      state.result?.strength?.observation||"",
+      "",
+      "Areas worth a closer look:",
+      ...(state.result?.opportunities||[]).flatMap((x,i)=>[(i+1)+". "+x.title,x.observation]),
+      "",
+      "Buyer search examples:",
+      ...(state.result?.buyer_search_examples||[])
+    ].join("\n");
     document.querySelector("[data-capture-website]").value=state.website;
     document.querySelector("[data-capture-summary]").value=summary;
     show("capture");
@@ -88,6 +101,10 @@
   document.querySelector("[data-capture-form]")?.addEventListener("submit",async(e)=>{
     e.preventDefault(); const form=e.currentTarget; const btn=form.querySelector("button[type=submit]"); const error=document.querySelector("[data-capture-error]");
     state.name=form.elements.name.value.trim(); state.email=form.elements.email.value.trim();
+    const cc=form.querySelector("[data-capture-cc]");
+    const replyto=form.querySelector("[data-capture-replyto]");
+    if(cc) cc.value=state.email;
+    if(replyto) replyto.value=state.email;
     btn.disabled=true; btn.textContent="Opening your snapshot…"; error.textContent="";
     try{
       const response=await fetch(form.action,{method:"POST",headers:{"Accept":"application/json"},body:new FormData(form)});
@@ -97,6 +114,8 @@
       document.querySelector("[data-qualify-website]").value=state.website;
       document.querySelector("[data-qualify-name]").value=state.name;
       document.querySelector("[data-qualify-email]").value=state.email;
+      const qReply=document.querySelector("[data-qualify-replyto]");
+      if(qReply) qReply.value=state.email;
       show("snapshot");
     }catch{
       error.textContent="I couldn't save that just now. Please try again.";
