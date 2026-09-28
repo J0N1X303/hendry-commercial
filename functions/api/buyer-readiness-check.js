@@ -216,8 +216,17 @@ function keywordPresent(text, rx) {
   return rx.test(text.toLowerCase());
 }
 
+function whyItMatters(dimension) {
+  if (dimension === "discover") return "If a buyer starts with the need or location rather than your name, clear context helps them decide whether you belong on the shortlist.";
+  if (dimension === "trust") return "Proof is most useful when a buyer can connect it quickly to the claim or part of the offer they are evaluating.";
+  if (dimension === "compare") return "When key answers are spread across pages or documents, buyers — and the tools helping them research — have to assemble the picture themselves.";
+  if (dimension === "understand") return "A buyer cannot confidently compare an offer they have not fully understood.";
+  if (dimension === "act") return "Even an interested buyer can drop out if the next step is not obvious.";
+  return "";
+}
+
 function makeFinding(id, dimension, title, observation, evidence) {
-  return { id, dimension, title, observation, confidence: evidence.length > 1 ? 0.9 : 0.8, evidence };
+  return { id, dimension, title, observation, why: whyItMatters(dimension), confidence: evidence.length > 1 ? 0.9 : 0.8, evidence };
 }
 
 function choosePages(allLinks) {
@@ -322,6 +331,13 @@ async function scanSite(input) {
   }));
   pages.push(...fetched.filter(p => p.html));
 
+  const discoveredLinks = pages.flatMap(p => linksFrom(p.html, canonical));
+  const decisionPdfLinks = unique(
+    discoveredLinks
+      .filter(l => /\.pdf(?:$|\?)/i.test(l.url) && /faq|question|price|pricing|pricelist|brochure|package|menu|information|guide/i.test((l.label + " " + l.url).toLowerCase()))
+      .map(l => l.label || new URL(l.url).pathname.split("/").pop())
+  ).slice(0, 4);
+
   const combinedText = pages.map(p => textOnly(p.html)).join(" ");
   const combined = combinedText.toLowerCase();
   const schema = schemaFacts(home);
@@ -341,9 +357,10 @@ async function scanSite(input) {
   const hasStrongCTA = keywordPresent(combined, /request a quote|get a quote|book (a|your)|make an enquiry|enquire now|schedule|contact us|speak to|arrange a viewing/);
   const structured = schema.types.length > 0;
   const proofCount = [hasTestimonials, hasCases, hasAwards].filter(Boolean).length;
+  const offerPagesWithProof = offerPages.filter(p => /testimonial|review|case stud|real wedding|hitched|award|accredit/i.test(textOnly(p.html))).length;
 
   let strength;
-  if (proofCount >= 2) strength = { dimension: "trust", title: "There is real proof for a buyer to work with.", observation: "The site surfaces more than one form of credibility evidence — such as customer proof, examples of work, awards, accreditations or experience." };
+  if (proofCount >= 2) strength = { dimension: "trust", title: primary === "wedding venue" ? "There is strong proof behind the venue." : "There is strong proof behind the business.", observation: "We found more than one form of credibility evidence, including customer proof, examples of work, awards, accreditations or experience." };
   else if (offerPages.length >= 3) strength = { dimension: "understand", title: "Your offer is given room to explain itself.", observation: "We found several dedicated pages for services or products rather than relying on the homepage to explain everything." };
   else if (hasStrongCTA) strength = { dimension: "act", title: "The next step is visible.", observation: "A buyer who is convinced can find a clear route to contact, enquire, request a quote or book." };
   else strength = { dimension: "understand", title: "The business can be identified from the public site.", observation: "The homepage gives enough information to establish the organisation and at least part of what it offers." };
@@ -352,19 +369,23 @@ async function scanSite(input) {
   const majorLocs = locations.filter(l => ["Berkshire", "Reading", "Newbury", "Hampshire", "London"].includes(l)).slice(0, 3);
 
   if (primary === "wedding venue" && majorLocs.length && !hasDedicatedLocationPage(pages, majorLocs, primary)) {
-    findings.push(makeFinding("D10", "discover", "Location relevance is visible, but not clearly organised around buyer searches.", `We detected location signals such as ${majorLocs.join(", ")}, but not a clear page or section connecting the venue to the location-led searches buyers are likely to use.`, [{ fact: `Locations detected: ${majorLocs.join(", ")}` }, { fact: "No dedicated location-intent page detected in the pages checked" }]));
+    findings.push(makeFinding("D10", "discover", "The venue is easy to place, but nearby-search relevance is less explicit.", `The site clearly gives us location signals such as ${majorLocs.join(", ")}. What we did not find was a dedicated page or section connecting the venue to the nearby-location searches buyers may use when building a shortlist.`, [{ fact: `Location signals found: ${majorLocs.join(", ")}` }, { fact: "No dedicated location-intent page detected in the pages checked" }]));
   } else if (locations.length === 0 && keywordPresent(combined, /local|nearby|service area|areas we cover|based in|across the uk|nationwide|berkshire|reading/)) {
     findings.push(makeFinding("D01", "discover", "Geographic relevance is discussed, but not strongly structured.", "The site appears to talk about where it works, but we could not confidently extract a clear locality or service-area signal from the public structure.", [{ fact: "Geographic language detected" }, { fact: "No structured locality/service-area signal extracted" }]));
   }
 
   if (proofCount === 0) {
     findings.push(makeFinding("T01", "trust", "Credibility is harder to verify than the offer itself.", "Across the pages checked, we found little obvious customer proof, case evidence, awards, accreditations or experience evidence for a cautious buyer to verify.", [{ fact: "No strong proof pattern detected across " + pages.length + " pages" }]));
-  } else if ((hasTestimonials || hasAwards || hasCases) && (proofPages.length < 2 || primary === "wedding venue")) {
-    findings.push(makeFinding("T12", "trust", "Proof exists, but it may not help comparison quickly.", "The site contains credibility signals, but the proof appears to be relatively general or thinly distributed rather than clearly helping a buyer compare the venue with alternatives.", [{ fact: "Proof signals detected" }, { fact: proofPages.length + " proof-focused pages checked" }]));
+  } else if ((hasTestimonials || hasAwards || hasCases) && primary === "wedding venue" && offerPagesWithProof < Math.min(2, Math.max(1, offerPages.length))) {
+    findings.push(makeFinding("T12", "trust", "Strong proof exists, but it is not consistently tied to the offer.", "We found testimonials, real-wedding evidence or other credibility signals, but relatively little of that proof appears directly within the venue and offer pages we checked.", [{ fact: "Dedicated proof signals were found" }, { fact: offerPagesWithProof + " of " + offerPages.length + " offer pages checked contained obvious proof signals" }]));
+  } else if ((hasTestimonials || hasAwards || hasCases) && proofPages.length < 2) {
+    findings.push(makeFinding("T12", "trust", "Proof exists, but it is concentrated in relatively few places.", "The site contains credibility signals, but they are not spread widely across the pages a buyer may use to understand and compare the offer.", [{ fact: "Proof signals detected" }, { fact: proofPages.length + " proof-focused pages checked" }]));
   }
 
-  if (primary === "wedding venue") {
-    findings.push(makeFinding("C12", "compare", "Important decision information may still need piecing together.", "For a considered choice like a wedding venue, buyers usually need capacity, availability, packages, viewings, accommodation and practical next steps. The scan found useful information, but not a strong central route through those buying questions.", [{ fact: decisionPages.length + " decision-focused pages checked" }, { fact: "Wedding venue research is usually a high-consideration journey" }]));
+  if (primary === "wedding venue" && decisionPdfLinks.length) {
+    findings.push(makeFinding("C12", "compare", "Some important buying answers sit outside the main page flow.", "We found useful decision information in downloadable documents such as FAQs, pricing or guides. Buyers can still reach it, but some of the picture sits outside the pages they are already reading.", [{ fact: "Decision documents found: " + decisionPdfLinks.join(", ") }, { fact: decisionPages.length + " decision-focused web pages checked" }]));
+  } else if (primary === "wedding venue") {
+    findings.push(makeFinding("C12", "compare", "Important decision information is spread across the journey.", "The site contains useful information for prospective couples, but the scan did not find one clear route bringing the main comparison questions together.", [{ fact: decisionPages.length + " decision-focused pages checked" }, { fact: "No single consolidated decision route detected in the pages checked" }]));
   } else if (!hasFAQ && !hasProcess && decisionPages.length === 0) {
     findings.push(makeFinding("C01", "compare", "The offer is easier to see than the buying process.", "We did not find an obvious FAQ, process or how-it-works route helping a buyer understand what happens after initial interest.", [{ fact: "No clear FAQ/process page detected" }]));
   }
@@ -413,7 +434,9 @@ async function scanSite(input) {
       proof_pages: proofPages.length,
       decision_pages: decisionPages.length,
       canonical_host: canonical.hostname,
-      location_mentions: locationMentionsByPage(pages, locations)
+      location_mentions: locationMentionsByPage(pages, locations),
+      offer_pages_with_proof: offerPagesWithProof,
+      decision_documents: decisionPdfLinks
     }
   };
 }
