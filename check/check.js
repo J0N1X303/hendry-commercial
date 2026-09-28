@@ -108,7 +108,32 @@
     state.name=form.elements.name.value.trim(); state.email=form.elements.email.value.trim(); error.textContent=""; btn.disabled=true; btn.textContent="Sending…"; saveState();
     try{
       const result=state.result||{};
-      const data=await postLead({stage:"free_snapshot",name:state.name,email:state.email,website:state.website,company_website:form.elements.company_website?.value||"",business_name:result.business?.name||result.domain||"",domain:result.domain||"",strength_title:result.strength?.title||"",strength_body:result.strength?.observation||"",opportunities:result.opportunities||[],buyer_search_examples:result.buyer_search_examples||[],snapshot_summary:snapshotSummary()});
+      ensureLeadIdentity();
+      const data=await postLead({
+        stage:"free_snapshot",
+        lead_id:state.lead_id,
+        created_at:state.created_at,
+        updated_at:new Date().toISOString(),
+        name:state.name,
+        email:state.email,
+        website:state.website,
+        company_website:form.elements.company_website?.value||"",
+        business_name:result.business?.name||result.domain||"",
+        domain:result.domain||"",
+        business_description:result.business?.description||"",
+        strength_title:result.strength?.title||"",
+        strength_body:result.strength?.observation||"",
+        opportunities:result.opportunities||[],
+        buyer_search_examples:result.buyer_search_examples||[],
+        snapshot:{
+          strength:result.strength||{},
+          opportunities:result.opportunities||[],
+          buyer_search_examples:result.buyer_search_examples||[],
+          facts:result.facts||{},
+          coverage:result.coverage||{}
+        },
+        snapshot_summary:snapshotSummary()
+      });
       renderSnapshot(state.result); show("snapshot");
       if(data.warning){ const heading=document.querySelector(".snapshot-heading"); if(heading&&!heading.querySelector(".delivery-note")){ const note=document.createElement("p"); note.className="delivery-note"; note.textContent=data.warning; heading.appendChild(note); } }
     }catch(err){ error.textContent="I couldn't send that just now. Please try again."; }
@@ -121,7 +146,38 @@
     e.preventDefault();
     const form=e.currentTarget; const btn=form.querySelector("button[type=submit]"); const error=document.querySelector("[data-qualify-error]");
     error.textContent=""; btn.disabled=true; btn.textContent="Saving…"; saveState();
-    try{ await postLead({stage:"qualified_lead",website:state.website,name:state.name,email:state.email,company_website:form.elements.company_website?.value||"",growth_priority:form.elements.growth_priority.value,desired_buyer:form.elements.desired_buyer.value,customer_value:form.elements.customer_value.value,desired_understanding:form.elements.desired_understanding.value,snapshot_strength:state.result?.strength?.title||"",snapshot_opportunities:(state.result?.opportunities||[]).map(x=>x.title).join(" | ")}); show("complete"); }
+    try{
+      ensureLeadIdentity();
+      const result=state.result||{};
+      await postLead({
+        stage:"qualified_lead",
+        lead_id:state.lead_id,
+        created_at:state.created_at,
+        updated_at:new Date().toISOString(),
+        website:state.website,
+        name:state.name,
+        email:state.email,
+        company_website:form.elements.company_website?.value||"",
+        business_name:result.business?.name||result.domain||"",
+        domain:result.domain||"",
+        business_description:result.business?.description||"",
+        snapshot:{
+          strength:result.strength||{},
+          opportunities:result.opportunities||[],
+          buyer_search_examples:result.buyer_search_examples||[],
+          facts:result.facts||{},
+          coverage:result.coverage||{}
+        },
+        growth_priority:form.elements.growth_priority.value,
+        desired_buyer:form.elements.desired_buyer.value,
+        customer_value:form.elements.customer_value.value,
+        desired_understanding:form.elements.desired_understanding.value,
+        snapshot_strength:result.strength?.title||"",
+        snapshot_opportunities:(result.opportunities||[]).map(x=>x.title).join(" | ")
+      });
+      saveState();
+      show("complete");
+    }
     catch(err){ error.textContent="I couldn't save that just now. Please try again."; }
     finally{ btn.disabled=false; btn.innerHTML='Finish and see the next step <span>→</span>'; }
   });
