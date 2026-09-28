@@ -479,19 +479,24 @@ async function scanSite(input) {
     findings.push(makeFinding("C12", "compare", "Some important buying answers sit outside the main page flow.", "We found useful decision information in downloadable documents such as FAQs, pricing or guides. Buyers can still reach it, but some of the picture sits outside the pages they are already reading.", [{ fact: "Decision documents found: " + decisionPdfLinks.join(", ") }, { fact: decisionPages.length + " decision-focused web pages checked" }]));
   } else if (primary === "wedding venue") {
     findings.push(makeFinding("C12", "compare", "Important decision information is spread across the journey.", "The site contains useful information for prospective couples, but the scan did not find one clear route bringing the main comparison questions together.", [{ fact: decisionPages.length + " decision-focused pages checked" }, { fact: "No single consolidated decision route detected in the pages checked" }]));
-  } else if (!hasFAQ && !hasProcess && decisionPages.length === 0) {
-    findings.push(makeFinding("C01", "compare", "The offer is easier to see than the buying process.", "We did not find an obvious FAQ, process or how-it-works route helping a buyer understand what happens after initial interest.", [{ fact: "No clear FAQ/process page detected" }]));
+  } else if (!hasFAQ && !hasProcess && decisionPages.length === 0 && standaloneFaqLinks.length > 0) {
+    findings.push(makeFinding("C01", "compare", "The offer is easier to see than the buying process.", "We did not find an obvious process or how-it-works route helping a buyer understand what happens after initial interest.", [{ fact: "No clear process/how-it-works page detected" }]));
   }
 
-  if (primary !== "wedding venue" && faqPages.length >= 2 && standaloneFaqLinks.length === 0) {
+  if (primary !== "wedding venue" && standaloneFaqLinks.length === 0) {
+    const hasScatteredFaq = faqPages.length > 0 || hasFAQ;
     findings.push(makeFinding(
       "C20",
       "compare",
-      "Useful buyer questions are answered, but across several pages.",
-      "We found FAQ content in multiple parts of the site. That is useful, but a buyer with cross-cutting questions may need to move between solution and approach pages to assemble the full picture.",
+      hasScatteredFaq
+        ? "Buyer questions are answered, but there is no dedicated FAQ hub."
+        : "There is no obvious FAQ route for common buyer questions.",
+      hasScatteredFaq
+        ? "We found FAQ-style answers within the site, but no standalone FAQ destination linked from the homepage. Bringing recurring buyer questions together would make those answers easier to find and reuse."
+        : "The pages checked did not expose a dedicated FAQ destination. A clear buyer-question page would give prospective customers — and machine-assisted research — one place to find explicit answers to common questions.",
       [
-        { fact: faqPages.length + " pages with FAQ content checked" },
-        { fact: "No standalone FAQ hub detected from the homepage" }
+        { fact: "No standalone FAQ route detected from the homepage" },
+        { fact: faqPages.length + " scanned page" + (faqPages.length === 1 ? "" : "s") + " contained obvious FAQ-style content" }
       ]
     ));
   }
