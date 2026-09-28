@@ -723,3 +723,34 @@ a[href]:focus-visible,button:focus-visible{outline:2px solid var(--accent);outli
   .output-card-cta{margin-top:13px;color:#e6f7ec}
   .commercial-summary .commercial-node::after{width:19px;height:19px;top:7px;right:7px;font-size:11px}
 }
+
+/* BUY / SELL / BUILD at the top are descriptors, not controls */
+.hero-terms{
+  gap:0;
+  align-items:stretch;
+  border-top:1px solid rgba(255,255,255,.08);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  padding:13px 0;
+  margin-top:30px
+}
+.hero-terms span{
+  min-width:0;
+  flex:1 1 0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:2px 18px 2px 0;
+  margin-right:18px;
+  transform:none!important;
+  cursor:default
+}
+.hero-terms span:not(:last-child){border-right:1px solid rgba(255,255,255,.08)}
+.hero-terms span:last-child{margin-right:0;padding-right:0}
+.hero-terms b{font-size:11px}
+.hero-terms small{font-size:10px;color:#78887e}
+@media(max-width:620px){
+  .hero-terms{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:11px 0}
+  .hero-terms span{padding:1px 10px 1px 0;margin-right:10px}
+  .hero-terms span:last-child{margin-right:0;padding-right:0}
+  .hero-terms small{font-size:8px;line-height:1.3}
+}
