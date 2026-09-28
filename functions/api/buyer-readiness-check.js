@@ -515,16 +515,25 @@ async function scanSite(input) {
 
   const dedup = [];
   const dims = new Set();
+  const seenFindings = new Set();
+
+  // Lead with breadth across the buyer journey, then include every other
+  // distinct evidence-backed finding rather than arbitrarily stopping at three.
   for (const f of findings) {
-    if (dedup.length >= 3) break;
-    if (!dims.has(f.dimension)) {
+    const key = f.id || (f.dimension + "|" + f.title);
+    if (!dims.has(f.dimension) && !seenFindings.has(key)) {
       dedup.push(f);
       dims.add(f.dimension);
+      seenFindings.add(key);
     }
   }
+
   for (const f of findings) {
-    if (dedup.length >= 3) break;
-    if (!dedup.includes(f)) dedup.push(f);
+    const key = f.id || (f.dimension + "|" + f.title);
+    if (!seenFindings.has(key)) {
+      dedup.push(f);
+      seenFindings.add(key);
+    }
   }
 
   const searches = searchExamples(primary, locations, combined, scopes);
