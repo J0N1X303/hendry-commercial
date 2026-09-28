@@ -49,7 +49,7 @@ export async function onRequestPost(context){
     const leadId=clean(body?.lead_id,120);
     const createdAt=clean(body?.created_at,80)||new Date().toISOString();
     const updatedAt=clean(body?.updated_at,80)||new Date().toISOString();
-    const status=["snapshot","qualified"].includes(clean(body?.status,30)) ? clean(body.status,30) : "snapshot";
+    const status=["scanned","snapshot","qualified"].includes(clean(body?.status,30)) ? clean(body.status,30) : "scanned";
     const contact=body?.contact&&typeof body.contact==="object" ? body.contact : {};
     const business=body?.business&&typeof body.business==="object" ? body.business : {};
     const email=clean(contact.email,320);
@@ -88,12 +88,20 @@ export async function onRequestPost(context){
       ) VALUES(?,?,?,?,?,?,?,?,?)
       ON CONFLICT(lead_id) DO UPDATE SET
         updated_at=excluded.updated_at,
-        status=excluded.status,
+        status=CASE
+        WHEN buyer_readiness_leads.status='qualified' THEN 'qualified'
+        WHEN buyer_readiness_leads.status='snapshot' AND excluded.status='scanned' THEN 'snapshot'
+        ELSE excluded.status
+      END,
         business_name=excluded.business_name,
         website=excluded.website,
         contact_name=excluded.contact_name,
         contact_email=excluded.contact_email,
-        payload_json=excluded.payload_json
+        payload_json=CASE
+        WHEN buyer_readiness_leads.status='qualified' AND excluded.status<>'qualified' THEN buyer_readiness_leads.payload_json
+        WHEN buyer_readiness_leads.status='snapshot' AND excluded.status='scanned' THEN buyer_readiness_leads.payload_json
+        ELSE excluded.payload_json
+      END
     `).bind(
       canonical.lead_id,
       canonical.created_at,
