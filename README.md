@@ -9,6 +9,9 @@ Open `index.html` in a browser.
 1. GitHub → Settings → Pages → Deploy from branch → `main` / root.
 2. Once live, add the chosen custom domain under Settings → Pages.
 
+## Buyer Readiness deployment notes
+Latest redeploy trigger: 2026-09-28 09:56 UK.
+
 ## Before public launch
 - Buy/confirm final domain.
 - Replace temporary Outlook `mailto:` with professional domain email.
