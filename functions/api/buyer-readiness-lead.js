@@ -95,6 +95,104 @@ async function sendEmail(env,{to,subject,html,text,replyTo}){
   return {ok:r.ok,status:r.status,data};
 }
 
+async function ensureLeadSchema(db){
+  await db.prepare(`
+    CREATE TABLE IF NOT EXISTS buyer_readiness_leads (
+      lead_id TEXT PRIMARY KEY,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      status TEXT NOT NULL,
+      business_name TEXT NOT NULL,
+      website TEXT NOT NULL,
+      contact_name TEXT NOT NULL DEFAULT '',
+      contact_email TEXT NOT NULL DEFAULT '',
+      payload_json TEXT NOT NULL
+    )
+  `).run();
+  await db.prepare(`
+    CREATE INDEX IF NOT EXISTS idx_buyer_readiness_leads_updated
+    ON buyer_readiness_leads(updated_at DESC)
+  `).run();
+}
+
+async function upsertCanonicalLead(env,body){
+  const db=env.BUYER_READINESS_DB;
+  if(!db) return {ok:false,message:"Lead inbox is not configured."};
+
+  const leadId=clean(body?.lead_id,120);
+  const createdAt=clean(body?.created_at,80)||new Date().toISOString();
+  const updatedAt=clean(body?.updated_at,80)||new Date().toISOString();
+  const stage=clean(body?.stage,60);
+  const status=stage==="qualified_lead" ? "qualified" : "snapshot";
+  const website=clean(body?.website,500);
+  const name=clean(body?.name,160);
+  const email=clean(body?.email,320);
+  const businessName=clean(body?.business_name,240) || clean(body?.domain,240) || website.replace(/^https?:\/\//,"").replace(/^www\./,"").split("/")[0];
+  if(!leadId || !website || !businessName) return {ok:false,message:"Canonical lead data is incomplete."};
+
+  const snapshot = body?.snapshot && typeof body.snapshot==="object" ? body.snapshot : {
+    strength:{
+      title:clean(body?.strength_title,500),
+      observation:clean(body?.strength_body,1200)
+    },
+    opportunities:Array.isArray(body?.opportunities)?body.opportunities:[],
+    buyer_search_examples:Array.isArray(body?.buyer_search_examples)?body.buyer_search_examples:[],
+    facts:{},
+    coverage:{}
+  };
+  const commercialContext = status==="qualified" ? {
+    growth_priority:clean(body?.growth_priority,2500),
+    desired_buyer:clean(body?.desired_buyer,2500),
+    customer_value:clean(body?.customer_value,300),
+    desired_understanding:clean(body?.desired_understanding,3000)
+  } : {};
+
+  const canonical={
+    schema_version:"buyer-readiness-lead-1",
+    lead_id:leadId,
+    created_at:createdAt,
+    updated_at:updatedAt,
+    source:"hendrycommercial_check",
+    status,
+    contact:{name,email},
+    business:{
+      name:businessName,
+      website,
+      domain:clean(body?.domain,240),
+      description:clean(body?.business_description,1800)
+    },
+    snapshot,
+    commercial_context:commercialContext
+  };
+
+  await ensureLeadSchema(db);
+  await db.prepare(`
+    INSERT INTO buyer_readiness_leads(
+      lead_id,created_at,updated_at,status,business_name,website,contact_name,contact_email,payload_json
+    ) VALUES(?,?,?,?,?,?,?,?,?)
+    ON CONFLICT(lead_id) DO UPDATE SET
+      updated_at=excluded.updated_at,
+      status=excluded.status,
+      business_name=excluded.business_name,
+      website=excluded.website,
+      contact_name=excluded.contact_name,
+      contact_email=excluded.contact_email,
+      payload_json=excluded.payload_json
+  `).bind(
+    canonical.lead_id,
+    canonical.created_at,
+    canonical.updated_at,
+    canonical.status,
+    canonical.business.name,
+    canonical.business.website,
+    canonical.contact.name,
+    canonical.contact.email,
+    JSON.stringify(canonical)
+  ).run();
+
+  return {ok:true,lead_id:canonical.lead_id,status:canonical.status};
+}
+
 export async function onRequestPost(context){
   try{
     const body=await context.request.json();
@@ -102,9 +200,12 @@ export async function onRequestPost(context){
     const stage=clean(body?.stage,60), name=clean(body?.name,160), email=clean(body?.email,320), website=clean(body?.website,500);
     if(!name || !validEmail(email) || !website) return json({success:false,message:"Please check your name, email and website."},400);
 
+    const stored=await upsertCanonicalLead(context.env,body);
+    if(!stored.ok) return json({success:false,message:stored.message||"I couldn't save your lead just now."},503);
+
     if(stage==="qualified_lead"){
       const sent=await sendEmail(context.env,{to:"jonny@hendrycommercial.co.uk",subject:`Qualified Buyer Readiness lead - ${name}`,html:ownerQualifiedHtml(body),text:`Qualified lead from ${name} (${email}) for ${website}`,replyTo:email});
-      return json({success:true,ownerSaved:sent.ok,warning:sent.ok?"":safeResendMessage(sent),owner_status:sent.status});
+      return json({success:true,leadStored:true,lead_id:stored.lead_id,status:stored.status,ownerSaved:sent.ok,warning:sent.ok?"":safeResendMessage(sent),owner_status:sent.status});
     }
 
     const parts=snapshotParts(body);
@@ -113,7 +214,7 @@ export async function onRequestPost(context){
     const warnings=[];
     if(!customer.ok) warnings.push(`Customer email failed: ${safeResendMessage(customer)}`);
     if(!owner.ok) warnings.push(`Owner email failed: ${safeResendMessage(owner)}`);
-    return json({success:true,customerEmailed:customer.ok,ownerSaved:owner.ok,warning:warnings.join(" | "),customer_status:customer.status,owner_status:owner.status});
+    return json({success:true,leadStored:true,lead_id:stored.lead_id,status:stored.status,customerEmailed:customer.ok,ownerSaved:owner.ok,warning:warnings.join(" | "),customer_status:customer.status,owner_status:owner.status});
   }catch(error){
     return json({success:true,warning:`Email diagnostic failed: ${clean(error?.message || error,240)}`});
   }
