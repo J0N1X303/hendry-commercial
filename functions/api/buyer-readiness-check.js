@@ -20,11 +20,18 @@ function tagText(html,tag){
   return out;
 }
 function meta(html,key){
-  const patterns=[
-    new RegExp('<meta[^>]+(?:name|property)=["\\']'+key+'["\\'][^>]+content=["\\']([^"\\']+)["\\']','i'),
-    new RegExp('<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:name|property)=["\\']'+key+'["\\']','i')
-  ];
-  for(const p of patterns){const m=html.match(p); if(m) return decode(m[1].trim());}
+  const tags=html.match(/<meta\\b[^>]*>/gi)||[];
+  const wanted=String(key||"").toLowerCase();
+  for(const tag of tags){
+    const attrs={};
+    const re=/([a-zA-Z:-]+)\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))/g;
+    let m;
+    while((m=re.exec(tag))){
+      attrs[m[1].toLowerCase()]=decode((m[2]??m[3]??m[4]??"").trim());
+    }
+    const ident=(attrs.name||attrs.property||"").toLowerCase();
+    if(ident===wanted && attrs.content) return attrs.content;
+  }
   return "";
 }
 function title(html){const m=html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);return m?textOnly(m[1]):""}
