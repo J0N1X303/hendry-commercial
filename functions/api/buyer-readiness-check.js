@@ -426,7 +426,17 @@ async function scanSite(input) {
   const proofPages = pages.filter(p => p.type === "proof");
   const decisionPages = pages.filter(p => p.type === "decision");
   const faqPages = pages.filter(p => /frequently asked|\bfaqs?\b/i.test(textOnly(p.html)));
-  const standaloneFaqLinks = allLinks.filter(l => /(^|\/)(faq|faqs|frequently-asked-questions)(\/|$)/i.test(l.path));
+
+  // Only count a real dedicated FAQ destination. Embedded FAQ sections on
+  // solution/approach pages are useful content, but they are not a central buyer-question hub.
+  const standaloneFaqLinks = allLinks.filter(l => {
+    const path=(l.path||"").replace(/\/+$/,"").toLowerCase();
+    const label=(l.label||"").trim().toLowerCase();
+    const topLevelFaq=/^\/(faq|faqs|frequently-asked-questions)$/.test(path);
+    const explicitFaqLabel=/^(faq|faqs|frequently asked questions)$/.test(label);
+    return topLevelFaq && explicitFaqLabel;
+  });
+
   const deepProofLinks = allLinks.filter(l => /case|customer-story|success-story|testimonial|measured-impact|results/i.test((l.label + " " + l.path).toLowerCase()));
 
   const hasTestimonials = keywordPresent(combined, /testimonial|what our (clients|customers|couples) say|reviews?\b/);
@@ -489,10 +499,10 @@ async function scanSite(input) {
       "C20",
       "compare",
       hasScatteredFaq
-        ? "Buyer questions are answered, but there is no dedicated FAQ hub."
+        ? "Buyer questions are answered, but there is no central FAQ hub."
         : "There is no obvious FAQ route for common buyer questions.",
       hasScatteredFaq
-        ? "We found FAQ-style answers within the site, but no standalone FAQ destination linked from the homepage. Bringing recurring buyer questions together would make those answers easier to find and reuse."
+        ? "We found FAQ-style answers across the site, but no central FAQ destination linked from the homepage. Bringing recurring buyer questions together would make those answers easier for buyers — and machine-assisted research — to find and reuse."
         : "The pages checked did not expose a dedicated FAQ destination. A clear buyer-question page would give prospective customers — and machine-assisted research — one place to find explicit answers to common questions.",
       [
         { fact: "No standalone FAQ route detected from the homepage" },
