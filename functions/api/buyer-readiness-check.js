@@ -275,7 +275,7 @@ function searchExamples(primary, locations, combined) {
     if (/accommodation|rooms|stay/.test(c)) add(loc ? `wedding venue with accommodation ${loc}` : "wedding venue with accommodation");
   } else {
     add(loc ? `best ${primary} ${loc}` : `best ${primary}`);
-    add(loc ? `${primary} for businesses in ${loc}` : `${primary} provider`);
+    add(loc ? `${primary} services ${loc}` : `${primary} services`);
   }
   if (locations[1]) add(`${primary} ${locations[1]}`);
   return out.slice(0, 5);
