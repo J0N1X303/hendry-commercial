@@ -107,9 +107,17 @@
     if(replyto) replyto.value=state.email;
     btn.disabled=true; btn.textContent="Opening your snapshot…"; error.textContent="";
     try{
-      const response=await fetch(form.action,{method:"POST",headers:{"Accept":"application/json"},body:new FormData(form)});
+      const payload={
+        stage:"free_snapshot",
+        name:state.name,
+        email:state.email,
+        website:state.website,
+        snapshot_summary:form.querySelector("[data-capture-summary]")?.value||"",
+        company_website:form.elements._honey?.value||""
+      };
+      const response=await fetch("/api/buyer-readiness-lead",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
       const data=await response.json().catch(()=>({}));
-      if(!response.ok||data.success===false) throw new Error();
+      if(!response.ok||data.success===false) throw new Error(data.message||"save_failed");
       renderSnapshot(state.result);
       document.querySelector("[data-qualify-website]").value=state.website;
       document.querySelector("[data-qualify-name]").value=state.name;
@@ -117,6 +125,15 @@
       const qReply=document.querySelector("[data-qualify-replyto]");
       if(qReply) qReply.value=state.email;
       show("snapshot");
+      if(data.customerEmailed===false){
+        const heading=document.querySelector(".snapshot-heading");
+        if(heading){
+          const note=document.createElement("p");
+          note.className="delivery-note";
+          note.textContent="Your snapshot is open below. The email copy could not be delivered, so please keep this page open or continue to the next step.";
+          heading.appendChild(note);
+        }
+      }
     }catch{
       error.textContent="I couldn't save that just now. Please try again.";
     }finally{btn.disabled=false;btn.innerHTML='Show my results <span>→</span>';}
@@ -128,10 +145,22 @@
     e.preventDefault(); const form=e.currentTarget; const btn=form.querySelector("button[type=submit]"); const error=document.querySelector("[data-qualify-error]");
     btn.disabled=true;btn.textContent="Saving…";error.textContent="";
     try{
-      const fd=new FormData(form); fd.append("snapshot_strength",state.result?.strength?.title||""); fd.append("snapshot_opportunities",(state.result?.opportunities||[]).map(x=>x.title).join(" | "));
-      const response=await fetch(form.action,{method:"POST",headers:{"Accept":"application/json"},body:fd});
+      const payload={
+        stage:"qualified_lead",
+        website:state.website,
+        name:state.name,
+        email:state.email,
+        growth_priority:form.elements.growth_priority.value,
+        desired_buyer:form.elements.desired_buyer.value,
+        customer_value:form.elements.customer_value.value,
+        desired_understanding:form.elements.desired_understanding.value,
+        snapshot_strength:state.result?.strength?.title||"",
+        snapshot_opportunities:(state.result?.opportunities||[]).map(x=>x.title).join(" | "),
+        company_website:form.elements._honey?.value||""
+      };
+      const response=await fetch("/api/buyer-readiness-lead",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
       const data=await response.json().catch(()=>({}));
-      if(!response.ok||data.success===false) throw new Error();
+      if(!response.ok||data.success===false) throw new Error(data.message||"save_failed");
       show("complete");
     }catch{error.textContent="I couldn't save that just now. Please try again.";}
     finally{btn.disabled=false;btn.innerHTML='Finish and see the next step <span>→</span>';}
