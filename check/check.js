@@ -13,6 +13,19 @@
   };
   const domain = (url) => { try { return new URL(url).hostname.replace(/^www\./,""); } catch { return url; } };
   const esc = (s="") => s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  const STORAGE_KEY = "hcBuyerReadiness";
+  const saveState = () => {
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+  };
+  const restoreState = () => {
+    try {
+      const raw=sessionStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const saved=JSON.parse(raw);
+      if(saved&&saved.website) Object.assign(state,saved);
+      return !!state.result;
+    } catch { return false; }
+  };
 
   async function runScan(website){
     show("scan");
@@ -98,77 +111,45 @@
     show("capture");
   });
 
-  document.querySelector("[data-capture-form]")?.addEventListener("submit",async(e)=>{
-    e.preventDefault(); const form=e.currentTarget; const btn=form.querySelector("button[type=submit]"); const error=document.querySelector("[data-capture-error]");
-    state.name=form.elements.name.value.trim(); state.email=form.elements.email.value.trim();
+  document.querySelector("[data-capture-form]")?.addEventListener("submit",(e)=>{
+    const form=e.currentTarget;
+    state.name=form.elements.name.value.trim();
+    state.email=form.elements.email.value.trim();
     const cc=form.querySelector("[data-capture-cc]");
     const replyto=form.querySelector("[data-capture-replyto]");
     if(cc) cc.value=state.email;
     if(replyto) replyto.value=state.email;
-    btn.disabled=true; btn.textContent="Opening your snapshot…"; error.textContent="";
-    try{
-      const payload={
-        stage:"free_snapshot",
-        name:state.name,
-        email:state.email,
-        website:state.website,
-        snapshot_summary:form.querySelector("[data-capture-summary]")?.value||"",
-        company_website:form.elements._honey?.value||""
-      };
-      const response=await fetch("/api/buyer-readiness-lead",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok||data.success===false) throw new Error(data.message||"save_failed");
-      renderSnapshot(state.result);
-      document.querySelector("[data-qualify-website]").value=state.website;
-      document.querySelector("[data-qualify-name]").value=state.name;
-      document.querySelector("[data-qualify-email]").value=state.email;
-      const qReply=document.querySelector("[data-qualify-replyto]");
-      if(qReply) qReply.value=state.email;
-      show("snapshot");
-      if(data.customerEmailed===false){
-        const heading=document.querySelector(".snapshot-heading");
-        if(heading){
-          const note=document.createElement("p");
-          note.className="delivery-note";
-          note.textContent="Your snapshot is open below. The email copy could not be delivered, so please keep this page open or continue to the next step.";
-          heading.appendChild(note);
-        }
-      }
-    }catch{
-      error.textContent="I couldn't save that just now. Please try again.";
-    }finally{btn.disabled=false;btn.innerHTML='Show my results <span>→</span>';}
+    saveState();
   });
 
   document.querySelector("[data-open-qualify]")?.addEventListener("click",()=>show("qualify"));
 
-  document.querySelector("[data-qualify-form]")?.addEventListener("submit",async(e)=>{
-    e.preventDefault(); const form=e.currentTarget; const btn=form.querySelector("button[type=submit]"); const error=document.querySelector("[data-qualify-error]");
-    btn.disabled=true;btn.textContent="Saving…";error.textContent="";
-    try{
-      const payload={
-        stage:"qualified_lead",
-        website:state.website,
-        name:state.name,
-        email:state.email,
-        growth_priority:form.elements.growth_priority.value,
-        desired_buyer:form.elements.desired_buyer.value,
-        customer_value:form.elements.customer_value.value,
-        desired_understanding:form.elements.desired_understanding.value,
-        snapshot_strength:state.result?.strength?.title||"",
-        snapshot_opportunities:(state.result?.opportunities||[]).map(x=>x.title).join(" | "),
-        company_website:form.elements._honey?.value||""
-      };
-      const response=await fetch("/api/buyer-readiness-lead",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok||data.success===false) throw new Error(data.message||"save_failed");
-      show("complete");
-    }catch{error.textContent="I couldn't save that just now. Please try again.";}
-    finally{btn.disabled=false;btn.innerHTML='Finish and see the next step <span>→</span>';}
+  document.querySelector("[data-qualify-form]")?.addEventListener("submit",(e)=>{
+    const form=e.currentTarget;
+    const qReply=document.querySelector("[data-qualify-replyto]");
+    if(qReply) qReply.value=state.email;
+    saveState();
   });
 
   document.querySelector("[data-back-results]")?.addEventListener("click",()=>show("snapshot"));
   document.querySelector("[data-retry]")?.addEventListener("click",()=>{document.querySelector("[data-url-form]").reset();show("start");});
 
-  const params=new URLSearchParams(location.search); const prefill=params.get("site");
-  if(prefill){const input=document.querySelector("#website"); if(input) input.value=prefill;}
+  const params=new URLSearchParams(location.search);
+  const submitted=params.get("submitted");
+  const prefill=params.get("site");
+  if(submitted==="snapshot" && restoreState()){
+    renderSnapshot(state.result);
+    document.querySelector("[data-qualify-website]").value=state.website;
+    document.querySelector("[data-qualify-name]").value=state.name;
+    document.querySelector("[data-qualify-email]").value=state.email;
+    const qReply=document.querySelector("[data-qualify-replyto]");
+    if(qReply) qReply.value=state.email;
+    history.replaceState({}, "", "/check");
+    show("snapshot");
+  } else if(submitted==="qualified" && restoreState()){
+    history.replaceState({}, "", "/check");
+    show("complete");
+  } else if(prefill){
+    const input=document.querySelector("#website"); if(input) input.value=prefill;
+  }
 })();
