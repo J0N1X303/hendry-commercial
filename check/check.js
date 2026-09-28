@@ -97,7 +97,7 @@
     const ops=r.opportunities||[];
     document.querySelector("[data-opportunity-count]").textContent=ops.length?ops.length+" evidence-backed observation"+(ops.length===1?"":"s"):"No obvious issue forced";
     if(!ops.length){ list.innerHTML='<article class="opportunity"><span class="opportunity-no">✓</span><div><h3>No obvious weakness was strong enough to report.</h3><p>That is a valid result. This surface-level check will not invent criticism simply to fill the page.</p><small>Deeper analysis may still find opportunities once commercial context and external evidence are added.</small></div></article>'; }
-    else { ops.forEach((o,i)=>{ const evidence=(o.evidence||[]).map(e=>e.fact).filter(Boolean).slice(0,2).join(" · "); const why=o.why?'<p><strong>Why it matters:</strong> '+esc(o.why)+'</p>':''; list.insertAdjacentHTML("beforeend",'<article class="opportunity"><span class="opportunity-no">0'+(i+1)+'</span><div><h3>'+esc(o.title)+'</h3><p>'+esc(o.observation)+'</p>'+why+'<small><strong>What we found:</strong> '+esc(evidence)+'</small></div></article>'); }); }
+    else { ops.forEach((o,i)=>{ const evidence=(o.evidence||[]).map(e=>e.fact).filter(Boolean).slice(0,2).join(" · "); const why=o.why?'<p><strong>Why it matters:</strong> '+esc(o.why)+'</p>':''; list.insertAdjacentHTML("beforeend",'<article class="opportunity"><span class="opportunity-no">'+String(i+1).padStart(2,"0")+'</span><div><h3>'+esc(o.title)+'</h3><p>'+esc(o.observation)+'</p>'+why+'<small><strong>What we found:</strong> '+esc(evidence)+'</small></div></article>'); }); }
   }
 
   function snapshotSummary(){
