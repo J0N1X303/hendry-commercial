@@ -39,13 +39,6 @@
   <link rel="stylesheet" href="styles.css?v=20260928-about-inline" />
   <style>
     .experience-heading > p:last-child{max-width:760px;color:rgba(238,237,231,.68);margin-top:16px}
-    .narrative-bridge{padding-top:clamp(20px,4vw,46px);padding-bottom:clamp(34px,6vw,76px)}
-    .narrative-bridge-inner{border-top:1px solid rgba(121,230,167,.18);border-bottom:1px solid rgba(238,237,231,.1);padding:clamp(28px,5vw,52px) 0;display:grid;grid-template-columns:.78fr 1.22fr;gap:clamp(26px,6vw,74px);align-items:start}
-    .narrative-bridge-inner h2{max-width:520px}
-    .narrative-bridge-copy{max-width:760px}
-    .narrative-bridge-copy p{color:rgba(238,237,231,.72);font-size:clamp(1rem,1.25vw,1.12rem);line-height:1.75}
-    .narrative-bridge-copy p+p{margin-top:16px}
-    .narrative-bridge-copy strong{color:#eeede7}
     .build-story-grid{display:grid;gap:22px;margin-top:30px}
     .build-story{position:relative;overflow:hidden;border:1px solid rgba(238,237,231,.12);border-radius:28px;background:rgba(255,255,255,.032);padding:clamp(24px,4vw,38px)}
     .build-story.primary-story{border-color:rgba(121,230,167,.3);background:radial-gradient(circle at 84% 8%,rgba(121,230,167,.12),transparent 34%),linear-gradient(145deg,rgba(14,44,28,.68),rgba(6,14,10,.96))}
@@ -77,7 +70,7 @@
     .thread-words span:not(:last-child)::after{content:"·";position:absolute;right:-2px;color:#3f5d49}
     .thread-words span:last-child{padding-right:0;margin-right:0}
     @media (max-width:860px){
-      .narrative-bridge-inner,.common-thread-card{grid-template-columns:1fr}
+      .common-thread-card{grid-template-columns:1fr}
       .story-outputs{grid-template-columns:1fr}
       .publication-output{grid-template-columns:72px minmax(0,1fr)}
       .output-cover img{width:72px}
@@ -299,26 +292,13 @@
       </div>
     </section>
 
-    <section class="section narrative-bridge" aria-labelledby="testing-thinking-title">
-      <div class="narrative-bridge-inner reveal">
-        <div>
-          <p class="eyebrow">From experience to experiment</p>
-          <h2 id="testing-thinking-title">I keep testing the thinking.</h2>
-        </div>
-        <div class="narrative-bridge-copy">
-          <p>I do not particularly enjoy leaving ideas as PowerPoint. If a problem is interesting enough, I tend to pull it apart, build something, put it in front of real people, and see whether reality agrees.</p>
-          <p><strong>The projects below look different, but they come from the same instinct.</strong> Curiosity, commercial judgement, and a bias towards turning an idea into something tangible enough to test.</p>
-        </div>
-      </div>
-    </section>
-
     <section id="ventures" class="section ventures">
       <div class="ventures-head reveal">
         <div>
           <p class="eyebrow">Built &amp; building</p>
           <h2>Things I’ve put into the world.</h2>
         </div>
-        <p>Different subjects, same pattern: notice something worth understanding, form a view, build a practical response, and learn from what happens next.</p>
+        <p>I don’t particularly enjoy leaving ideas as PowerPoint. If a problem is interesting enough, I tend to pull it apart, form a view, build something tangible, and see whether reality agrees.</p>
       </div>
 
       <div class="build-story-grid">
