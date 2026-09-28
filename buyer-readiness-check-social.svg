@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1254" viewBox="0 0 2400 1254">
+  <defs>
+    <radialGradient id="bg1" cx="0.08" cy="0.05" r="0.65">
+      <stop offset="0" stop-color="#174b31" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#08110c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bg2" cx="0.93" cy="0.78" r="0.55">
+      <stop offset="0" stop-color="#123b28" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#08110c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="hc-green" x1="0.08" y1="0.9" x2="0.88" y2="0.04">
+      <stop offset="0" stop-color="#58d691"/>
+      <stop offset="1" stop-color="#79e6a7"/>
+    </linearGradient>
+    <linearGradient id="hc-fold" x1="0.15" y1="0.85" x2="0.8" y2="0.1">
+      <stop offset="0" stop-color="#156b45"/>
+      <stop offset="1" stop-color="#0f4d34"/>
+    </linearGradient>
+    <linearGradient id="hc-white" x1="0.08" y1="0.95" x2="0.92" y2="0.05">
+      <stop offset="0" stop-color="#eeede7"/>
+      <stop offset="1" stop-color="#fffefa"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="2400" height="1254" fill="#08110c"/>
+  <rect width="2400" height="1254" fill="url(#bg1)"/>
+  <rect width="2400" height="1254" fill="url(#bg2)"/>
+
+  <!-- Brand -->
+  <g transform="translate(120 84)">
+    <g transform="scale(.30)">
+      <path fill="url(#hc-green)" d="M315 21L170 90C150 100 135 113 124 129L24 387L156 325C168 319 177 310 184 298C197 306 214 311 233 312L291 182C273 190 254 198 234 198C251 181 263 158 274 130Z"/>
+      <path fill="url(#hc-fold)" d="M234 198C206 208 181 229 170 256C160 282 168 303 184 314C198 324 217 328 233 322L256 270C237 278 222 274 215 263C208 252 213 232 229 217C238 208 248 201 260 196C251 198 242 199 234 198Z"/>
+      <path fill="#2ca86a" d="M229 217C242 206 260 198 291 182L278 212C259 225 246 236 240 249C234 262 238 272 256 270L244 297C224 294 211 286 207 273C202 256 211 235 229 217Z"/>
+      <path fill="url(#hc-white)" d="M430 118L284 192L176 462L338 378C348 373 356 365 360 354L430 118Z"/>
+    </g>
+    <rect x="150" y="0" width="2" height="122" fill="#f3f4ef" opacity=".30"/>
+    <text x="190" y="53" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="46" letter-spacing="2">HENDRY</text>
+    <text x="190" y="101" fill="#e5e9e6" font-family="Arial, Helvetica, sans-serif" font-size="29" letter-spacing="8.2">COMMERCIAL</text>
+  </g>
+
+  <!-- Decorative geometry -->
+  <circle cx="2150" cy="10" r="470" fill="none" stroke="#63d995" stroke-width="4" opacity=".62"/>
+  <circle cx="2150" cy="10" r="405" fill="none" stroke="#2f8b54" stroke-width="2.5" opacity=".34"/>
+  <g opacity=".42" fill="none" stroke="#2f8b54" stroke-width="2.4">
+    <path d="M1580 1230 L2410 975"/>
+    <path d="M1580 1230 L2410 1030"/>
+    <path d="M1580 1230 L2410 1085"/>
+    <path d="M1580 1230 L2410 1140"/>
+  </g>
+
+  <text x="1810" y="146" fill="#63d995" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="36" letter-spacing="3.5">BUYER READINESS CHECK</text>
+
+  <!-- Small proposition pill -->
+  <rect x="120" y="336" width="430" height="72" rx="36" fill="none" stroke="#63d995" stroke-width="2.5"/>
+  <text x="335" y="383" text-anchor="middle" fill="#d9e8df" font-family="Arial, Helvetica, sans-serif" font-size="29" letter-spacing="3">FREE WEBSITE CHECK</text>
+
+  <!-- Main message: intentionally sparse and oversized for LinkedIn preview rendering -->
+  <text x="120" y="590" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="130" letter-spacing="-3">How easy is your</text>
+  <text x="120" y="742" fill="#f3f4ef" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="130" letter-spacing="-3">business to <tspan fill="#63d995">choose?</tspan></text>
+
+  <text x="124" y="855" fill="#d5ded8" font-family="Arial, Helvetica, sans-serif" font-size="38">
+    See what a prospective buyer can quickly understand, verify and act on — before they contact you.
+  </text>
+
+  <!-- Four large cues -->
+  <g font-family="Arial, Helvetica, sans-serif" font-size="27" fill="#e1e8e4" text-anchor="middle">
+    <rect x="120" y="925" width="150" height="60" rx="30" fill="none" stroke="#2f8b54" stroke-width="2"/>
+    <text x="195" y="964">FIND</text>
+    <rect x="292" y="925" width="252" height="60" rx="30" fill="none" stroke="#2f8b54" stroke-width="2"/>
+    <text x="418" y="964">UNDERSTAND</text>
+    <rect x="566" y="925" width="170" height="60" rx="30" fill="none" stroke="#2f8b54" stroke-width="2"/>
+    <text x="651" y="964">TRUST</text>
+    <rect x="758" y="925" width="140" height="60" rx="30" fill="none" stroke="#2f8b54" stroke-width="2"/>
+    <text x="828" y="964">ACT</text>
+  </g>
+
+  <rect x="120" y="1085" width="86" height="4" rx="2" fill="#63d995"/>
+  <text x="120" y="1164" fill="#aebbb3" font-family="Arial, Helvetica, sans-serif" font-size="34">hendrycommercial.co.uk/check</text>
+</svg>
