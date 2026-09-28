@@ -1,0 +1,6 @@
+/check
+  Cache-Control: no-store, max-age=0
+/check/*
+  Cache-Control: no-store, max-age=0
+/api/*
+  Cache-Control: no-store, max-age=0
