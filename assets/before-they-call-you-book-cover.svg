@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1920" role="img" aria-labelledby="title desc">
+  <title id="title">Before They Call You</title>
+  <desc id="desc">Book cover for Before They Call You by Jonathan Hendry.</desc>
+  <rect width="1200" height="1920" fill="#08271b"/>
+  <rect x="92" y="92" width="92" height="8" rx="4" fill="#62df98"/>
+  <text x="92" y="138" fill="#62df98" font-family="Arial,Helvetica,sans-serif" font-size="24" font-weight="800" letter-spacing="1.2">THE BUYING DECISION IS ALREADY HAPPENING</text>
+
+  <text x="92" y="345" fill="#f1f3ee" font-family="Arial,Helvetica,sans-serif" font-size="105" font-weight="900">BEFORE</text>
+  <text x="92" y="470" fill="#f1f3ee" font-family="Arial,Helvetica,sans-serif" font-size="105" font-weight="900">THEY</text>
+  <text x="92" y="595" fill="#62df98" font-family="Arial,Helvetica,sans-serif" font-size="105" font-weight="900">CALL YOU</text>
+
+  <text x="92" y="770" fill="#e7ece8" font-family="Arial,Helvetica,sans-serif" font-size="35">How AI Is Changing the Buying Journey Before You Ever</text>
+  <text x="92" y="815" fill="#e7ece8" font-family="Arial,Helvetica,sans-serif" font-size="35">Speak to the Customer</text>
+
+  <line x1="92" y1="900" x2="790" y2="900" stroke="#275a42" stroke-width="2"/>
+  <text x="92" y="958" fill="#a8bcb0" font-family="Arial,Helvetica,sans-serif" font-size="26">Make your business easier to find, understand, verify, shortlist and</text>
+  <text x="92" y="997" fill="#a8bcb0" font-family="Arial,Helvetica,sans-serif" font-size="26">choose before the first conversation.</text>
+
+  <line x1="955" y1="290" x2="955" y2="1040" stroke="#214c37" stroke-width="4"/>
+  <circle cx="955" cy="320" r="15" fill="#62df98"/>
+  <circle cx="955" cy="500" r="13" fill="#0c3324" stroke="#315e48" stroke-width="4"/>
+  <circle cx="955" cy="680" r="13" fill="#0c3324" stroke="#315e48" stroke-width="4"/>
+  <circle cx="955" cy="860" r="13" fill="#0c3324" stroke="#315e48" stroke-width="4"/>
+  <circle cx="955" cy="1040" r="15" fill="#62df98"/>
+
+  <text x="925" y="328" text-anchor="end" fill="#dbe6df" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700">FIND</text>
+  <text x="925" y="508" text-anchor="end" fill="#8ea99a" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700">UNDERSTAND</text>
+  <text x="925" y="688" text-anchor="end" fill="#8ea99a" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700">VERIFY</text>
+  <text x="925" y="868" text-anchor="end" fill="#8ea99a" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700">SHORTLIST</text>
+  <text x="925" y="1048" text-anchor="end" fill="#dbe6df" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700">ACT</text>
+
+  <text x="92" y="1770" fill="#f1f3ee" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="800" letter-spacing="1.6">JONATHAN HENDRY</text>
+</svg>
