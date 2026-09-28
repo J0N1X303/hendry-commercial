@@ -1,0 +1,6 @@
+worker.js
+wrangler.jsonc
+.github
+.gitignore
+README.md
+DOMAIN-EMAIL-SETUP.md
