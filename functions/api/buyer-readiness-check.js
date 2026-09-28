@@ -194,9 +194,30 @@ function schemaFacts(html) {
   return Object.fromEntries(Object.entries(facts).map(([k, v]) => [k, unique(v)]));
 }
 
+function escapeRegex(value = "") {
+  return String(value).replace(/[|\\{}()[\]^$+*?.-]/g, "\\$&");
+}
+
 function locationsFromText(text) {
   const t = " " + text + " ";
-  return KNOWN_LOCATIONS.filter(place => new RegExp("\\b" + place.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(t));
+  return KNOWN_LOCATIONS.filter(place => new RegExp("\\b" + escapeRegex(place) + "\\b", "i").test(t));
+}
+
+function isBroadScope(value = "") {
+  return /^(worldwide|global|globally|international|internationally|nationwide|national|remote|online|anywhere|all regions)$/i.test(String(value).trim());
+}
+
+function scopeSignals(text, schema) {
+  const lower = text.toLowerCase();
+  const schemaAreas = [...(schema.localities || []), ...(schema.regions || [])];
+  const out = [];
+  if (schemaAreas.some(isBroadScope) || /\bworldwide\b|\bglobally\b|\bglobal delivery\b|\bmultinational\b|\binternational delivery\b|\bany time zone\b/.test(lower)) {
+    out.push("Global / multinational delivery");
+  }
+  if (/\bvirtual delivery\b|\bonline delivery\b|\bremote delivery\b/.test(lower)) {
+    out.push("Virtual delivery");
+  }
+  return unique(out).slice(0, 3);
 }
 
 function businessName(html, host, schema) {
@@ -254,30 +275,49 @@ function choosePages(allLinks) {
 }
 
 function inferPrimarySearch(offers, name, combined) {
-  const c = combined.toLowerCase();
-  if (/wedding|bride|groom|ceremony|reception/.test(c)) return "wedding venue";
-  if (/tree surgeon|arborist|arboricultural|stump grinding/.test(c)) return "tree surgeon";
-  if (/it support|managed it|cyber security|technology support/.test(c)) return "IT support";
+  const lower = combined.toLowerCase();
+  if (/wedding|bride|groom|ceremony|reception/.test(lower)) return "wedding venue";
+  if (/commercial capability/.test(lower) && /training|programme|learning/.test(lower)) return "commercial capability training";
+  if (/sales training/.test(lower) && /negotiat|selling|sales/.test(lower)) return "sales training";
+  if (/tree surgeon|arborist|arboricultural|stump grinding/.test(lower)) return "tree surgeon";
+  if (/it support|managed it|cyber security|technology support/.test(lower)) return "IT support";
   const nonBrand = offers.find(x => x && !name.toLowerCase().includes(x.toLowerCase()) && !/^(weddings|events|services|solutions)$/i.test(x));
   return (nonBrand || offers[0] || name).replace(/[.!?].*$/, "").trim();
 }
 
-function searchExamples(primary, locations, combined) {
-  const loc = locations[0] || "";
-  const c = combined.toLowerCase();
+function searchExamples(primary, locations, combined, scopes = []) {
+  const lower = combined.toLowerCase();
+  const globalScope = scopes.includes("Global / multinational delivery");
+  const loc = globalScope ? "" : (locations[0] || "");
   const out = [];
   const add = x => { if (x && !out.includes(x)) out.push(x); };
-  add(loc ? `${primary} ${loc}` : primary);
-  add(loc ? `${primary} near ${loc}` : `${primary} near me`);
-  if (primary === "wedding venue") {
-    if (/barn/.test(c)) add(loc ? `barn wedding venue ${loc}` : "barn wedding venue");
-    if (/exclusive/.test(c)) add(loc ? `exclusive use wedding venue ${loc}` : "exclusive use wedding venue");
-    if (/accommodation|rooms|stay/.test(c)) add(loc ? `wedding venue with accommodation ${loc}` : "wedding venue with accommodation");
-  } else {
-    add(loc ? `best ${primary} ${loc}` : `best ${primary}`);
-    add(loc ? `${primary} services ${loc}` : `${primary} services`);
+
+  if (primary === "commercial capability training" || primary === "sales training") {
+    add(primary);
+    if (/commercial skills/.test(lower)) add("commercial skills training");
+    if (/\bsales\b|selling/.test(lower)) add(globalScope ? "global sales training" : "sales training provider");
+    if (/negotiat/.test(lower)) add("negotiation training for sales teams");
+    if (/multinational|global teams|globally placed|six languages|any time zone/.test(lower)) add("sales training for global teams");
+    if (/leadership|coaching/.test(lower)) add("commercial coaching training");
+    return out.slice(0, 5);
   }
-  if (locations[1]) add(`${primary} ${locations[1]}`);
+
+  add(loc ? primary + " " + loc : primary);
+
+  if (primary === "wedding venue") {
+    if (loc) add(primary + " near " + loc);
+    if (/barn/.test(lower)) add(loc ? "barn wedding venue " + loc : "barn wedding venue");
+    if (/exclusive/.test(lower)) add(loc ? "exclusive use wedding venue " + loc : "exclusive use wedding venue");
+    if (/accommodation|rooms|stay/.test(lower)) add(loc ? "wedding venue with accommodation " + loc : "wedding venue with accommodation");
+  } else if (loc) {
+    add(primary + " near " + loc);
+    add(primary + " services " + loc);
+    if (locations[1]) add(primary + " " + locations[1]);
+  } else {
+    add(primary + " provider");
+    add(primary + " services");
+  }
+
   return out.slice(0, 5);
 }
 
@@ -377,11 +417,17 @@ async function scanSite(input) {
   const schema = schemaFacts(home);
   const name = businessName(home, canonical.hostname, schema);
   const offers = offerSignals(home, allLinks);
-  const locations = unique([...schema.localities, ...schema.regions, ...locationsFromText(combinedText)]).slice(0, 5);
+  const scopes = scopeSignals(combinedText, schema);
+  const locations = unique([...schema.localities, ...schema.regions, ...locationsFromText(combinedText)])
+    .filter(v => !isBroadScope(v))
+    .slice(0, 5);
   const primary = inferPrimarySearch(offers, name, combined);
   const offerPages = pages.filter(p => p.type === "offer");
   const proofPages = pages.filter(p => p.type === "proof");
   const decisionPages = pages.filter(p => p.type === "decision");
+  const faqPages = pages.filter(p => /frequently asked|\bfaqs?\b/i.test(textOnly(p.html)));
+  const standaloneFaqLinks = allLinks.filter(l => /(^|\/)(faq|faqs|frequently-asked-questions)(\/|$)/i.test(l.path));
+  const deepProofLinks = allLinks.filter(l => /case|customer-story|success-story|testimonial|measured-impact|results/i.test((l.label + " " + l.path).toLowerCase()));
 
   const hasTestimonials = keywordPresent(combined, /testimonial|what our (clients|customers|couples) say|reviews?\b/);
   const hasCases = keywordPresent(combined, /case stud|our work|projects?|portfolio|gallery|real weddings/);
@@ -391,7 +437,7 @@ async function scanSite(input) {
   const hasStrongCTA = keywordPresent(combined, /request a quote|get a quote|book (a|your)|make an enquiry|enquire now|schedule|contact us|speak to|arrange a viewing/);
   const structured = schema.types.length > 0;
   const proofCount = [hasTestimonials, hasCases, hasAwards].filter(Boolean).length;
-  const offerPagesWithProof = offerPages.filter(p => /testimonial|review|case stud|real wedding|hitched|award|accredit/i.test(textOnly(p.html))).length;
+  const offerPagesWithProof = offerPages.filter(p => /testimonial|review|case stud|customer story|real wedding|hitched|award|accredit|trusted by|global clients/i.test(textOnly(p.html))).length;
 
   let strength;
   if (proofCount >= 2) strength = { dimension: "trust", title: primary === "wedding venue" ? "There is strong proof behind the venue." : "There is strong proof behind the business.", observation: "We found more than one form of credibility evidence, including customer proof, examples of work, awards, accreditations or experience." };
@@ -416,12 +462,38 @@ async function scanSite(input) {
     findings.push(makeFinding("T12", "trust", "Proof exists, but it is concentrated in relatively few places.", "The site contains credibility signals, but they are not spread widely across the pages a buyer may use to understand and compare the offer.", [{ fact: "Proof signals detected" }, { fact: proofPages.length + " proof-focused pages checked" }]));
   }
 
+  if (primary !== "wedding venue" && proofCount >= 2 && deepProofLinks.length <= 1 && offerPages.length >= 2 && !findings.some(f => f.dimension === "trust")) {
+    findings.push(makeFinding(
+      "T20",
+      "trust",
+      "Social proof is strong, but deeper proof is less obvious to follow.",
+      "Recognisable client and credibility signals are easy to find. The scan found fewer obvious routes into detailed outcome, customer-story or case evidence for a buyer who wants to verify the claims in depth.",
+      [
+        { fact: "Multiple credibility signals detected" },
+        { fact: deepProofLinks.length + " obvious deep-proof route" + (deepProofLinks.length === 1 ? "" : "s") + " found from the homepage" }
+      ]
+    ));
+  }
+
   if (primary === "wedding venue" && decisionPdfLinks.length) {
     findings.push(makeFinding("C12", "compare", "Some important buying answers sit outside the main page flow.", "We found useful decision information in downloadable documents such as FAQs, pricing or guides. Buyers can still reach it, but some of the picture sits outside the pages they are already reading.", [{ fact: "Decision documents found: " + decisionPdfLinks.join(", ") }, { fact: decisionPages.length + " decision-focused web pages checked" }]));
   } else if (primary === "wedding venue") {
     findings.push(makeFinding("C12", "compare", "Important decision information is spread across the journey.", "The site contains useful information for prospective couples, but the scan did not find one clear route bringing the main comparison questions together.", [{ fact: decisionPages.length + " decision-focused pages checked" }, { fact: "No single consolidated decision route detected in the pages checked" }]));
   } else if (!hasFAQ && !hasProcess && decisionPages.length === 0) {
     findings.push(makeFinding("C01", "compare", "The offer is easier to see than the buying process.", "We did not find an obvious FAQ, process or how-it-works route helping a buyer understand what happens after initial interest.", [{ fact: "No clear FAQ/process page detected" }]));
+  }
+
+  if (primary !== "wedding venue" && faqPages.length >= 2 && standaloneFaqLinks.length === 0) {
+    findings.push(makeFinding(
+      "C20",
+      "compare",
+      "Useful buyer questions are answered, but across several pages.",
+      "We found FAQ content in multiple parts of the site. That is useful, but a buyer with cross-cutting questions may need to move between solution and approach pages to assemble the full picture.",
+      [
+        { fact: faqPages.length + " pages with FAQ content checked" },
+        { fact: "No standalone FAQ hub detected from the homepage" }
+      ]
+    ));
   }
 
   if (offers.length >= 2 && offerPages.length < 2) {
@@ -450,7 +522,7 @@ async function scanSite(input) {
     if (!dedup.includes(f)) dedup.push(f);
   }
 
-  const searches = searchExamples(primary, locations, combined);
+  const searches = searchExamples(primary, locations, combined, scopes);
 
   return {
     status: "complete",
@@ -458,7 +530,7 @@ async function scanSite(input) {
     canonical_url: canonical.href,
     input_url: start.href,
     business: { name, description: meta(home, "description") || meta(home, "og:description") || tagText(home, "h1")[0] || "" },
-    facts: { offers: offers.slice(0, 5), locations, structured_types: schema.types.slice(0, 8) },
+    facts: { offers: offers.slice(0, 5), locations, scope_signals: scopes, structured_types: schema.types.slice(0, 8) },
     buyer_search_examples: searches,
     strength,
     opportunities: dedup,
@@ -470,7 +542,7 @@ async function scanSite(input) {
       canonical_host: canonical.hostname,
       location_mentions: locationMentionsByPage(pages, locations),
       offer_pages_with_proof: offerPagesWithProof,
-      decision_documents: decisionPdfLinks
+      decision_documents: decisionPdfLinks,\n      faq_pages: faqPages.length,\n      standalone_faq_links: standaloneFaqLinks.length,\n      deep_proof_links: deepProofLinks.length
     }
   };
 }
