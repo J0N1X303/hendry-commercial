@@ -161,11 +161,34 @@
 
 
   const commercialMap = document.querySelector('[data-commercial-map]');
+  const frameworkToggle = document.querySelector('[data-framework-toggle]');
+  const frameworkDetail = document.querySelector('[data-framework-detail]');
+  const pressureToggle = document.querySelector('[data-pressure-toggle]');
+  const pressureDetail = document.querySelector('[data-pressure-detail]');
+
+  function setDisclosure(toggle, detail, open) {
+    if (!toggle || !detail) return;
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    detail.hidden = !open;
+  }
+
+  frameworkToggle?.addEventListener('click', () => {
+    const open = frameworkToggle.getAttribute('aria-expanded') !== 'true';
+    setDisclosure(frameworkToggle, frameworkDetail, open);
+    if (!open) setDisclosure(pressureToggle, pressureDetail, false);
+  });
+
+  pressureToggle?.addEventListener('click', () => {
+    const open = pressureToggle.getAttribute('aria-expanded') !== 'true';
+    setDisclosure(pressureToggle, pressureDetail, open);
+  });
+
   if (commercialMap) {
     const tabs = [...commercialMap.querySelectorAll('[data-engine-tab]')];
     const panels = [...commercialMap.querySelectorAll('[data-engine-panel]')];
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
+        setDisclosure(frameworkToggle, frameworkDetail, true);
         const target = tab.dataset.engineTab;
         tabs.forEach((item) => {
           const active = item === tab;
