@@ -754,3 +754,44 @@ a[href]:focus-visible,button:focus-visible{outline:2px solid var(--accent);outli
   .hero-terms span:last-child{margin-right:0;padding-right:0}
   .hero-terms small{font-size:8px;line-height:1.3}
 }
+
+/* About portrait: editorial support, not a feature image */
+.about-copy{display:block}
+.about-photo-inline{
+  float:right;
+  width:148px;
+  aspect-ratio:4/5;
+  margin:2px 0 18px 28px;
+  border-radius:14px;
+  border:1px solid rgba(238,237,231,.12);
+  box-shadow:0 10px 28px rgba(0,0,0,.16);
+  overflow:hidden;
+  background:#0d1611
+}
+.about-photo-inline::after{display:none}
+.about-photo-inline img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center top;
+  transform:none!important;
+  filter:grayscale(1)
+}
+.about-copy::after{content:"";display:block;clear:both}
+@media(max-width:980px){
+  .about-left{display:block}
+  .about-copy{order:2}
+  .about-photo-inline{
+    float:right;
+    width:122px;
+    margin:2px 0 16px 22px
+  }
+}
+@media(max-width:620px){
+  .about-photo-inline{
+    width:92px;
+    margin:3px 0 14px 17px;
+    border-radius:11px
+  }
+}
