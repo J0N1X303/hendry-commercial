@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'social-preview.svg'
+      - 'buyer-readiness-check-social.svg'
       - '.github/workflows/generate-social-preview.yml'
   workflow_dispatch:
 
@@ -21,10 +22,11 @@ jobs:
       - name: Generate Open Graph PNG
         run: |
           rsvg-convert -w 2400 -h 1254 social-preview.svg -o linkedin-preview-hd-20260923-v2.png
+          rsvg-convert -w 2400 -h 1254 buyer-readiness-check-social.svg -o buyer-readiness-check-social-hd.png
       - name: Commit generated image
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add linkedin-preview-hd-20260923-v2.png
+          git add linkedin-preview-hd-20260923-v2.png buyer-readiness-check-social-hd.png
           git diff --cached --quiet || git commit -m "Generate HD LinkedIn preview"
           git push
