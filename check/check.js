@@ -13,7 +13,7 @@
     }
     if(!state.created_at) state.created_at = new Date().toISOString();
   };
-  const handoffPayload = (commercialContext={}) => {
+  const handoffPayload = (status="scanned", commercialContext={}) => {
     ensureLeadIdentity();
     const r=state.result||{};
     return {
@@ -22,12 +22,12 @@
       created_at:state.created_at,
       updated_at:new Date().toISOString(),
       source:"hendrycommercial_check",
-      status: commercialContext && Object.values(commercialContext).every(v=>String(v||"").trim()) ? "qualified" : "snapshot",
+      status,
       contact:{name:state.name,email:state.email},
       business:{
-        name:r.business?.name||r.domain||"",
+        name:r.business?.name||r.domain||domain(state.website)||"",
         website:state.website,
-        domain:r.domain||"",
+        domain:r.domain||domain(state.website)||"",
         description:r.business?.description||""
       },
       snapshot:{
@@ -40,11 +40,15 @@
       commercial_context:commercialContext||{}
     };
   };
-  const sendHandoff = (commercialContext={}) => {
+  const sendHandoff = (status="scanned", commercialContext={}) => {
     try{
-      const payload=handoffPayload(commercialContext);
-      const blob=new Blob([JSON.stringify(payload)],{type:"application/json"});
-      navigator.sendBeacon("/api/buyer-readiness-store",blob);
+      const payload=handoffPayload(status,commercialContext);
+      fetch("/api/buyer-readiness-store",{
+        method:"POST",
+        headers:{"content-type":"application/json"},
+        body:JSON.stringify(payload),
+        keepalive:true
+      }).catch(()=>{});
       saveState();
     }catch{}
   };
@@ -63,7 +67,10 @@
     clearInterval(timer);
     for(let i=0;i<steps.length;i++){steps[i].classList.remove("active");steps[i].classList.add("done");steps[i].querySelector("b").textContent="Done";await new Promise(r=>setTimeout(r,90));}
     if(result.status!=="complete"){document.querySelector("[data-limited-message]").textContent=result.reason||"There was not enough reliable evidence to build a useful snapshot.";show("limited");return;}
-    state.result=result; renderPreview(result); show("preview");
+    state.result=result;
+    sendHandoff("scanned");
+    renderPreview(result);
+    show("preview");
   }
 
   function renderPreview(r){
@@ -111,7 +118,25 @@
     return data;
   }
 
-  document.querySelector("[data-url-form]")?.addEventListener("submit",(e)=>{ e.preventDefault(); const input=e.currentTarget.website; const website=norm(input.value); const err=document.querySelector("[data-start-error]"); if(!website){err.textContent="Enter a valid website address.";return;} err.textContent=""; state.website=website; runScan(website); });
+  document.querySelector("[data-url-form]")?.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    const input=e.currentTarget.website;
+    const website=norm(input.value);
+    const err=document.querySelector("[data-start-error]");
+    if(!website){err.textContent="Enter a valid website address.";return;}
+    err.textContent="";
+    if(state.website && state.website!==website){
+      state.result=null;
+      state.name="";
+      state.email="";
+      state.lead_id="";
+      state.created_at="";
+    }
+    state.website=website;
+    ensureLeadIdentity();
+    sendHandoff("scanned");
+    runScan(website);
+  });
 
   document.querySelector("[data-open-capture]")?.addEventListener("click",()=>show("capture"));
 
