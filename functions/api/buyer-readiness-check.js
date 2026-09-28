@@ -299,12 +299,46 @@ function locationMentionsByPage(pages, locations) {
 
 async function scanSite(input) {
   const start = normalizeUrl(input);
-  let homeResp = await getHtml(start.href);
-  if (!homeResp && start.protocol === "https:") {
-    start.protocol = "http:";
-    homeResp = await getHtml(start.href);
+
+  const homepageCandidates = [];
+  const pushCandidate = (u) => {
+    try {
+      const x = new URL(u);
+      x.hash = "";
+      if (!homepageCandidates.includes(x.href)) homepageCandidates.push(x.href);
+    } catch {}
+  };
+
+  pushCandidate(start.href);
+
+  const toggled = new URL(start.href);
+  toggled.hostname = toggled.hostname.startsWith("www.")
+    ? toggled.hostname.replace(/^www\./, "")
+    : "www." + toggled.hostname;
+  pushCandidate(toggled.href);
+
+  if (start.protocol === "https:") {
+    const httpStart = new URL(start.href);
+    httpStart.protocol = "http:";
+    pushCandidate(httpStart.href);
+
+    const httpToggle = new URL(toggled.href);
+    httpToggle.protocol = "http:";
+    pushCandidate(httpToggle.href);
   }
-  if (!homeResp) return { status: "limited", reason: "We could not reliably read the public homepage." };
+
+  let homeResp = null;
+  for (const candidate of homepageCandidates) {
+    homeResp = await getHtml(candidate);
+    if (homeResp) break;
+  }
+
+  if (!homeResp) {
+    return {
+      status: "limited",
+      reason: "We could not reliably reach that website. Check the current homepage address — the site may have moved, changed domain, or be blocking automated access."
+    };
+  }
 
   let canonical = new URL(homeResp.finalUrl || start.href);
   const declared = canonicalFromHtml(homeResp.html, canonical);
