@@ -115,10 +115,34 @@
     const form=e.currentTarget;
     state.name=form.elements.name.value.trim();
     state.email=form.elements.email.value.trim();
-    const cc=form.querySelector("[data-capture-cc]");
     const replyto=form.querySelector("[data-capture-replyto]");
-    if(cc) cc.value=state.email;
+    const autoresponse=form.querySelector("[data-capture-autoresponse]");
     if(replyto) replyto.value=state.email;
+    if(autoresponse){
+      const result=state.result||{};
+      const lines=[
+        "Your Buyer Readiness Snapshot",
+        "",
+        (result.business?.name||result.domain||state.website),
+        state.website,
+        "",
+        "WHAT COMES THROUGH CLEARLY",
+        result.strength?.title||"",
+        result.strength?.observation||"",
+        "",
+        "AREAS WORTH A CLOSER LOOK"
+      ];
+      (result.opportunities||[]).forEach((x,i)=>{
+        lines.push((i+1)+". "+x.title);
+        lines.push(x.observation);
+        lines.push("");
+      });
+      lines.push("BUYER SEARCH EXAMPLES");
+      (result.buyer_search_examples||[]).forEach(x=>lines.push("• "+x));
+      lines.push("");
+      lines.push("This is a quick evidence-led check of the public website, not a full audit or a guarantee of search or AI visibility.");
+      autoresponse.value=lines.join("\n");
+    }
     saveState();
   });
 
@@ -131,7 +155,10 @@
     saveState();
   });
 
-  document.querySelector("[data-back-results]")?.addEventListener("click",()=>show("snapshot"));
+  document.querySelector("[data-back-results]")?.addEventListener("click",()=>{
+    if(state.result) renderSnapshot(state.result);
+    show("snapshot");
+  });
   document.querySelector("[data-retry]")?.addEventListener("click",()=>{document.querySelector("[data-url-form]").reset();show("start");});
 
   const params=new URLSearchParams(location.search);
@@ -147,6 +174,7 @@
     history.replaceState({}, "", "/check");
     show("snapshot");
   } else if(submitted==="qualified" && restoreState()){
+    renderSnapshot(state.result);
     history.replaceState({}, "", "/check");
     show("complete");
   } else if(prefill){
