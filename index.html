@@ -48,8 +48,8 @@
     .narrative-bridge-copy strong{color:#eeede7}
     .build-story-grid{display:grid;gap:22px;margin-top:30px}
     .build-story{position:relative;overflow:hidden;border:1px solid rgba(238,237,231,.12);border-radius:28px;background:rgba(255,255,255,.032);padding:clamp(24px,4vw,38px)}
-    .build-story.primary-story{border-color:rgba(121,230,167,.3);background:linear-gradient(145deg,rgba(14,44,28,.68),rgba(6,14,10,.96))}
-    .build-story.primary-story:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle at 84% 8%,rgba(121,230,167,.13),transparent 32%);pointer-events:none}
+    .build-story.primary-story{border-color:rgba(121,230,167,.3);background:radial-gradient(circle at 84% 8%,rgba(121,230,167,.12),transparent 34%),linear-gradient(145deg,rgba(14,44,28,.68),rgba(6,14,10,.96))}
+    .build-story.pointer-glow::before{width:300px;height:300px;background:rgba(99,217,149,.14);filter:blur(54px)}
     .build-story>*{position:relative}
     .story-head{max-width:900px}
     .story-head h3{font-size:clamp(1.6rem,3vw,2.45rem);margin:14px 0}
@@ -300,7 +300,7 @@
         </div>
         <div class="narrative-bridge-copy">
           <p>I do not particularly enjoy leaving ideas as PowerPoint. If a problem is interesting enough, I tend to pull it apart, build something, put it in front of real people, and see whether reality agrees.</p>
-          <p><strong>The things below are not separate propositions competing for attention.</strong> They are examples of the same behaviour: curiosity, commercial judgement, and a bias towards turning an idea into something tangible enough to test.</p>
+          <p><strong>The projects below look different, but they come from the same instinct.</strong> Curiosity, commercial judgement, and a bias towards turning an idea into something tangible enough to test.</p>
         </div>
       </div>
     </section>
