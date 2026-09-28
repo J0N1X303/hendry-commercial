@@ -256,24 +256,32 @@ function makeFinding(id, dimension, title, observation, evidence) {
 function choosePages(allLinks) {
   const chosen = [];
   const seen = new Set();
-  const quotas = { offer: 3, proof: 2, decision: 2, action: 1, other: 2 };
+
+  // Sample broadly enough to understand the buying journey rather than
+  // over-weighting the homepage or one content type.
+  const quotas = { offer: 4, proof: 3, decision: 3, action: 2, other: 3 };
+  const maxPages = 15;
+
   const add = (l, type) => {
     const u = new URL(l.url);
     const k = (u.pathname.replace(/\/$/, "") || "/") + u.search;
-    if (seen.has(k) || chosen.length >= 10) return;
+    if (seen.has(k) || chosen.length >= maxPages) return;
     seen.add(k);
     chosen.push({ ...l, type });
   };
+
   for (const type of ["offer", "proof", "decision", "action", "other"]) {
     for (const l of allLinks.filter(x => classifyLink(x) === type)) {
       if (chosen.filter(x => x.type === type).length >= quotas[type]) break;
       add(l, type);
     }
   }
+
   for (const l of allLinks) {
-    if (chosen.length >= 10) break;
+    if (chosen.length >= maxPages) break;
     add(l, classifyLink(l));
   }
+
   return chosen;
 }
 
@@ -413,7 +421,7 @@ async function scanSite(input) {
     discoveredLinks
       .filter(l => /\.pdf(?:$|\?)/i.test(l.url) && /faq|question|price|pricing|pricelist|brochure|package|menu|information|guide/i.test((l.label + " " + l.url).toLowerCase()))
       .map(l => l.label || new URL(l.url).pathname.split("/").pop())
-  ).slice(0, 4);
+  ).slice(0, 6);
 
   const combinedText = pages.map(p => textOnly(p.html)).join(" ");
   const combined = combinedText.toLowerCase();
