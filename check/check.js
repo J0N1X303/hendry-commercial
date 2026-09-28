@@ -72,9 +72,22 @@
     const services=document.querySelector("[data-service-chips]"); services.innerHTML="";
     const offers=(r.facts?.offers||[]).slice(0,5); (offers.length?offers:["Offer identifiable"]).forEach(x=>services.insertAdjacentHTML("beforeend",'<span>'+esc(x)+'</span>'));
     const locations=document.querySelector("[data-location-chips]"); locations.innerHTML="";
-    const locs=(r.facts?.locations||[]).slice(0,5); (locs.length?locs:["No strong structured location signal"]).forEach(x=>locations.insertAdjacentHTML("beforeend",'<span>'+esc(x)+'</span>'));
+    const locs=[...(r.facts?.locations||[]),...(r.facts?.scope_signals||[])].slice(0,5);
+    (locs.length?locs:["No strong location or delivery-scope signal"]).forEach(x=>locations.insertAdjacentHTML("beforeend",'<span>'+esc(x)+'</span>'));
     const searches=document.querySelector("[data-search-list]"); searches.innerHTML=""; (r.buyer_search_examples||[]).forEach(x=>searches.insertAdjacentHTML("beforeend",'<span>'+esc(x)+'</span>'));
-    const count=(r.opportunities||[]).length; document.querySelector("[data-finding-count]").textContent=count||"—"; document.querySelector(".unlock-card strong").textContent=count===1?"area worth a closer look":count>1?"areas worth a closer look":"a result worth reviewing";
+    const count=(r.opportunities||[]).length;
+    const countEl=document.querySelector("[data-finding-count]");
+    const titleEl=document.querySelector(".unlock-card strong");
+    const noteEl=document.querySelector(".unlock-card p");
+    if(count===0){
+      countEl.textContent="✓";
+      titleEl.textContent="no obvious weakness forced";
+      noteEl.textContent="The site gave enough evidence that this quick check did not need to invent a criticism.";
+    }else{
+      countEl.textContent=count;
+      titleEl.textContent=count===1?"area worth a closer look":"areas worth a closer look";
+      noteEl.textContent="These could make it harder for a buyer to understand, compare, or shortlist you.";
+    }
   }
 
   function renderSnapshot(r){
