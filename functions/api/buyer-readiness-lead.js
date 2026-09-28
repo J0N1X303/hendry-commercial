@@ -24,7 +24,7 @@ function snapshotParts(body){
   const website=clean(body?.website,500);
   const strengthTitle=clean(body?.strength_title,500);
   const strengthBody=clean(body?.strength_body,1200);
-  const opportunities=Array.isArray(body?.opportunities) ? body.opportunities.slice(0,5).map((x,i)=>({
+  const opportunities=Array.isArray(body?.opportunities) ? body.opportunities.map((x,i)=>({
     number:i+1,
     title:clean(x?.title,500),
     body:clean(x?.observation || x?.body,1200)
