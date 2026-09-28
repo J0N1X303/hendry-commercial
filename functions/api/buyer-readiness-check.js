@@ -542,7 +542,10 @@ async function scanSite(input) {
       canonical_host: canonical.hostname,
       location_mentions: locationMentionsByPage(pages, locations),
       offer_pages_with_proof: offerPagesWithProof,
-      decision_documents: decisionPdfLinks,\n      faq_pages: faqPages.length,\n      standalone_faq_links: standaloneFaqLinks.length,\n      deep_proof_links: deepProofLinks.length
+      decision_documents: decisionPdfLinks,
+      faq_pages: faqPages.length,
+      standalone_faq_links: standaloneFaqLinks.length,
+      deep_proof_links: deepProofLinks.length
     }
   };
 }
