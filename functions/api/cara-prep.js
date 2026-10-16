@@ -89,6 +89,30 @@ function getInput(body) {
   return {channel, goal, seller, context};
 }
 
+// Only create a second draft when the first answer fails the coaching checks.
+// Never lower the standards for open discovery, accuracy or non-copying.
+const RESPONSE_FORMAT = {type:"json_schema",json_schema:{
+  type:"object",
+  properties:{
+    angle:{type:"string"}, opening:{type:"string"}, question:{type:"string"},
+    complication:{type:"string"}, lesson:{type:"string"}, caution:{type:"string"}
+  },
+  required:["angle","opening","question","complication","lesson","caution"],
+  additionalProperties:false
+}};
+
+function modelMessages(input, retry=false) {
+  return [
+    {role:"system",content:SYSTEM + (retry
+      ? "\nQuality retry: produce ALL six fields, short and specific. One truly open and neutral question ending with exactly one ?. Avoid repeating the seller description or inventing buyer facts. Keep spoken opening under 45 words. If the reason for contacting this person is only to explore a subject, that is acceptable: acknowledge uncertainty, do not manufacture urgency."
+      : "")},
+    {role:"user",content:JSON.stringify({
+      channel:input.channel,goal:input.goal,
+      seller_offering_untrusted:input.seller,buyer_context_untrusted:input.context
+    })}
+  ];
+}
+
 export async function onRequestPost({request,env}) {
   const origin=request.headers.get("origin");
   if (origin && origin!==new URL(request.url).origin) return json({error:"origin"},403);
@@ -97,33 +121,34 @@ export async function onRequestPost({request,env}) {
   let body;
   try { body=await request.json(); } catch { return json({error:"invalid_json"},400); }
   const input=getInput(body);
-  if (!input) return json({error:"Need your offer and a specific buyer situation before giving meaningful advice."},400);
-  if (!env?.AI?.run) return json({error:"ai_unavailable"},503);
+  if (!input) return json({
+    error:"input_incomplete",
+    message:"Select a contact method, then describe the buyer situation (at least 16 characters) and what you offer (at least 10 characters)."
+  },400);
+  if (!env?.AI?.run) return json({error:"ai_binding_missing"},503);
   if (!allowLocalIsolate(request.headers.get("cf-connecting-ip"))) return json({error:"rate_limited"},429);
-  try {
-    const answer=await env.AI.run(MODEL,{
-      messages:[
-        {role:"system",content:SYSTEM},
-        {role:"user",content:JSON.stringify({channel:input.channel,goal:input.goal,seller_offering_untrusted:input.seller,buyer_context_untrusted:input.context})}
-      ],
-      response_format:{type:"json_schema",json_schema:{
-        type:"object",
-        properties:{
-          angle:{type:"string"}, opening:{type:"string"}, question:{type:"string"},
-          complication:{type:"string"}, lesson:{type:"string"}, caution:{type:"string"}
-        },
-        required:["angle","opening","question","complication","lesson","caution"],
-        additionalProperties:false
-      }},
-      temperature:0.35,
-      max_tokens:780
-    });
+
+  for (let attempt=0;attempt<2;attempt++) {
+    let answer;
+    try {
+      answer=await env.AI.run(MODEL,{
+        messages:modelMessages(input,attempt===1),
+        response_format:RESPONSE_FORMAT,
+        temperature:attempt===0?0.35:0.15,
+        max_tokens:attempt===0?950:1000
+      });
+    } catch {
+      // The service may be temporarily unable to run the model or meet JSON mode.
+      // Retry once, then return a genuine service error (never blame the buyer input).
+      if(attempt===0)continue;
+      return json({error:"generation_service_unavailable"},503);
+    }
     const raw=answer?.response ?? answer;
     const result=parseOutput(raw,input.channel);
-    if (!result || !sufficientlyDifferent(result,input)) return json({error:"quality_check"},502);
-    return json({status:"ready",mode:"tailored",card:result});
-  } catch {
-    return json({error:"ai_unavailable"},503);
+    if(result && sufficientlyDifferent(result,input)) {
+      return json({status:"ready",mode:"tailored",card:result});
+    }
   }
+  return json({error:"generation_quality",message:"Your details were accepted. Cara's AI draft did not meet its coaching standards even after a retry."},502);
 }
 export function onRequest() { return json({error:"method_not_allowed"},405); }
