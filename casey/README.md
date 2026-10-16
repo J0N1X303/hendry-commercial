@@ -167,3 +167,18 @@ Changes:
 Mock end-to-end checks confirm named and unnamed email greetings, precisely one copied discovery question and one AI request on each case, plus no missing browser DOM nodes. Real generated hook quality remains to be assessed in the private preview.
 
 V4.1 is archived at `archive/casey-v4-1-before-email-quality-20261016`. No production deployment until owner approval and the agreed November launch review.
+
+## V4.3 — isolate call prompt and stream response heartbeat (16 October 2026)
+
+After V4.2 improved the email, the user again reported a ~12-second browser `TypeError` on first call submission. The root cause is not proven: browser idle connections, Cloudflare preview/function startup and session routing remain hypotheses. Importantly, the email enhancement modified the shared prompt; this was reverted for the phone channel.
+
+Changes:
+- Calls now use exactly the shorter V4.1 instruction prompt. Email alone uses the stronger V4.2 hook and conservative supplied-name personalisation.
+- The same authenticated `/casey/api` POST supports opt-in `Accept: application/x-ndjson`: the server sends an immediate `accepted` line and a `working` heartbeat every 3 seconds while AI inference runs. It sends exactly one final result line, then closes the stream. The legacy plain JSON response remains available.
+- Browser reads streamed lines with a chunk-safe parser and marks progress only on actual server messages, not on fictitious percentages. If a stream terminates early, the error distinguishes before and after server acknowledgement.
+- Still only one submission per click. Never retry a POST automatically when it may have reached AI inference; no extra readiness GET.
+- Kept the 70-second total browser deadline and the indeterminate progress bar. Public main is unchanged.
+
+Mock tests: call prompt is shorter and excludes email hook; email prompt retains hook; server response emits immediate ack, heartbeat, complete valid card, closes cleanly and makes one AI inference; non-stream clients still receive standard JSON; client reconstructs chunk-split NDJSON progress and final result; JS parses and all DOM IDs resolve.
+
+A successfully deployed Cloudflare preview does not verify first-attempt reliability on the user's iPhone. If the browser still fails without ever receiving an `accepted` event, investigate Cloudflare Pages Functions request logs and Basic Auth delivery instead of adding more AI processing or retries.
