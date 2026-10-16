@@ -128,6 +128,44 @@
     area.dataset.status = status;
     area.hidden = !message;
   }
+  async function receiveBriefing(response,progressUpdate) {
+    const kind=String(response.headers?.get('content-type')||'');
+    if(!kind.includes('application/x-ndjson')) {
+      return {status:response.status,result:await response.json()};
+    }
+    let completed=null;
+    let buffer='';
+    const handle=line=>{
+      if(!line.trim())return;
+      const message=JSON.parse(line);
+      if(message.event==='accepted')progressUpdate('accepted');
+      else if(message.event==='working')progressUpdate('working');
+      else if(message.event==='result')completed={status:message.status,result:message.data};
+    };
+    if(!response.body?.getReader) {
+      for(const line of (await response.text()).split('\n'))handle(line);
+    }else{
+      const reader=response.body.getReader();
+      const decoder=new TextDecoder();
+      try{
+        while(true){
+          const chunk=await reader.read();
+          if(chunk.done)break;
+          buffer+=decoder.decode(chunk.value,{stream:true});
+          if(buffer.length>30000)throw new Error('stream_too_large');
+          let newline;
+          while((newline=buffer.indexOf('\n'))>=0) {
+            handle(buffer.slice(0,newline));
+            buffer=buffer.slice(newline+1);
+          }
+        }
+        buffer+=decoder.decode();
+        if(buffer.trim())handle(buffer);
+      }finally{reader.releaseLock();}
+    }
+    if(!completed)throw new Error('stream_ended_without_result');
+    return completed;
+  }
   function validateResponse(obj) {
     if(!obj || obj.status!=='ready' || obj.mode!=='tailored' || !obj.card || typeof obj.card!=='object')return null;
     const card=obj.card;
@@ -231,7 +269,7 @@
     progressMessage.textContent='Connecting to the preparation service…';
     elapsedLabel.textContent='0 seconds elapsed';
     const started=Date.now();
-    let phase='generating', timedOut=false;
+    let phase='generating', timedOut=false, acceptedByServer=false;
     const controller=new AbortController();
     // Allow the full AI generation/retry window, rather than cancelling cold
     // requests at the old 28-second limit.
@@ -250,7 +288,7 @@
       progressMessage.textContent='Finding a relevant opening and one good question…';
       const requestOptions={
         method:'POST',
-        headers:{'content-type':'application/json'},
+        headers:{'content-type':'application/json','accept':'application/x-ndjson'},
         body:JSON.stringify(inputs),
         signal:controller.signal,
         cache:'no-store',
@@ -259,31 +297,45 @@
       // Only one POST per click. We cannot safely infer that a dropped
       // response means no inference took place server-side.
       const response=await fetch('/casey/api',requestOptions);
-      let result;
+      let outcome;
       try {
-        result=await response.json();
-      } catch {
-        feedback('Casey received an unexpected response from its test server (HTTP '+response.status+'). Your inputs are saved on screen; this is a technical problem, not missing information.','error');
+        outcome=await receiveBriefing(response,event=>{
+          if(event==='accepted') {
+            acceptedByServer=true;
+            phase='streaming';
+            progressMessage.textContent='Connected. Casey is preparing your briefing…';
+          }else if(event==='working') {
+            acceptedByServer=true;
+            phase='streaming';
+            progressMessage.textContent='Casey is still working on your briefing…';
+          }
+        });
+      }catch(error) {
+        feedback('The preparation response could not be completed ('+
+          (acceptedByServer?'service acknowledged request':'no service acknowledgement')+
+          ', '+Math.round((Date.now()-started)/1000)+'s elapsed). Your details are still here.','error');
         return;
       }
-      if(!response.ok) {
+      const result=outcome.result;
+      const status=outcome.status;
+      if(status>=400) {
         const errorCode=String(result?.error||'unknown');
-        if(response.status===400 && errorCode==='input_incomplete') {
+        if(status===400 && errorCode==='input_incomplete') {
           feedback(result.message||'Please check the required contact and offering fields.','error');
-        } else if(response.status===429) {
+        } else if(status===429) {
           feedback('Casey has reached its test usage limit. Your information was accepted. Please try later.','error');
-        } else if(response.status===502 && errorCode==='generation_quality') {
+        } else if(status===502 && errorCode==='generation_quality') {
           feedback('Your input is sufficient. Casey could not make a reliable briefing ('+String(result?.reason||'generation')+'). This is a generation problem; no changes to your details are needed.','error');
-        } else if(response.status===503 && errorCode==='ai_binding_missing') {
+        } else if(status===503 && errorCode==='ai_binding_missing') {
           feedback('Your information is sufficient. AI is not connected to this test deployment yet. This needs a site configuration fix, not a change to your prompt.','error');
-        } else if(response.status===503) {
+        } else if(status===503) {
           feedback('Your information is sufficient. The AI generation service is temporarily unavailable. Please try again shortly.','error');
-        } else if(response.status===401 || response.status===403) {
+        } else if(status===401 || status===403) {
           feedback('Your private preview session was not authorised. Reopen the private test link and sign in again.','error');
-        } else if(response.status===404 || response.status===405) {
-          feedback('Your information is sufficient. Casey’s preparation endpoint is missing from this preview (HTTP '+response.status+'). This needs a deployment fix.','error');
+        } else if(status===404 || status===405) {
+          feedback('Your information is sufficient. Casey’s preparation endpoint is missing from this preview (HTTP '+status+'). This needs a deployment fix.','error');
         } else {
-          feedback('Casey encountered a technical problem (HTTP '+response.status+', '+errorCode+'). Your information was accepted; please don’t rewrite it just to fix this.','error');
+          feedback('Casey encountered a technical problem (HTTP '+status+', '+errorCode+'). Your information was accepted; please don’t rewrite it just to fix this.','error');
         }
         return;
       }
@@ -299,7 +351,7 @@
         ? 'Casey is taking unusually long to respond. The request stopped after 70 seconds. Your details are still on screen; please retry when the service is responsive.'
         : error?.name==='AbortError'
           ? 'The preparation request was interrupted. Your details remain on screen.'
-          : 'Casey could not confirm a response from the preparation service ('+Math.round((Date.now()-started)/1000)+'s elapsed, '+(navigator.onLine===false?'browser reports offline':'browser network error')+'). The request was not resent automatically to avoid duplicate AI processing. Your details remain on screen.','error');
+          : 'Casey lost the connection ('+Math.round((Date.now()-started)/1000)+'s, '+(acceptedByServer?'after server acknowledgement':'before server acknowledgement')+'). No automatic duplicate request was made. Your details remain on screen.','error');
     } finally {
       clearTimeout(timeout);
       clearInterval(ticker);
