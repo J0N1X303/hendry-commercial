@@ -103,3 +103,17 @@ Changes:
 - Preserve the current local storage behavior, unchanged preview password, and the November release hold.
 
 QA: JS compiles, every referenced DOM ID exists, one test simulates early network failure then successful retry, and the progress UI is indeterminate and respects reduced-motion settings. Live model latency and real-world iPhone testing must be observed by the user; a successful Cloudflare preview build alone does not verify them.
+
+## V3.4 — first-request connection readiness (16 October 2026)
+
+Observed: first submission often fails with a transport error; a second submission of unchanged content works. V3.3's 70-second timeout and early POST retry did not resolve the symptom. Without live authenticated request traces, the exact cause remains unconfirmed; likely factors include Pages Function startup or Basic Auth request timing.
+
+Changes:
+- Implement an authenticated GET on the exact `/casey/api` path, protected by the existing middleware; returns only `ready`/HTTP status and checks the AI binding, without user inputs or AI inference.
+- Begin warming the same endpoint when the private page loads. Before POST, await the in-flight readiness call or run a fresh check. A failed background result must be retried on submission.
+- Retry GET once after a short delay for transient transport errors or 5xx failures. Do not retry 401/403 or missing-route 404/405.
+- Remove all automatic POST retries. An early TypeError does not prove the model request was never received; duplicating inference risks quota and inconsistent results.
+- Show the connection-check phase in the existing progress indicator, plus specific diagnostic codes for a failed readiness attempt.
+- Preserve the 70-second upper deadline, a single POST per user click, all existing sale-coaching rules, the old login credentials, and the private November release hold.
+
+Verified using mocked browser/Functions tests: first GET TypeError -> successful GET -> one successful POST; background GET failures -> fresh GET before submit; 401 -> no POST; POST TypeError -> no duplicate POST; progress starts and stops; server readiness returns 200 with an AI binding and 503 without. This is a simulated test, **not** a confirmed authenticated live invocation. Keep the feature unlaunched until the initial request succeeds reliably in a real browser.
