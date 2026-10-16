@@ -155,12 +155,12 @@
       openingTitle = 'Your introduction';
       opening = 'Hello,\n\n' +
         (about ? 'I work with businesses on ' + about + '. ' : '') +
-        'I’m reaching out about ' + topic + '. I’d be interested in how you’re approaching this area at the moment and whether there might be a useful conversation to have.\n\nNo problem if it is not a priority right now.\n\nBest,\n[Your name]';
+        'I’m reaching out about ' + topic + '. \n\nWhat does your current approach to this area look like?\n\nNo problem if it is not a priority right now.\n\nBest,\n[Your name]';
       question = 'What does your current approach to ' + topic + ' look like?';
       lesson = 'An introduction should give a genuine reason for contact and make it easy to decline. Avoid a long credentials pitch or an invented point of urgency.';
     } else if (data.format === 'followup') {
       openingTitle = 'Your follow-up';
-      opening = 'Hello,\n\nI wanted to pick up the thread on ' + topic + '. I know priorities can change, so I thought it might be useful to revisit this briefly.\n\nIf it remains relevant, I’d be interested in hearing where things stand. If not, no problem.\n\nBest,\n[Your name]';
+      opening = 'Hello,\n\nI wanted to pick up the thread on ' + topic + '. I know priorities can change.\n\nHow is this fitting into your priorities at the moment?\n\nIf it is no longer relevant, no problem.\n\nBest,\n[Your name]';
       question = 'How is ' + topic + ' fitting into your priorities at the moment?';
       lesson = 'Give a genuine reason for following up. Ask about what has changed, not why they failed to reply. Respect a clear no.';
     } else {
