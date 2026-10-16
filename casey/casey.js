@@ -128,50 +128,16 @@
     area.dataset.status = status;
     area.hidden = !message;
   }
-  // A cheap, authenticated GET to the same endpoint used for generation.
-  // It warms the Functions route, confirms the AI binding, and lets us
-  // separate connection/authentication faults from AI model failures.
-  // No offering or prospect details are sent and no inference is run.
-  let readinessPromise=null;
-  let readinessStarted=0;
-  async function checkServiceReady(onStage) {
-    const now=Date.now();
-    if(readinessPromise && now-readinessStarted<9000) {
-      const previous=await readinessPromise;
-      if(previous.ok || !onStage)return previous;
-      // A failed background warm-up must never poison the first submit.
-      // Recheck the same safe GET instead of sending a risky POST.
-    }
-    readinessStarted=now;
-    readinessPromise=(async()=>{
-      let code='unknown';
-      for(let attempt=0;attempt<2;attempt++) {
-        if(onStage)onStage(attempt?'Checking the connection again…':'Checking the private preparation service…');
-        const controller=new AbortController();
-        const deadline=setTimeout(()=>controller.abort(),8500);
-        try {
-          const response=await fetch('/casey/api?ready=1',{
-            method:'GET',headers:{accept:'application/json'},
-            credentials:'same-origin',cache:'no-store',
-            signal:controller.signal
-          });
-          if(response.status===401||response.status===403)return {ok:false,code:'authentication_'+response.status};
-          if(response.status===404||response.status===405)return {ok:false,code:'preview_route_'+response.status};
-          if(response.ok) {
-            const status=await response.json();
-            if(status?.ready===true)return {ok:true,code:'connected'};
-            code='ai_binding_missing';
-            if(status?.ready===false)return {ok:false,code};
-          } else code='service_http_'+response.status;
-        } catch(error) {
-          code=error?.name==='AbortError'?'readiness_timeout':
-            error?.name==='TypeError'?'readiness_network':'readiness_error';
-        } finally {clearTimeout(deadline);}
-        if(attempt===0)await new Promise(resolve=>setTimeout(resolve,850));
-      }
-      return {ok:false,code};
-    })();
-    return readinessPromise;
+  // Best-effort page-load warm-up. Never gate the user's POST on it:
+  // the warm-up GET has timed out in real browsers even when a subsequent
+  // generation succeeds. It carries no customer input and incurs no AI use.
+  function warmServiceQuietly() {
+    const controller=new AbortController();
+    const deadline=setTimeout(()=>controller.abort(),12000);
+    void fetch('/casey/api?warm=1',{
+      method:'GET',credentials:'same-origin',cache:'no-store',
+      headers:{accept:'application/json'},signal:controller.signal
+    }).catch(()=>{}).finally(()=>clearTimeout(deadline));
   }
 
   function validateResponse(obj) {
@@ -314,7 +280,7 @@
     progressMessage.textContent='Connecting to the preparation service…';
     elapsedLabel.textContent='0 seconds elapsed';
     const started=Date.now();
-    let phase='checking', timedOut=false;
+    let phase='generating', timedOut=false;
     const controller=new AbortController();
     // Allow the full AI generation/retry window, rather than cancelling cold
     // requests at the old 28-second limit.
@@ -328,20 +294,9 @@
       }
     },1000);
     try {
-      // Warm the same protected API route before submitting a real AI job.
-      // Retrying GET is safe; automatically retrying POST is not, because
-      // a transport error cannot prove the model never received the request.
-      const ready=await checkServiceReady(text=>{progressMessage.textContent=text;});
-      if(!ready.ok) {
-        feedback(ready.code.startsWith('authentication_')
-          ? 'The private Casey login needs renewing (readiness '+ready.code+'). Reopen this preview and sign in; your text is still here.'
-          : ready.code==='ai_binding_missing'
-          ? 'The preparation service is responding but its AI binding is unavailable. This is a preview configuration issue, not your inputs.'
-          : 'Casey could not establish a reliable connection before sending your briefing ('+ready.code+'). No AI request was made. Your text is still here; please retry.','error');
-        return;
-      }
-      phase='generating';
-      progressMessage.textContent='Connected. Preparing the commercial coaching…';
+      // Submit immediately; do not make successful GET health checks
+      // a prerequisite. The API itself returns explicit binding/auth errors.
+      progressMessage.textContent='Preparing your commercial coaching…';
       const requestOptions={
         method:'POST',
         headers:{'content-type':'application/json'},
@@ -393,7 +348,7 @@
         ? 'Casey is taking unusually long to respond. The request stopped after 70 seconds. Your details are still on screen; please retry when the service is responsive.'
         : error?.name==='AbortError'
           ? 'The preparation request was interrupted. Your details remain on screen.'
-          : 'The connection dropped during preparation. The service passed its readiness check, but Casey could not confirm a result. To avoid generating twice, your request was not resent. Your details remain on screen.','error');
+          : 'Casey could not confirm a response from the preparation service ('+Math.round((Date.now()-started)/1000)+'s elapsed, '+(navigator.onLine===false?'browser reports offline':'browser network error')+'). The request was not resent automatically to avoid duplicate AI processing. Your details remain on screen.','error');
     } finally {
       clearTimeout(timeout);
       clearInterval(ticker);
@@ -460,8 +415,6 @@
     switchMode('coach');
   }
   renderSkills();
-  // Start a safe warm-up as soon as the private page loads. The same check
-  // is also run/awaited on submission if this one did not complete.
-  void checkServiceReady(null).catch(()=>{});
+  warmServiceQuietly();
   window.ColdCallCaseyQuality=Object.freeze({checkDiscoveryQuestion,validateResponse,skills});
 })();
