@@ -72,3 +72,6 @@
  .pushback-main{padding:13px}
  .angle-test{margin-top:12px}
 }
+
+/* V3.2: incomplete optional model output must never render empty coaching cards. */
+.signal[hidden],.pushback-option[hidden],.angle-test[hidden],.verify[hidden]{display:none!important}
