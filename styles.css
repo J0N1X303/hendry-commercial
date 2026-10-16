@@ -941,7 +941,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #a4f4bf;outline-offset:3p
 
 /* Horizontal project cards: draggable on desktop without affecting native touch scroll. */
 @media (hover:hover) and (pointer:fine){
-  .project-track{cursor:grab}
+  .project-track{cursor:grab;scroll-snap-type:none}
   .project-track.is-dragging{cursor:grabbing;scroll-snap-type:none;user-select:none;-webkit-user-select:none}
   .project-track.is-dragging *{cursor:grabbing!important;user-select:none;-webkit-user-select:none}
 }
