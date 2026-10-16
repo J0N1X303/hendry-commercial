@@ -40,13 +40,16 @@ function evaluateDraft(raw,channel) {
   const fields=["angle","angle_test","opening","question","next_question","lesson","caution","verify"];
   for(const key of fields)card[key]=trim(o[key],key==="opening"?900:780);
   card.subject=trim(o.subject||"",90).replace(/[\r\n]+/g," ");
-  if(fields.some(k=>card[k].length<10))return {card:null,reason:"missing_core"};
+  const essentials=["angle","opening","question","next_question","lesson","caution"];
+  if(essentials.some(k=>card[k].length<10))return {card:null,reason:"missing_core"};
   if(!openQuestion(card.question)||!openQuestion(card.next_question))return {card:null,reason:"discovery_question"};
   if(card.question.toLowerCase()===card.next_question.toLowerCase()||overlap(card.question,card.next_question)>.77)return {card:null,reason:"duplicate_question"};
   const rawSignals=Array.isArray(o.signals)?o.signals:[];
   card.signals=rawSignals.slice(0,3).map(x=>({
     cue:trim(x?.cue,220),meaning:trim(x?.meaning,260),move:trim(x?.move,260)
   })).filter(x=>x.cue.length>=9&&x.meaning.length>=9&&x.move.length>=9);
+  // Two substantive conditional signals are preferable to rejecting the entire
+  // briefing because the model failed to supply a third cosmetic list item.
   if(card.signals.length<2)return {card:null,reason:"missing_signals"};
   const rawPushbacks=Array.isArray(o.pushbacks)?o.pushbacks:[];
   const byType={};
@@ -74,7 +77,9 @@ function evaluateDraft(raw,channel) {
       why:"A clear refusal ends the conversation. Don't try to win another opportunity."
     };
   }
-  card.pushbacks=expected.map(type=>byType[type]).filter(Boolean);
+  // Keep fixed presentation slots without inventing a synthetic reconnect pitch.
+  // An absent optional strategy is hidden in the browser.
+  card.pushbacks=expected.map(type=>byType[type]||null);
   if(channel==="call"){
     if(card.opening.includes("?"))return {card:null,reason:"call_opening_question"};
     card.subject="";
