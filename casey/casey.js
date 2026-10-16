@@ -128,6 +128,47 @@
     area.dataset.status = status;
     area.hidden = !message;
   }
+  // A cheap, authenticated GET to the same endpoint used for generation.
+  // It warms the Functions route, confirms the AI binding, and lets us
+  // separate connection/authentication faults from AI model failures.
+  // No offering or prospect details are sent and no inference is run.
+  let readinessPromise=null;
+  let readinessStarted=0;
+  async function checkServiceReady(onStage,allowReuse=false) {
+    const now=Date.now();
+    if(readinessPromise && (now-readinessStarted<9000))return readinessPromise;
+    readinessStarted=now;
+    readinessPromise=(async()=>{
+      let code='unknown';
+      for(let attempt=0;attempt<2;attempt++) {
+        if(onStage)onStage(attempt?'Checking the connection again…':'Checking the private preparation service…');
+        const controller=new AbortController();
+        const deadline=setTimeout(()=>controller.abort(),8500);
+        try {
+          const response=await fetch('/casey/api?ready=1',{
+            method:'GET',headers:{accept:'application/json'},
+            credentials:'same-origin',cache:'no-store',
+            signal:controller.signal
+          });
+          if(response.status===401||response.status===403)return {ok:false,code:'authentication_'+response.status};
+          if(response.status===404||response.status===405)return {ok:false,code:'preview_route_'+response.status};
+          if(response.ok) {
+            const status=await response.json();
+            if(status?.ready===true)return {ok:true,code:'connected'};
+            code='ai_binding_missing';
+            if(status?.ready===false)return {ok:false,code};
+          } else code='service_http_'+response.status;
+        } catch(error) {
+          code=error?.name==='AbortError'?'readiness_timeout':
+            error?.name==='TypeError'?'readiness_network':'readiness_error';
+        } finally {clearTimeout(deadline);}
+        if(attempt===0)await new Promise(resolve=>setTimeout(resolve,850));
+      }
+      return {ok:false,code};
+    })();
+    return readinessPromise;
+  }
+
   function validateResponse(obj) {
     if(!obj||obj.status!=='ready'||obj.mode!=='tailored'||!obj.card||typeof obj.card!=='object')return null;
     const c=obj.card;
@@ -268,7 +309,7 @@
     progressMessage.textContent='Connecting to the preparation service…';
     elapsedLabel.textContent='0 seconds elapsed';
     const started=Date.now();
-    let reconnecting=false, timedOut=false;
+    let phase='checking', timedOut=false;
     const controller=new AbortController();
     // Allow the full AI generation/retry window, rather than cancelling cold
     // requests at the old 28-second limit.
@@ -276,12 +317,26 @@
     const ticker=setInterval(()=>{
       const seconds=Math.floor((Date.now()-started)/1000);
       elapsedLabel.textContent=seconds+' second'+(seconds===1?'':'s')+' elapsed';
-      if(!reconnecting) {
+      if(phase==='generating') {
         if(seconds>=40)progressMessage.textContent='Still working — this is taking longer than usual. Your entries are safe.';
         else if(seconds>=12)progressMessage.textContent='Waiting for the AI to complete the commercial coaching…';
       }
     },1000);
     try {
+      // Warm the same protected API route before submitting a real AI job.
+      // Retrying GET is safe; automatically retrying POST is not, because
+      // a transport error cannot prove the model never received the request.
+      const ready=await checkServiceReady(text=>{progressMessage.textContent=text;});
+      if(!ready.ok) {
+        feedback(ready.code.startsWith('authentication_')
+          ? 'The private Casey login needs renewing (readiness '+ready.code+'). Reopen this preview and sign in; your text is still here.'
+          : ready.code==='ai_binding_missing'
+          ? 'The preparation service is responding but its AI binding is unavailable. This is a preview configuration issue, not your inputs.'
+          : 'Casey could not establish a reliable connection before sending your briefing ('+ready.code+'). No AI request was made. Your text is still here; please retry.','error');
+        return;
+      }
+      phase='generating';
+      progressMessage.textContent='Connected. Preparing the commercial coaching…';
       const requestOptions={
         method:'POST',
         headers:{'content-type':'application/json'},
@@ -290,28 +345,9 @@
         cache:'no-store',
         credentials:'same-origin'
       };
-      let response;
-      try {
-        response=await fetch('/casey/api',requestOptions);
-      } catch(error) {
-        const seconds=(Date.now()-started)/1000;
-        // Retry only an early, transport-level failure. Do not resubmit after
-        // a long-running request, a timeout, or an HTTP/model error: that
-        // could duplicate inference usage and conceal a persistent fault.
-        if(error?.name!=='TypeError'||seconds>=10||controller.signal.aborted)throw error;
-        reconnecting=true;
-        progressMessage.textContent='The connection dropped early. Reconnecting once…';
-        await new Promise((resolve,reject)=>{
-          const delay=setTimeout(resolve,800);
-          controller.signal.addEventListener('abort',()=>{
-            clearTimeout(delay);
-            reject(new DOMException('Request cancelled','AbortError'));
-          },{once:true});
-        });
-        response=await fetch('/casey/api',requestOptions);
-        reconnecting=false;
-        progressMessage.textContent='Connected. Waiting for Casey’s coaching…';
-      }
+      // Only one POST per click. We cannot safely infer that a dropped
+      // response means no inference took place server-side.
+      const response=await fetch('/casey/api',requestOptions);
       let result;
       try {
         result=await response.json();
@@ -352,7 +388,7 @@
         ? 'Casey is taking unusually long to respond. The request stopped after 70 seconds. Your details are still on screen; please retry when the service is responsive.'
         : error?.name==='AbortError'
           ? 'The preparation request was interrupted. Your details remain on screen.'
-          : 'The connection to Casey failed after a brief retry, or the browser interrupted the request. Your details are still on screen. Check the connection and try again.','error');
+          : 'The connection dropped during preparation. The service passed its readiness check, but Casey could not confirm a result. To avoid generating twice, your request was not resent. Your details remain on screen.','error');
     } finally {
       clearTimeout(timeout);
       clearInterval(ticker);
@@ -419,5 +455,8 @@
     switchMode('coach');
   }
   renderSkills();
+  // Start a safe warm-up as soon as the private page loads. The same check
+  // is also run/awaited on submission if this one did not complete.
+  void checkServiceReady(null).catch(()=>{});
   window.ColdCallCaseyQuality=Object.freeze({checkDiscoveryQuestion,validateResponse,skills});
 })();
