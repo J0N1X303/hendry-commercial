@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - feature/homepage-studio-20261016
+      - main
+    paths:
+      - index.html
+      - script.js
+      - styles.css
+      - tests/homepage.mjs
   pull_request:
     paths:
       - index.html
@@ -36,3 +42,21 @@ jobs:
           name: homepage-desktop-mobile-screenshots
           path: ui-artifacts/
           retention-days: 7
+      - name: Confirm public homepage after main deployment
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 24); do
+            if curl -fsSL --connect-timeout 10 --max-time 20 -H 'Cache-Control: no-cache' "https://hendrycommercial.co.uk/?build=${GITHUB_SHA}" -o /tmp/hc-live.html; then
+              if grep -q '20261016-studio1' /tmp/hc-live.html && grep -q 'studio-stage' /tmp/hc-live.html && ! grep -qi 'Cold Call Cara' /tmp/hc-live.html; then
+                curl -fsSL --connect-timeout 10 --max-time 20 'https://hendrycommercial.co.uk/check/' -o /dev/null
+                echo 'PASS: live homepage is updated, Cara remains unpublished and Buyer Readiness remains reachable.'
+                exit 0
+              fi
+            fi
+            echo "Waiting for deployment propagation (${attempt}/24)..."
+            sleep 10
+          done
+          echo 'FAIL: live homepage not verified within the deployment check window.'
+          exit 1
