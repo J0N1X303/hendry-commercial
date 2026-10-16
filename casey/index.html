@@ -16,8 +16,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/casey/casey.css?v=3.2">
-  <script src="/casey/casey.js?v=3.2-20261016" defer></script>
+  <link rel="stylesheet" href="/casey/casey.css?v=3.3-20261016">
+  <script src="/casey/casey.js?v=3.3-20261016" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -78,6 +78,14 @@
           </div>
           <p class="privacy-prompt">Casey sends the two input entries to Cloudflare Workers AI for your briefing. Don't enter confidential information or personal data. No account is needed.</p>
         </form>
+        <section class="casey-progress" id="casey-progress" hidden aria-label="Casey preparation status">
+          <div class="progress-heading">
+            <span class="progress-orbit" aria-hidden="true"></span>
+            <div><strong>Casey is preparing your briefing</strong><p id="progress-message" role="status" aria-live="polite">Connecting to the preparation service…</p></div>
+          </div>
+          <div class="casey-progress-track" role="progressbar" aria-label="Casey is working; completion time is not yet known"><div class="casey-progress-motion"></div></div>
+          <div class="progress-bottom"><span id="progress-elapsed" aria-label="Elapsed processing time">0 seconds elapsed</span><span>Activity indicator · time is not a completion estimate</span></div>
+        </section>
         <section class="prepare-feedback" id="prepare-feedback" hidden role="status" aria-live="polite"></section>
         <section class="result" id="preparation-result" hidden aria-live="polite">
           <div class="result-top"><span class="step">AI-tailored from your inputs</span><h3 id="result-title">A better way in</h3><p>No independent buyer research performed. Check every claim before using it.</p></div>
