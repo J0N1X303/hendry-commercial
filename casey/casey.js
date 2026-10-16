@@ -83,10 +83,10 @@
   }
 
   function safeGet() {
-    try { return localStorage.getItem(storeKey) || localStorage.getItem('hendry-casey-offer-v1') || ''; } catch { return ''; }
+    try { return localStorage.getItem(storeKey) || localStorage.getItem('hendry-cara-offer-v2') || localStorage.getItem('hendry-cara-offer-v1') || ''; } catch { return ''; }
   }
   function safeSave(value) {
-    try { if (value) localStorage.setItem(storeKey,value); else localStorage.removeItem(storeKey); localStorage.removeItem('hendry-casey-offer-v1'); } catch {}
+    try { if (value) localStorage.setItem(storeKey,value); else localStorage.removeItem(storeKey); localStorage.removeItem('hendry-cara-offer-v1'); localStorage.removeItem('hendry-cara-offer-v2'); } catch {}
   }
   function switchMode(mode) {
     ['prepare','coach'].forEach((name) => {
