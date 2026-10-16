@@ -129,48 +129,67 @@
     area.hidden = !message;
   }
   function validateResponse(obj) {
-    if (!obj || obj.status!=='ready' || obj.mode!=='tailored' || typeof obj.card!=='object') return null;
+    if(!obj||obj.status!=='ready'||obj.mode!=='tailored'||!obj.card||typeof obj.card!=='object')return null;
     const c=obj.card;
-    const fields=['angle','opening','question','next_question','listen_for','complication','lesson','caution'];
-    if (!fields.every(k=>typeof c[k]==='string' && c[k].trim().length>=12)) return null;
-    if(!checkDiscoveryQuestion(c.question).pass || !checkDiscoveryQuestion(c.next_question).pass) return null;
+    const fields=['angle','angle_test','opening','question','next_question','lesson','caution','verify'];
+    if(!fields.every(k=>typeof c[k]==='string'&&c[k].trim().length>=12))return null;
+    if(!checkDiscoveryQuestion(c.question).pass||!checkDiscoveryQuestion(c.next_question).pass)return null;
     if(c.question.trim().toLowerCase()===c.next_question.trim().toLowerCase())return null;
+    if(!Array.isArray(c.signals)||c.signals.length!==3||
+      !c.signals.every(item=>['cue','meaning','move'].every(k=>typeof item?.[k]==='string'&&item[k].trim().length>=12)))return null;
+    if(!Array.isArray(c.pushbacks)||c.pushbacks.length!==3||
+      !c.pushbacks.every((item,i)=>item?.type===['reframe','reconnect','respect_no'][i]&&
+        ['buyer','reply','why'].every(k=>typeof item?.[k]==='string'&&item[k].trim().length>=8)))return null;
     return c;
   }
   function displayCard(card,channel) {
     const isEmail=channel!=='call';
-    $('result-title').textContent=channel==='call'
-      ? 'A sharper way into the call'
-      : channel==='intro'?'An introduction with a reason':'A follow-up worth considering';
+    $('result-title').textContent=channel==='call'?'A sharper way into the call':
+      channel==='intro'?'An introduction with a reason':'A follow-up worth considering';
     $('cue-angle').textContent=card.angle;
+    $('cue-angle-test').textContent=card.angle_test;
     $('cue-opening-title').textContent=isEmail?'Your email — ready to edit':'A natural opening';
     $('cue-opening').textContent=card.opening;
-    // An email includes its initial question already. Never display or copy it twice.
+    // The initial email already includes the first discovery question.
+    // Coaching displays only the distinct question for a later reply.
     $('cue-question-title').textContent=isEmail?'If they reply, explore this':'Your first open question';
     $('cue-question').textContent=isEmail?card.next_question:card.question;
-    $('cue-question-hint').textContent=isEmail
-      ? 'A different question for a later exchange — not part of the email above.'
-      : 'Ask it once. Listen to the actual answer rather than rushing to another question.';
+    $('cue-question-hint').textContent=isEmail?'A different question for a later exchange — not part of the email above.':
+      'Ask it once. Listen to the actual answer rather than rushing to another question.';
     $('cue-next').hidden=isEmail;
-    if(!isEmail) {
-      $('cue-next-question').textContent=card.next_question;
-    }
-    $('cue-listen-for').textContent=card.listen_for;
-    $('cue-objection').textContent=card.complication;
+    if(!isEmail)$('cue-next-question').textContent=card.next_question;
+    card.signals.forEach((signal,i)=>{
+      $('signal-'+i+'-cue').textContent=signal.cue;
+      $('signal-'+i+'-meaning').textContent=signal.meaning;
+      $('signal-'+i+'-move').textContent=signal.move;
+    });
+    card.pushbacks.forEach((pushback,i)=>{
+      $('push-'+i+'-buyer').textContent=pushback.buyer;
+      $('push-'+i+'-reply').textContent=pushback.reply;
+      $('push-'+i+'-why').textContent=pushback.why;
+    });
     $('cue-lesson').textContent=card.lesson;
     $('cue-caution').textContent=card.caution;
+    $('cue-verify').textContent=card.verify;
     $('copy-card').textContent=isEmail?'Copy email':'Copy preparation card';
+    const signalsText=card.signals.map((x,i)=>
+      (i+1)+'. '+x.cue+'\nMeaning: '+x.meaning+'\nThen: '+x.move).join('\n\n');
+    const pushbacksText=card.pushbacks.map((x,i)=>
+      ['Reframe','Reposition or reconnect','Respect a clear no'][i]+
+      '\nBuyer may say: '+x.buyer+'\nYour reply: '+x.reply+'\nWhy: '+x.why).join('\n\n');
     lastCard=isEmail?card.opening:[
       'COLD CALL CASEY — CONVERSATION PREP',
-      'WHY THIS COULD BE RELEVANT\n'+card.angle,
+      'THE COMMERCIAL OBJECTIVE\n'+card.angle,
+      'WHAT WOULD MAKE IT RELEVANT\n'+card.angle_test,
       'OPENING\n'+card.opening,
       'INITIAL DISCOVERY QUESTION\n'+card.question,
-      'WHAT TO LISTEN FOR\n'+card.listen_for,
+      'WHAT TO LISTEN FOR\n'+signalsText,
+      'ONE THING TO PRACTISE\n'+card.lesson,
       'FOLLOW-UP AFTER THEIR ANSWER\n'+card.next_question,
-      'IF THEY PUSH BACK\n'+card.complication,
-      'ONE THING TO TRY\n'+card.lesson,
-      'DON’T ASSUME\n'+card.caution,
-      'Based only on the information supplied. Adapt to the person and check claims.'
+      'IF THEY PUSH BACK\n'+pushbacksText,
+      "DON'T ASSUME\n"+card.caution,
+      'HOW TO VERIFY\n'+card.verify,
+      'Based only on your inputs. Adapt to what the buyer actually says.'
     ].join('\n\n');
     $('preparation-result').hidden=false;
     $('reflection-message').textContent='';
