@@ -5,6 +5,12 @@
   "assets": {
     "directory": "."
   },
-  "ai": {"binding": "AI"},
-  "previews": {}
+  "ai": {
+    "binding": "AI"
+  },
+  "previews": {
+    "ai": {
+      "binding": "AI"
+    }
+  }
 }
