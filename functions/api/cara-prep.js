@@ -16,7 +16,7 @@ const questionPass = (q) => {
   const text = String(q||"").trim();
   return /^(what|how|which|where|when|who|describe|tell me about|walk me through)\b/i.test(text)
     && (text.match(/\?/g)||[]).length === 1
-    && !/\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with)\b/i.test(text);
+    && !/\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with|what problems|what challenges|what issues|how dissatisfied|how unhappy|how badly)\b/i.test(text);
 };
 const safe = (s, cap=850) => typeof s === "string" ? s.trim().slice(0,cap) : "";
 
