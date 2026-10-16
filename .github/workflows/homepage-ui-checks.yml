@@ -1,0 +1,38 @@
+name: Homepage desktop and mobile interaction checks
+on:
+  push:
+    branches:
+      - feature/homepage-studio-20261016
+  pull_request:
+    paths:
+      - index.html
+      - script.js
+      - styles.css
+      - tests/homepage.mjs
+  workflow_dispatch:
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test tooling
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Start local site
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hc-server.log 2>&1 &
+          sleep 2
+      - name: Check desktop, tablet and mobile functionality
+        run: node tests/homepage.mjs
+      - name: Keep browser screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: homepage-desktop-mobile-screenshots
+          path: ui-artifacts/
+          retention-days: 7
