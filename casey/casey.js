@@ -258,19 +258,60 @@
     setProfileCollapsed($('remember').checked);
     running=true;
     $('generate-button').disabled=true;
-    $('generate-button').textContent='Considering the buyer situation…';
+    $('generate-button').textContent='Preparing your briefing…';
     $('preparation-result').hidden=true;
-    feedback('Considering the buyer decision, useful signals and the right response to pushback.','info');
+    feedback('');
+    const progress=$('casey-progress');
+    const progressMessage=$('progress-message');
+    const elapsedLabel=$('progress-elapsed');
+    progress.hidden=false;
+    progressMessage.textContent='Connecting to the preparation service…';
+    elapsedLabel.textContent='0 seconds elapsed';
+    const started=Date.now();
+    let reconnecting=false, timedOut=false;
     const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(),28000);
+    // Allow the full AI generation/retry window, rather than cancelling cold
+    // requests at the old 28-second limit.
+    const timeout=setTimeout(()=>{timedOut=true;controller.abort();},70000);
+    const ticker=setInterval(()=>{
+      const seconds=Math.floor((Date.now()-started)/1000);
+      elapsedLabel.textContent=seconds+' second'+(seconds===1?'':'s')+' elapsed';
+      if(!reconnecting) {
+        if(seconds>=40)progressMessage.textContent='Still working — this is taking longer than usual. Your entries are safe.';
+        else if(seconds>=12)progressMessage.textContent='Waiting for the AI to complete the commercial coaching…';
+      }
+    },1000);
     try {
-      const response=await fetch('/casey/api',{
+      const requestOptions={
         method:'POST',
         headers:{'content-type':'application/json'},
         body:JSON.stringify(inputs),
         signal:controller.signal,
-        cache:'no-store'
-      });
+        cache:'no-store',
+        credentials:'same-origin'
+      };
+      let response;
+      try {
+        response=await fetch('/casey/api',requestOptions);
+      } catch(error) {
+        const seconds=(Date.now()-started)/1000;
+        // Retry only an early, transport-level failure. Do not resubmit after
+        // a long-running request, a timeout, or an HTTP/model error: that
+        // could duplicate inference usage and conceal a persistent fault.
+        if(error?.name!=='TypeError'||seconds>=10||controller.signal.aborted)throw error;
+        reconnecting=true;
+        progressMessage.textContent='The connection dropped early. Reconnecting once…';
+        await new Promise((resolve,reject)=>{
+          const delay=setTimeout(resolve,800);
+          controller.signal.addEventListener('abort',()=>{
+            clearTimeout(delay);
+            reject(new DOMException('Request cancelled','AbortError'));
+          },{once:true});
+        });
+        response=await fetch('/casey/api',requestOptions);
+        reconnecting=false;
+        progressMessage.textContent='Connected. Waiting for Casey’s coaching…';
+      }
       let result;
       try {
         result=await response.json();
@@ -307,11 +348,15 @@
       feedback('');
       displayCard(card,inputs.channel);
     } catch(error) {
-      feedback(error?.name==='AbortError'
-        ? 'The briefing took too long. Your text is still here — please try again.'
-        : 'Casey couldn’t reach the preparation service. Your text is still here — please try again or use a coaching challenge.','error');
+      feedback(timedOut
+        ? 'Casey is taking unusually long to respond. The request stopped after 70 seconds. Your details are still on screen; please retry when the service is responsive.'
+        : error?.name==='AbortError'
+          ? 'The preparation request was interrupted. Your details remain on screen.'
+          : 'The connection to Casey failed after a brief retry, or the browser interrupted the request. Your details are still on screen. Check the connection and try again.','error');
     } finally {
       clearTimeout(timeout);
+      clearInterval(ticker);
+      progress.hidden=true;
       running=false;
       $('generate-button').disabled=false;
       $('generate-button').textContent='Help me prepare →';
