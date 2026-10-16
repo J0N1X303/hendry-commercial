@@ -1,6 +1,6 @@
 // Cold Call Cara: short, bounded AI drafting. Requires Workers AI binding "AI".
 // Treat user input as untrusted scenario data, never as system instructions.
-const MODEL = "@cf/meta/llama-3.1-8b-instruct";
+const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const FORMATS = new Set(["call","intro","followup"]);
 const GOALS = new Set(["explore","reconnect","next-step"]);
 const sessionHits = new Map();
@@ -40,7 +40,17 @@ function parseOutput(raw) {
   if (words(result.opening) > 115) return null;
   if (words(result.complication) > 70) return null;
   if (words(result.lesson) > 70) return null;
+  
   return result;
+}
+
+function sufficientlyDifferent(card, input) {
+  const seller = input.seller.toLowerCase().replace(/\s+/g," ");
+  const opening = card.opening.toLowerCase().replace(/\s+/g," ");
+  // Reproducing the complete supplied service description was the original failure mode.
+  if (seller.length >= 32 && opening.includes(seller)) return false;
+  if (/(i saw|i noticed|recently announced|congratulations on)/i.test(card.opening) && !/\b(announced|published|launched|posted|reported|news|confirmed|saw|noticed)\b/i.test(input.context)) return false;
+  return true;
 }
 
 function allowLocalIsolate(ip) {
@@ -93,13 +103,21 @@ export async function onRequestPost({request,env}) {
         {role:"system",content:SYSTEM},
         {role:"user",content:JSON.stringify({channel:input.channel,goal:input.goal,seller_offering_untrusted:input.seller,buyer_context_untrusted:input.context})}
       ],
-      response_format:{type:"json_object"},
+      response_format:{type:"json_schema",json_schema:{
+        type:"object",
+        properties:{
+          angle:{type:"string"}, opening:{type:"string"}, question:{type:"string"},
+          complication:{type:"string"}, lesson:{type:"string"}, caution:{type:"string"}
+        },
+        required:["angle","opening","question","complication","lesson","caution"],
+        additionalProperties:false
+      }},
       temperature:0.35,
       max_tokens:780
     });
     const raw=answer?.response ?? answer;
     const result=parseOutput(raw);
-    if (!result) return json({error:"quality_check"},502);
+    if (!result || !sufficientlyDifferent(result,input)) return json({error:"quality_check"},502);
     return json({status:"ready",mode:"tailored",card:result});
   } catch {
     return json({error:"ai_unavailable"},503);
