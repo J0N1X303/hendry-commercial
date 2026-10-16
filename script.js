@@ -163,8 +163,6 @@
   const commercialMap = document.querySelector('[data-commercial-map]');
   const frameworkToggle = document.querySelector('[data-framework-toggle]');
   const frameworkDetail = document.querySelector('[data-framework-detail]');
-  const pressureToggle = document.querySelector('[data-pressure-toggle]');
-  const pressureDetail = document.querySelector('[data-pressure-detail]');
 
   function setDisclosure(toggle, detail, open) {
     if (!toggle || !detail) return;
@@ -175,35 +173,63 @@
   frameworkToggle?.addEventListener('click', () => {
     const open = frameworkToggle.getAttribute('aria-expanded') !== 'true';
     setDisclosure(frameworkToggle, frameworkDetail, open);
-    if (!open) setDisclosure(pressureToggle, pressureDetail, false);
-  });
-
-  pressureToggle?.addEventListener('click', () => {
-    const open = pressureToggle.getAttribute('aria-expanded') !== 'true';
-    setDisclosure(pressureToggle, pressureDetail, open);
   });
 
   if (commercialMap) {
     const tabs = [...commercialMap.querySelectorAll('[data-engine-tab]')];
     const panels = [...commercialMap.querySelectorAll('[data-engine-panel]')];
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        setDisclosure(frameworkToggle, frameworkDetail, true);
-        const target = tab.dataset.engineTab;
-        tabs.forEach((item) => {
-          const active = item === tab;
-          item.classList.toggle('is-active', active);
-          item.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-        panels.forEach((panel) => {
-          const active = panel.dataset.enginePanel === target;
-          panel.hidden = !active;
-          panel.classList.toggle('is-active', active);
-        });
+    const lensData = {
+      buy: {
+        number: '01 / BUY',
+        title: 'What would make someone choose us?',
+        description: 'Start with the buying decision, not the sales activity. Customers form a view of credibility, proof and risk long before a seller enters the conversation.',
+        question: 'What can a buyer see and verify before they ever speak to us?',
+        next: 'Then compare the experience with two credible alternatives from the buyer’s perspective.'
+      },
+      sell: {
+        number: '02 / SELL',
+        title: 'Where is progress actually happening?',
+        description: 'Pipeline activity can look impressive without changing a buyer’s decision. Focus on decisions and commitments that move an opportunity forward.',
+        question: 'What has the buyer committed to that materially moves this forward?',
+        next: 'Then inspect the last ten qualified opportunities for observable buyer actions.'
+      },
+      build: {
+        number: '03 / BUILD',
+        title: 'What makes good performance repeatable?',
+        description: 'Revenue is fragile if it depends on heroic effort, invisible know-how or systems people work around rather than with.',
+        question: 'Which important decision or task still depends on one person’s judgement?',
+        next: 'Then distinguish useful standardisation from process that merely adds work.'
+      }
+    };
+    const stage = commercialMap.querySelector('.studio-stage');
+    const fields = {
+      number: stage?.querySelector('[data-stage-number]'),
+      title: stage?.querySelector('[data-stage-title]'),
+      description: stage?.querySelector('[data-stage-description]'),
+      question: stage?.querySelector('[data-stage-question]'),
+      next: stage?.querySelector('[data-stage-next]')
+    };
+    const chooseLens = (target) => {
+      const selected = lensData[target];
+      if (!selected) return;
+      tabs.forEach(tab => {
+        const active = tab.dataset.engineTab === target;
+        tab.classList.toggle('is-active', active);
+        tab.setAttribute('aria-pressed', String(active));
       });
-    });
+      panels.forEach(panel => {
+        const active = panel.dataset.enginePanel === target;
+        panel.hidden = !active;
+        panel.classList.toggle('is-active', active);
+      });
+      Object.keys(fields).forEach(key => {
+        if (fields[key]) fields[key].textContent = selected[key];
+      });
+      if (stage) stage.dataset.activeLens = target;
+    };
+    tabs.forEach(tab => tab.addEventListener('click', () => chooseLens(tab.dataset.engineTab)));
+    chooseLens('buy');
   }
-
 
   const pressureTest = document.querySelector('[data-commercial-pressure]');
   if (pressureTest) {
@@ -255,6 +281,31 @@
         if (move) move.textContent = selected.move;
       });
     });
+  }
+
+  // Preserve native touch/trackpad scrolling; arrows add a desktop affordance.
+  const projectTrack = document.querySelector('[data-project-track]');
+  const projectPrev = document.querySelector('[data-project-prev]');
+  const projectNext = document.querySelector('[data-project-next]');
+  if (projectTrack && projectPrev && projectNext) {
+    const step = () => {
+      const card = projectTrack.querySelector('.project-card');
+      const gap = parseFloat(window.getComputedStyle(projectTrack).gap) || 16;
+      return card ? card.getBoundingClientRect().width + gap : projectTrack.clientWidth * 0.85;
+    };
+    const move = direction => projectTrack.scrollBy({
+      left: direction * step(),
+      behavior: reduceMotion ? 'instant' : 'smooth'
+    });
+    projectPrev.addEventListener('click', () => move(-1));
+    projectNext.addEventListener('click', () => move(1));
+    const updateArrows = () => {
+      projectPrev.disabled = projectTrack.scrollLeft <= 3;
+      projectNext.disabled = projectTrack.scrollLeft >= projectTrack.scrollWidth - projectTrack.clientWidth - 3;
+    };
+    projectTrack.addEventListener('scroll', updateArrows, { passive: true });
+    window.addEventListener('resize', updateArrows);
+    updateArrows();
   }
 
   const cvDialog = document.querySelector('[data-cv-dialog]');
