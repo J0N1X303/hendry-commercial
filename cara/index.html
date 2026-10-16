@@ -16,8 +16,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/cara/cara.css?v=1">
-  <script src="/cara/cara.js?v=1" defer></script>
+  <link rel="stylesheet" href="/cara/cara.css?v=2">
+  <script src="/cara/cara.js?v=2" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -32,9 +32,9 @@
         <h1>Cold Call <em>Cara.</em></h1>
         <p class="headline">Make your next conversation a better one.</p>
         <p class="intro">Less overthinking. A better opening, a useful question and one thing to try on your next real customer contact.</p>
-        <div class="trust"><span>About a minute</span><span>No account</span><span>No roleplay</span><span>Free</span></div>
+        <div class="trust"><span>A short briefing</span><span>No account</span><span>No roleplay</span><span>Free</span></div>
       </div>
-      <aside class="hero-note" aria-label="How Cara works"><span class="note-icon" aria-hidden="true">↗</span><strong>Not another sales script.</strong><p>A small shift in approach can change the whole conversation. Cara gives you something worth trying, not something to memorise.</p><span class="scribble">Prepare → Contact → Learn</span></aside>
+      <aside class="hero-note" aria-label="How Cara works"><span class="note-icon" aria-hidden="true">↗</span><strong>Not another sales script.</strong><p>A small shift in approach can change the whole conversation. Cara looks for buyer relevance and one meaningful question — not a generic script.</p><span class="scribble">Prepare → Contact → Learn</span></aside>
     </section>
 
     <section class="workspace" aria-labelledby="work-title">
@@ -48,38 +48,47 @@
       </div>
 
       <section id="panel-prepare" class="panel" role="tabpanel" aria-labelledby="tab-prepare">
-        <div class="panel-top"><span class="step">01 / 02</span><h3>Tell Cara just enough.</h3><p>Your preparation stays on this device. Cara doesn't research or contact the prospect.</p></div>
+        <div class="panel-top"><span class="step">Before the real contact</span><h3>Give Cara the situation. Not a script.</h3><p>Two details the first time. Just the buyer situation after that.</p></div>
         <form id="prepare-form">
-          <fieldset class="format-picker"><legend>What are you about to do?</legend><div class="option-grid">
-            <label class="pill-radio"><input type="radio" name="format" value="call" checked><span>☎ <b>Make a call</b></span></label>
-            <label class="pill-radio"><input type="radio" name="format" value="intro"><span>↗ <b>Send an introduction</b></span></label>
-            <label class="pill-radio"><input type="radio" name="format" value="followup"><span>↻ <b>Follow up</b></span></label>
+          <fieldset class="format-picker"><legend>How are you reaching out?</legend><div class="option-grid">
+            <label class="pill-radio"><input type="radio" name="channel" value="call" checked><span>☎ <b>Call</b></span></label>
+            <label class="pill-radio"><input type="radio" name="channel" value="intro"><span>↗ <b>Introduction email</b></span></label>
+            <label class="pill-radio"><input type="radio" name="channel" value="followup"><span>↻ <b>Follow-up</b></span></label>
           </div></fieldset>
-          <div class="form-grid">
-            <div class="field"><label for="topic">What do you want to understand or discuss? <span class="req">Required</span></label><input id="topic" name="topic" maxlength="130" placeholder="e.g. packaging for a new product range" required><small>Write the subject of a conversation, not your sales pitch.</small></div>
-            <div class="field"><label for="reason">Why this prospect, why now? <span class="optional">Optional</span></label><input id="reason" name="reason" maxlength="170" placeholder="e.g. their recently announced product launch"><small>Only enter something you actually know. Cara won't invent a reason.</small></div>
-            <div class="field"><label for="offer">What do you help customers with? <span class="optional">Optional</span></label><input id="offer" name="offer" maxlength="150" placeholder="e.g. launch-ready packaging supply"><small>Think about the outcome, rather than a feature list.</small></div>
-            <div class="field"><label for="company">Company you're contacting <span class="optional">Optional</span></label><input id="company" name="company" maxlength="100" placeholder="e.g. a food manufacturer"><small>For your context only; we won't guess what they need.</small></div>
+          <div class="buyer-field field">
+            <label for="context">Who are you approaching, and what's the reason? <span class="req">Required</span></label>
+            <textarea id="context" name="context" rows="3" maxlength="450" minlength="16" required placeholder="e.g. Operations director at a food brand. They have announced a new range, and I want to understand how they're planning the packaging."></textarea>
+            <small>What you know, not what you assume. A person’s name is unnecessary. No website research is performed.</small>
           </div>
-          <fieldset class="challenge-picker"><legend>What might make this tricky?</legend><div class="chip-options">
-            <label><input type="radio" name="obstacle" value="none" checked><span>Not sure yet</span></label>
-            <label><input type="radio" name="obstacle" value="incumbent"><span>Existing supplier</span></label>
-            <label><input type="radio" name="obstacle" value="busy"><span>They're busy</span></label>
-            <label><input type="radio" name="obstacle" value="send"><span>“Send an email”</span></label>
-            <label><input type="radio" name="obstacle" value="gatekeeper"><span>Gatekeeper</span></label>
-            <label><input type="radio" name="obstacle" value="silence"><span>No response yet</span></label>
-          </div></fieldset>
-          <div class="form-footer"><label class="remember"><input type="checkbox" id="remember"> Remember my offer on this device</label><button type="submit" class="btn primary">Get my preparation card <span aria-hidden="true">→</span></button></div>
+          <div class="seller-head">
+            <div><label for="seller">What do you help customers with?</label><p>Set this once. Cara uses it to explore buyer relevance, not repeat a sales pitch.</p></div>
+            <button type="button" class="small-link" id="edit-profile" hidden>Edit your offering ↗</button>
+          </div>
+          <div class="field seller-area" id="seller-area">
+            <textarea id="seller" name="seller" rows="2" maxlength="300" minlength="10" required placeholder="e.g. I source and design packaging, including sustainable materials and new product packaging."></textarea>
+            <small id="seller-hint">Plain English is fine. You don’t need to write something polished.</small>
+          </div>
+          <details class="fine-tune"><summary>Optional: What outcome do you want?</summary>
+            <label for="goal">Your immediate aim</label>
+            <select id="goal"><option value="explore">Understand their situation (recommended)</option><option value="reconnect">Restart a conversation</option><option value="next-step">Explore a sensible next step</option></select>
+          </details>
+          <div class="form-footer">
+            <label class="remember"><input type="checkbox" id="remember" checked> Remember my offering on this device</label>
+            <button type="submit" id="generate-button" class="btn primary">Help me prepare <span aria-hidden="true">→</span></button>
+          </div>
+          <p class="privacy-prompt">Cara sends these two entries to Cloudflare Workers AI for your briefing. Don't enter confidential information or personal data. No account is needed.</p>
         </form>
+        <section class="prepare-feedback" id="prepare-feedback" hidden role="status" aria-live="polite"></section>
         <section class="result" id="preparation-result" hidden aria-live="polite">
-          <div class="result-top"><span class="step">02 / 02 · Ready to use</span><h3 id="result-title">Your conversation card</h3><p id="result-context"></p></div>
+          <div class="result-top"><span class="step">AI-tailored from your inputs</span><h3 id="result-title">A better way in</h3><p>No independent buyer research performed. Check every claim before using it.</p></div>
+          <div class="angle"><span class="angle-label">The potential relevance</span><p id="cue-angle"></p></div>
           <div class="cue"><span class="cue-no">01</span><div><h4 id="cue-opening-title">Start here</h4><p id="cue-opening"></p></div></div>
-          <div class="cue"><span class="cue-no">02</span><div><h4>Ask this open question</h4><p id="cue-question"></p><small>Ask one question. Then give them room to answer.</small></div></div>
-          <div class="cue"><span class="cue-no">03</span><div><h4 id="cue-objection-title">If the conversation stalls</h4><p id="cue-objection"></p></div></div>
-          <div class="lesson"><span class="lesson-label">One thing to try</span><p id="cue-lesson"></p></div>
-          <p class="result-disclaimer">Starter language, not a script. Adapt it to your voice and the actual response. No claims about the prospect have been independently verified.</p>
-          <div class="result-actions"><button type="button" class="btn primary" id="copy-card">Copy my card</button><button type="button" class="btn subtle" id="start-again">Change the approach</button></div>
-          <div class="reflection"><h4>After the real contact, what happened?</h4><div class="reflection-buttons" role="group" aria-label="Record call outcome"><button type="button" data-outcome="useful">Useful conversation</button><button type="button" data-outcome="no-fit">Not a fit</button><button type="button" data-outcome="not-reached">Didn't connect</button></div><p class="reflection-message" id="reflection-message" aria-live="polite"></p></div>
+          <div class="cue"><span class="cue-no">02</span><div><h4>One open discovery question</h4><p id="cue-question"></p><small>Ask it, then listen. This is a starting point, not a checklist.</small></div></div>
+          <div class="cue"><span class="cue-no">03</span><div><h4>If the conversation doesn't open up</h4><p id="cue-objection"></p></div></div>
+          <div class="lesson"><span class="lesson-label">One skill to practise</span><p id="cue-lesson"></p></div>
+          <div class="caution"><strong>Don't assume</strong><p id="cue-caution"></p></div>
+          <div class="result-actions"><button type="button" class="btn primary" id="copy-card">Copy the useful bits</button><button type="button" class="btn subtle" id="start-again">Refine the context</button></div>
+          <div class="reflection"><h4>After the real contact, what happened?</h4><div class="reflection-buttons" role="group" aria-label="Reflect on the outcome"><button type="button" data-outcome="useful">Useful conversation</button><button type="button" data-outcome="no-fit">Not a fit</button><button type="button" data-outcome="not-reached">Didn't connect</button></div><p class="reflection-message" id="reflection-message" aria-live="polite"></p></div>
         </section>
       </section>
 
@@ -105,7 +114,7 @@
 
     <footer>
       <p><strong>Cold Call Cara</strong> is an experimental, free coaching utility from <a href="/">Hendry Commercial</a>. It's not an AI imitation of a prospect; it helps you prepare for a real person.</p>
-      <p>We don't send your entered details to a server. Only your offer is optionally saved in your browser. Outcome reflections aren't stored. Avoid entering confidential or sensitive prospect information. <button class="inline-button" type="button" id="clear-local">Clear local data</button></p>
+      <p>Only an optional saved offering is stored in your browser. The entries you submit for a briefing are sent to Cloudflare Workers AI. Avoid entering personal or confidential information. <button class="inline-button" type="button" id="clear-local">Clear local data</button></p>
       <p class="reg-note">For UK outbound calls, check the applicable <a href="https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guide-to-pecr/electronic-and-telephone-marketing/telephone-marketing/" target="_blank" rel="noopener noreferrer">ICO telephone marketing guidance</a>, including TPS/CTPS screening and objections.</p>
     </footer>
   </main>

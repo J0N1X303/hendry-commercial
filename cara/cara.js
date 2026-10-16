@@ -1,8 +1,7 @@
 (() => {
   'use strict';
-
   const $ = (id) => document.getElementById(id);
-  const storeKey = 'hendry-cara-offer-v1';
+  const storeKey = 'hendry-cara-offer-v2';
   const skills = [
     {
       id:'question-first', name:'Ask before you pitch', tag:'Discovery',
@@ -48,42 +47,10 @@
     }
   ];
 
-  const obstacles = {
-    none:{
-      title:'If the fit is unclear',
-      line:'If the response shows no clear need, explore their priorities without pushing for a meeting. A useful no can save both sides time.',
-      lesson:'Keep the first exchange focused on learning whether a conversation is relevant, not securing a meeting at any cost.'
-    },
-    incumbent:{
-      title:'If they already have a supplier',
-      line:'“How does your current arrangement usually work when your requirements change?”',
-      lesson:'An existing supplier is not automatically a problem. Understand what works before suggesting anything different.'
-    },
-    busy:{
-      title:'If they are short on time',
-      line:'“Understood. What would be the most useful way to pick this up, if it becomes relevant?”',
-      lesson:'Stop when someone says they are busy. Respect their answer, including if the answer is not to follow up.'
-    },
-    send:{
-      title:'If they say “Send an email”',
-      line:'“Of course. What would be most useful to include so it’s relevant to your situation?”',
-      lesson:'Make the email about the buyer’s stated priorities. If they give no context, keep it short rather than assuming interest.'
-    },
-    gatekeeper:{
-      title:'If someone else answers',
-      line:'“Who would be best placed to explain how this area is managed?”',
-      lesson:'Be transparent about who you are and why you called. Don’t invent a relationship or an appointment to get through.'
-    },
-    silence:{
-      title:'If your earlier message had no reply',
-      line:'Offer one new, specific reason to revisit the subject; otherwise give a respectful way to decline. Avoid another empty “just checking in”.',
-      lesson:'Silence is not an objection you can solve with volume. Add relevance, change the channel appropriately or stop.'
-    }
-  };
 
   let selectedSkill = skills[0].id;
   let lastCard = '';
-  let toastTimer;
+  let toastTimer, running = false;
 
   function toast(message) {
     const el = $('toast');
@@ -110,102 +77,84 @@
         if (!ok) throw new Error('Copy unavailable');
       }
       toast(message || 'Copied');
-    } catch (error) {
-      toast('Copy unavailable here. Please select and copy the text manually.');
+    } catch {
+      toast('Copy unavailable. Select and copy the text manually.');
     }
   }
 
   function safeGet() {
-    try { return localStorage.getItem(storeKey) || ''; } catch (_) { return ''; }
+    try { return localStorage.getItem(storeKey) || localStorage.getItem('hendry-cara-offer-v1') || ''; } catch { return ''; }
   }
   function safeSave(value) {
-    try {
-      if (value) localStorage.setItem(storeKey,value);
-      else localStorage.removeItem(storeKey);
-    } catch (_) {}
+    try { if (value) localStorage.setItem(storeKey,value); else localStorage.removeItem(storeKey); localStorage.removeItem('hendry-cara-offer-v1'); } catch {}
   }
-  function switchMode(mode, focus) {
+  function switchMode(mode) {
     ['prepare','coach'].forEach((name) => {
       const active = name === mode;
       $('tab-' + name).classList.toggle('active', active);
       $('tab-' + name).setAttribute('aria-selected', String(active));
       $('panel-' + name).hidden = !active;
     });
-    if (focus) $('tab-' + mode).focus();
   }
-
-  function checkDiscoveryQuestion(question) {
-    const clean = String(question || '').trim();
-    const opens = /^(what|how|where|when|who|which|tell me about|walk me through|describe)\b/i.test(clean);
-    const multiple = (clean.match(/\?/g) || []).length !== 1;
-    const loaded = /\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you)\b/i.test(clean);
-    return {pass: opens && !multiple && !loaded, reason: !opens ? 'Not an open question' : multiple ? 'Ask one question at a time' : loaded ? 'Potentially leading question' : 'Neutral open discovery opening'};
-  }
-
   function getFormValue(name) {
-    const element = document.querySelector('input[name="' + name + '"]:checked');
-    return element ? element.value : '';
+    return document.querySelector('input[name="' + name + '"]:checked')?.value || '';
   }
-
-  function makeCard(data) {
-    const topic = data.topic;
-    const about = data.offer || '';
-    let opening, question, openingTitle, lesson;
-    if (data.format === 'intro') {
-      openingTitle = 'Your introduction';
-      opening = 'Hello,\n\n' +
-        (about ? 'I work with businesses on ' + about + '. ' : '') +
-        'I’m reaching out about ' + topic + '. \n\nWhat does your current approach to this area look like?\n\nNo problem if it is not a priority right now.\n\nBest,\n[Your name]';
-      question = 'What does your current approach to ' + topic + ' look like?';
-      lesson = 'An introduction should give a genuine reason for contact and make it easy to decline. Avoid a long credentials pitch or an invented point of urgency.';
-    } else if (data.format === 'followup') {
-      openingTitle = 'Your follow-up';
-      opening = 'Hello,\n\nI wanted to pick up the thread on ' + topic + '. I know priorities can change.\n\nHow is this fitting into your priorities at the moment?\n\nIf it is no longer relevant, no problem.\n\nBest,\n[Your name]';
-      question = 'How is ' + topic + ' fitting into your priorities at the moment?';
-      lesson = 'Give a genuine reason for following up. Ask about what has changed, not why they failed to reply. Respect a clear no.';
-    } else {
-      openingTitle = 'Your call opening';
-      opening = '“Hi, I’m [your name]. ' +
-        (about ? 'I work with businesses on ' + about + '. ' : '') +
-        'I’m getting in touch about ' + topic + '. I was interested in how you’re approaching that at the moment.”';
-      question = 'How are you currently approaching ' + topic + '?';
-      lesson = 'Make the reason for your call clear, then give them space to explain their situation. Don’t turn a neutral discovery question into a disguised pitch.';
-    }
-
-    // Guard the discovery field even if editorial content is changed later.
-    if (!checkDiscoveryQuestion(question).pass) {
-      question = 'What does your current approach look like?';
-    }
-
-    const obs = obstacles[data.obstacle] || obstacles.none;
-    const company = data.company ? 'Contact: ' + data.company + '. ' : '';
-    const verifiedReason = data.reason ? 'Potential relevance: ' + data.reason + '. Mention this only if it is accurate and publicly appropriate.' : 'No buying trigger supplied. Do not imply a business need you haven’t established.';
+  function checkDiscoveryQuestion(question) {
+    const text = String(question || '').trim();
+    const beginsOpen = /^(what|how|which|who|where|when|describe|tell me about|walk me through)\b/i.test(text);
+    const oneQuestion = (text.match(/\?/g) || []).length === 1;
+    const leading = /\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with)\b/i.test(text);
+    return {pass: beginsOpen && oneQuestion && !leading, reason: !beginsOpen?'Not an open question':!oneQuestion?'Must be one question':leading?'Assumes a problem':'Open discovery question'};
+  }
+  function getInputs() {
     return {
-      title: data.format === 'call' ? 'Before you pick up the phone' : data.format === 'intro' ? 'Before you hit send' : 'Before you follow up',
-      context: company + verifiedReason,
-      openingTitle, opening, question,
-      objectionTitle: obs.title, objection: obs.line,
-      lesson: obs.lesson + ' ' + lesson
+      seller:$('seller').value.trim().replace(/\s+/g,' '),
+      context:$('context').value.trim().replace(/\s+/g,' '),
+      channel:getFormValue('channel') || 'call',
+      goal:$('goal').value
     };
   }
+  function setProfileCollapsed(isSaved) {
+    const hasSaved = !!isSaved;
+    $('edit-profile').hidden = !hasSaved;
+    $('seller-area').hidden = hasSaved;
+    $('seller-hint').textContent = hasSaved
+      ? 'Your offering is saved in this browser.'
+      : 'Plain English is fine. You don’t need to write something polished.';
+  }
+  function feedback(message, status='info') {
+    const area=$('prepare-feedback');
+    area.textContent = message;
+    area.dataset.status = status;
+    area.hidden = !message;
+  }
+  function validateResponse(obj) {
+    if (!obj || obj.status!=='ready' || obj.mode!=='tailored' || typeof obj.card!=='object') return null;
+    const c = obj.card;
+    const fields = ['angle','opening','question','complication','lesson','caution'];
+    if (!fields.every(k => typeof c[k]==='string' && c[k].trim().length>8)) return null;
+    if (!checkDiscoveryQuestion(c.question).pass) return null;
+    return c;
+  }
 
-  function displayCard(card) {
-    $('result-title').textContent = card.title;
-    $('result-context').textContent = card.context;
-    $('cue-opening-title').textContent = card.openingTitle;
+  function displayCard(card, channel) {
+    $('result-title').textContent = channel === 'call' ? 'A better way into the call' : channel === 'intro' ? 'An introduction with a purpose' : 'A follow-up worth sending';
+    $('cue-angle').textContent = card.angle;
+    $('cue-opening-title').textContent = channel === 'call' ? 'A natural opening' : channel === 'intro' ? 'Your introduction email' : 'Your follow-up email';
     $('cue-opening').textContent = card.opening;
     $('cue-question').textContent = card.question;
-    $('cue-objection-title').textContent = card.objectionTitle;
-    $('cue-objection').textContent = card.objection;
+    $('cue-objection').textContent = card.complication;
     $('cue-lesson').textContent = card.lesson;
+    $('cue-caution').textContent = card.caution;
     lastCard = [
-      'Cold Call Cara — ' + card.title,
-      card.context,
-      'START HERE', card.opening,
-      'OPEN DISCOVERY QUESTION', card.question,
-      card.objectionTitle.toUpperCase(), card.objection,
-      'ONE THING TO TRY', card.lesson,
-      'Adapt this guidance to your voice and the actual customer. No prospect claims have been verified.'
+      'COLD CALL CARA — PRE-CONTACT BRIEF',
+      'POTENTIAL RELEVANCE\n' + card.angle,
+      'YOUR APPROACH\n' + card.opening,
+      'OPEN DISCOVERY QUESTION\n' + card.question,
+      'IF THEY PUSH BACK\n' + card.complication,
+      'ONE SKILL TO PRACTISE\n' + card.lesson,
+      'DON’T ASSUME\n' + card.caution,
+      'Based only on your inputs. Check claims and adapt to the buyer.'
     ].join('\n\n');
     $('preparation-result').hidden = false;
     $('reflection-message').textContent = '';
@@ -215,100 +164,148 @@
   function renderSkills() {
     $('skill-list').replaceChildren();
     skills.forEach((skill, index) => {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'skill-choice' + (skill.id === selectedSkill ? ' active' : '');
-      button.dataset.skill = skill.id;
-      const label = document.createElement('span');
-      label.textContent = String(index+1).padStart(2,'0') + ' · ' + skill.tag;
-      const title = document.createTextNode(skill.name);
-      button.append(label,title);
-      button.addEventListener('click', () => chooseSkill(skill.id));
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='skill-choice'+(skill.id===selectedSkill?' active':'');
+      button.dataset.skill=skill.id;
+      const label=document.createElement('span');
+      label.textContent=String(index+1).padStart(2,'0')+' · '+skill.tag;
+      button.append(label,document.createTextNode(skill.name));
+      button.addEventListener('click',()=>chooseSkill(skill.id));
       $('skill-list').appendChild(button);
     });
     chooseSkill(selectedSkill);
   }
 
   function chooseSkill(id) {
-    const skill = skills.find((item) => item.id === id) || skills[0];
-    selectedSkill = skill.id;
-    document.querySelectorAll('.skill-choice').forEach((button) => {
-      button.classList.toggle('active', button.dataset.skill === skill.id);
-      button.setAttribute('aria-pressed', String(button.dataset.skill === skill.id));
+    const skill = skills.find(item=>item.id===id) || skills[0];
+    selectedSkill=skill.id;
+    document.querySelectorAll('.skill-choice').forEach(button=>{
+      const active=button.dataset.skill===skill.id;
+      button.classList.toggle('active',active);
+      button.setAttribute('aria-pressed',String(active));
     });
-    $('skill-title').textContent = skill.name;
-    $('skill-premise').textContent = skill.premise;
-    $('skill-trap').textContent = skill.trap;
-    $('skill-example').textContent = skill.example;
-    $('skill-action').textContent = skill.action;
+    $('skill-title').textContent=skill.name;
+    $('skill-premise').textContent=skill.premise;
+    $('skill-trap').textContent=skill.trap;
+    $('skill-example').textContent=skill.example;
+    $('skill-action').textContent=skill.action;
   }
 
-  document.querySelectorAll('[data-mode]').forEach((tab) => {
-    tab.addEventListener('click', () => switchMode(tab.dataset.mode, false));
+  document.querySelectorAll('[data-mode]').forEach(tab=>{
+    tab.addEventListener('click',()=>switchMode(tab.dataset.mode));
   });
 
-  $('prepare-form').addEventListener('submit', (event) => {
+  $('prepare-form').addEventListener('submit',async event=>{
     event.preventDefault();
-    const data = {
-      topic: $('topic').value.trim().replace(/\s+/g,' '),
-      reason: $('reason').value.trim().replace(/\s+/g,' '),
-      offer: $('offer').value.trim().replace(/\s+/g,' '),
-      company: $('company').value.trim().replace(/\s+/g,' '),
-      format: getFormValue('format'),
-      obstacle: getFormValue('obstacle')
-    };
-    if (!data.topic) {
-      $('topic').focus();
+    if(running) return;
+    const inputs=getInputs();
+    if(inputs.seller.length<10) {
+      $('seller-area').hidden=false;
+      $('seller').focus();
+      feedback('Add a short description of what you help businesses achieve.','error');
       return;
     }
-    safeSave($('remember').checked ? data.offer : '');
-    displayCard(makeCard(data));
+    if(inputs.context.length<16) {
+      $('context').focus();
+      feedback('Describe who you’re approaching and why there may be a reason to speak.','error');
+      return;
+    }
+    // Save only the reusable seller offering. Never store named-prospect context.
+    safeSave($('remember').checked ? inputs.seller : '');
+    setProfileCollapsed($('remember').checked);
+    running=true;
+    $('generate-button').disabled=true;
+    $('generate-button').textContent='Considering the buyer situation…';
+    $('preparation-result').hidden=true;
+    feedback('Looking for a useful commercial angle, a better question and one coaching insight.','info');
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),18000);
+    try {
+      const response=await fetch('/api/cara-prep',{
+        method:'POST',
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify(inputs),
+        signal:controller.signal,
+        cache:'no-store'
+      });
+      const result=await response.json();
+      const card=validateResponse(result);
+      if(!response.ok || !card) {
+        if(response.status===400 && result?.error) feedback(result.error,'error');
+        else if(response.status===429) feedback('Cara has reached its free AI usage limit. Please try again later or use a coaching challenge below.','error');
+        else feedback('Cara couldn’t produce a reliable, tailored briefing from that request. Try a clearer buyer situation or use a coaching challenge. I won’t substitute a generic template.','error');
+        return;
+      }
+      feedback('');
+      displayCard(card,inputs.channel);
+    } catch(error) {
+      feedback(error?.name==='AbortError'
+        ? 'The briefing took too long. Your text is still here — please try again.'
+        : 'Cara couldn’t reach the preparation service. Your text is still here — please try again or use a coaching challenge.','error');
+    } finally {
+      clearTimeout(timeout);
+      running=false;
+      $('generate-button').disabled=false;
+      $('generate-button').textContent='Help me prepare →';
+    }
   });
-  $('copy-card').addEventListener('click', () => {
-    if (lastCard) copy(lastCard,'Preparation card copied');
+
+  $('edit-profile').addEventListener('click',()=>{
+    $('seller-area').hidden=false;
+    $('seller').focus();
   });
-  $('start-again').addEventListener('click', () => {
-    $('preparation-result').hidden = true;
-    $('topic').focus();
+  $('seller').addEventListener('input',()=>{
+    if($('seller').value.trim()!==safeGet()) $('edit-profile').hidden=true;
   });
-  document.querySelectorAll('[data-outcome]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const messages = {
-        useful:'Good. What did you learn from their answer? Use that to improve your next question.',
-        'no-fit':'That is a useful result too. Note what told you it was not relevant, then move on professionally.',
-        'not-reached':'Not connecting is normal. Recheck your relevance and channel before deciding whether to follow up.'
+  $('remember').addEventListener('change',()=>{
+    if(!$('remember').checked) {
+      safeSave('');
+      setProfileCollapsed(false);
+    }
+  });
+  $('copy-card').addEventListener('click',()=>{ if(lastCard) copy(lastCard,'Preparation copied'); });
+  $('start-again').addEventListener('click',()=>{
+    $('preparation-result').hidden=true;
+    $('context').focus();
+  });
+  document.querySelectorAll('[data-outcome]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const messages={
+        useful:'What did you learn from the buyer’s answer? Use that to improve your next question.',
+        'no-fit':'Recognising no fit is useful. Note what told you and move on.',
+        'not-reached':'Consider whether you have a new reason to follow up. Silence is not permission to chase indefinitely.'
       };
-      $('reflection-message').textContent = messages[button.dataset.outcome] || '';
+      $('reflection-message').textContent=messages[button.dataset.outcome]||'';
     });
   });
-
-  $('share-skill').addEventListener('click', () => {
-    const url = new URL(window.location.href);
-    url.search = '';
-    url.hash = '';
+  $('share-skill').addEventListener('click',()=>{
+    const url=new URL(window.location.href);
+    url.hash='';
+    url.search='';
     url.searchParams.set('skill',selectedSkill);
-    copy(url.toString(),'Challenge link copied');
+    copy(url.toString(),'Coaching challenge link copied');
   });
-
-  $('clear-local').addEventListener('click', () => {
+  $('clear-local').addEventListener('click',()=>{
     safeSave('');
-    $('remember').checked = false;
-    $('offer').value = '';
-    toast('Saved offer cleared from this device');
+    $('seller').value='';
+    $('context').value='';
+    $('remember').checked=false;
+    setProfileCollapsed(false);
+    toast('Saved offering cleared from this device');
   });
 
-  const saved = safeGet();
-  if (saved) {
-    $('offer').value = saved;
-    $('remember').checked = true;
-  }
-  const requested = new URLSearchParams(window.location.search).get('skill');
-  if (requested && skills.some((s) => s.id === requested)) {
-    selectedSkill = requested;
-    switchMode('coach',false);
+  const saved=safeGet();
+  if(saved) {
+    $('seller').value=saved;
+    $('remember').checked=true;
+    setProfileCollapsed(true);
+  } else setProfileCollapsed(false);
+  const requested=new URLSearchParams(window.location.search).get('skill');
+  if(requested && skills.some(s=>s.id===requested)) {
+    selectedSkill=requested;
+    switchMode('coach');
   }
   renderSkills();
-
-  // Exposed only for a small regression test suite, not as an AI-powered evaluator.
-  window.ColdCallCaraQuality = Object.freeze({checkDiscoveryQuestion, makeCard, skills});
+  window.ColdCallCaraQuality=Object.freeze({checkDiscoveryQuestion,validateResponse,skills});
 })();

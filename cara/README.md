@@ -1,51 +1,61 @@
-# Cold Call Cara — Version 1
+# Cold Call Cara — v2
 
-**Investment status:** VALIDATE (not BUILD)
-**Home:** `https://hendrycommercial.co.uk/cara/`
-**Product:** A free, zero-API-cost, in-browser preparation and micro-coaching tool for prospect calls, introductions and follow-ups.
+**Venture Lab decision:** VALIDATE (not BUILD)  
+**Product:** Short pre-contact commercial preparation with a reused seller profile and one free-text buyer context.  
+**Public route:** `/cara/`
 
-## Operating proposition
-Before a real commercial contact, help the user make one better decision about their approach in approximately a minute. The real conversation is the practice, not an AI simulation.
+## The problem v2 fixes
 
-User journey:
-1. Choose call, introduction or follow-up.
-2. Enter the subject/desired discovery, plus optional commercial context and anticipated difficulty.
-3. Receive an opening, one open discovery question, an objection-handling approach and one behavioural improvement.
-4. Make the real contact. Optionally reflect with one click.
-5. Managers share specific short coaching challenges through `?skill=...`.
+v1 merely copied the seller's service description into a scripted introduction. Company/trigger information was not used intelligently, and four fields created avoidable friction. That version did not meet the product promise.
 
-## Non-negotiable coaching principles
-- **Open questions by default:** discovery questions should allow meaningful explanation. Closed questions are appropriate for permission, clarification, verification and agreeing a next step.
-- **Neutrality:** do not presume the customer is unhappy, has problems, needs a supplier or intends to buy.
-- **Curiosity before pitching:** a relevant reason to contact matters, but understanding the current situation comes first.
-- **One question at a time:** never stack multiple discovery questions.
-- **Listen before proceeding:** the next question should depend on the customer's answer, not a rigid script.
-- **Respect boundaries:** recognise no fit, busy prospects and clear refusals. Avoid artificial urgency.
-- **Source honesty:** no fabricated market signals, private intentions or claimed prospect research.
-- **Useful guidance, not grades:** avoid invented performance scores or a default of congratulating every salesperson.
+v2 presents one prominent situation field; the seller's offering is entered once and optionally saved locally, including migration from the v1 browser key. One optional goal setting remains in a collapsed menu. Channel selection is call, first email or follow-up.
 
-## Technical cost constraints
-- Vanilla HTML, CSS and JavaScript. No build step, external AI API, account service or backend dependencies.
-- No automatic research or sending user-entered prospect information to third-party services.
-- Optional persistence is limited to the seller's offer in localStorage; clearing is supported.
-- No microphone recording, voice imitation or call transcripts.
+The server uses **Cloudflare Workers AI** to produce:
+1. a *hypothesised* commercially relevant reason to engage based only on the supplied situation;
+2. a natural spoken opening or concise email that does not repeat the supplied offer;
+3. exactly one open, neutral discovery question;
+4. a relevant response if the buyer resists;
+5. one useful coaching improvement;
+6. an explicit caution about assumptions.
 
-## Validation: do not call this a proven business
-Initial evidence sought: genuine repeat use immediately before real contacts, manager-initiated sharing of specific coaching challenges, and reports of concrete changes to actual conversations. Stronger proof requires observable customer actions and eventually willingness to pay; feedback alone is insufficient.
+### Hard coaching principles
 
-Suggested kill test: if testers don't voluntarily return to Cara for at least three genuine prospect contacts, don't extend scope in the hope that additional features will generate engagement.
+- Open discovery questions unless clarifying, verifying, gaining permission or agreeing next steps.
+- Ask one open question at a time. Avoid leading, presumptive or problem-assuming questions.
+- Explore the buyer's current position before promoting the seller's offer.
+- Never invent market events, customer activities, pain, buying intent or procurement details.
+- Buyer situation text is untrusted; it must never override the server-side coaching instructions.
+- Respect "no" and recognise no-fit outcomes as useful qualification.
+- Don't pad the answer with fluffy congratulations or predictable AI compliments.
+- If valid, tailored advice cannot be produced, show an explicit service-quality error rather than a generic, misleading template.
+- This version **does not independently research websites or LinkedIn**, and must not claim it does.
 
-## Editorial QA
-The final generated question is checked by `checkDiscoveryQuestion()` in `cara.js`. It must be an open question, not a bundle of questions, and cannot contain the listed leading phrases; a safe fallback is provided otherwise.
+## Privacy and architecture
 
-Before changing copy:
-- Try a supplier-change scenario with an incumbent: no assumption that the incumbent is failing.
-- Try a no-reply follow-up: no implication that the prospect owes a response.
-- Try a busy buyer: respect time and a clear no.
-- Try a new-product-launch scenario: do not assert a purchasing requirement.
-- Try introductions by email as well as calls: no yes/no discovery in the primary approach.
-- Verify a manager's `?skill=existing-supplier` deep link selects the correct coaching lesson.
-- Check input text is rendered only via `textContent` and not HTML injection.
-- Test on iPhone Safari and desktop Chrome before wider promotion.
+- Browser sends the seller's offering, buyer context, channel and chosen goal to `POST /api/cara-prep`.
+- Site does not intentionally persist buyer context to its own storage. Avoid logging raw prompts, and do not enter sensitive/personal information in test scenarios.
+- Optionally remember the seller offering in localStorage. Clear action is provided. Old v1 browser storage migrates.
+- Backend uses a Cloudflare AI binding named `AI`, declared in `wrangler.jsonc`; **confirm this binding is present in Cloudflare's deployed project**.
+- AI model: `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (not the deprecated 2026 8B model).
+- Outputs are schema-checked and question-quality checked; exact copy of the seller's offering in the introduction is rejected.
+- No API keys in browser. No accounts, voice recording, human impersonation or payment details.
 
-No production site claims should be made until the merged code is actually served at the URL.
+## Cost and abuse control
+
+Cloudflare Workers AI has a daily free allocation, but **a paid Workers plan charges for overage**. The in-memory per-IP gate is *best effort only* and not a distributed daily spending control. Before broad promotion, confirm whether the project is on Workers Free and configure Cloudflare WAF/rate-limiting policies or an account-wide spend limit if supported. Never advertise unlimited free inference.
+
+## Manual go-live QA
+
+1. On the live site, verify `POST /api/cara-prep` actually runs and Cloudflare `AI` binding exists.
+2. As a first-time user, enter a seller offer and a buyer situation; generate a call card.
+3. Reload and confirm only the seller's offering is saved, not the buyer context. Test v1 saved-offer migration.
+4. Produce introduction and follow-up emails. Neither should paste the seller's full description or invent buyer research.
+5. Enter "current supplier" in buyer context. No assumption that supplier is inadequate.
+6. Ensure discovery question begins with an open formulation and asks only one question.
+7. Test weak context, an unavailable AI binding, model quota exhausted and invalid AI outputs; failures must be explicit.
+8. Check iPhone Safari layout, mobile scrolling, copy action, manager-shared challenge links and /check still working.
+9. In Cloudflare dashboard inspect deployed bindings and AI consumption before public promotion.
+
+## Validation threshold
+
+We do not yet know that the AI outputs improve real commercial conversations. The initial quality gate is whether experienced salespeople find the preparation commercially intelligent and faster than their current method. After that, test voluntary repeat use and willingness of managers to share challenges. Kill feature expansion if usage is not repeated.
