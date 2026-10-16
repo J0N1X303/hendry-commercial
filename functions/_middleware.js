@@ -1,4 +1,4 @@
-// Private Cara V2 pre-launch test. This middleware exists ONLY on the holding branch.
+// Private Casey V3 pre-launch test. This middleware exists ONLY on the holding branch.
 // Requires a high-entropy password. Never expose the unprotected buyer-prep endpoint.
 const SALT = "8302e88a76cb72ce493a290d475fd459";
 const PASSWORD_HASH = "086ec975e8749d9bdc2cae52fbf148f4d2f48d91aa54a665e6d1752f8b91e6b4";
@@ -7,7 +7,7 @@ function denied() {
   return new Response("Private preview. Sign in with the testing credentials.", {
     status:401,
     headers:{
-      "WWW-Authenticate": 'Basic realm="Cold Call Cara private test", charset="UTF-8"',
+      "WWW-Authenticate": 'Basic realm="Cold Call Casey private test", charset="UTF-8"',
       "Cache-Control":"no-store",
       "X-Robots-Tag":"noindex, nofollow, noarchive",
       "X-Content-Type-Options":"nosniff",
@@ -33,10 +33,16 @@ async function approved(authorization) {
 }
 export async function onRequest(context) {
   const path=new URL(context.request.url).pathname;
-  if(path==="/api/cara-prep" || path.startsWith("/api/cara-prep/")) {
-    return new Response("Not found", {status:404,headers:{"Cache-Control":"no-store","X-Robots-Tag":"noindex"}});
+  // Never expose either private-generation function without authentication.
+  if(path==="/api/casey-prep"||path.startsWith("/api/casey-prep/")||
+     path==="/api/cara-prep"||path.startsWith("/api/cara-prep/")) {
+    return new Response("Not found",{status:404,headers:{"Cache-Control":"no-store","X-Robots-Tag":"noindex"}});
   }
-  if(path!=="/cara" && !path.startsWith("/cara/")) return context.next();
+  // Retire the old name and route, including assets. Earlier snapshots are preserved in Git.
+  if(path==="/cara"||path.startsWith("/cara/")) {
+    return new Response("Not found",{status:404,headers:{"Cache-Control":"no-store","X-Robots-Tag":"noindex"}});
+  }
+  if(path!=="/casey"&&!path.startsWith("/casey/"))return context.next();
   if(!(await approved(context.request.headers.get("Authorization"))))return denied();
   const response=await context.next();
   const headers=new Headers(response.headers);
