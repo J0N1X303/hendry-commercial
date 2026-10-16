@@ -53,6 +53,17 @@ function relevant(card,input){
   if(/\b(as discussed|following our conversation|good to speak)\b/i.test(card.opening)&&input.channel==="intro"&&!/\b(spoke|talked|discussed|met|contacted|previous)\b/i.test(input.context))return false;
   return true;
 }
+function grounded(card,input) {
+  // Reject wholly generic discovery, without requiring exact wording or invented facts.
+  // Stemming is deliberately light because this is a guard, not a semantic classifier.
+  const stop=new Set(["they","their","there","them","what","where","which","when","this","that","with","from","into","your","ours","have","about","like","then","currently","current","could","would","should","business","company","person","approach","situation","prospect","customer","seller","sales","conversation","talking","understand","help","work","working","offer","offering","change","changes"]);
+  const terms=text=>new Set(String(text||"").toLowerCase().replace(/[^a-z0-9 ]+/g," ").split(/\s+/)
+    .filter(w=>w.length>=4&&!stop.has(w)).map(w=>w.replace(/(ing|ed|es|s)$/,"")));
+  const known=terms(input.context+" "+input.seller);
+  const discovery=terms(card.question+" "+card.listen_for+" "+card.next_question);
+  return [...discovery].some(t=>known.has(t));
+}
+
 function getInput(body){
   const channel=clean(body?.channel,20),goal=clean(body?.goal,20)||"explore";
   const seller=clean(body?.seller,300),context=clean(body?.context,450);
@@ -100,7 +111,7 @@ export async function onRequestPost({request,env}){
       });
     }catch{if(!attempt)continue;return json({error:"generation_service_unavailable"},503);}
     const draft=parseOutput(response?.response??response,input.channel);
-    if(draft&&relevant(draft,input))return json({status:"ready",mode:"tailored",card:draft});
+    if(draft&&relevant(draft,input)&&grounded(draft,input))return json({status:"ready",mode:"tailored",card:draft});
   }
   return json({error:"generation_quality",message:"Your information was accepted but Casey's AI drafts did not pass its coaching standards."},502);
 }
