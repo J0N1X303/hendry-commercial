@@ -134,9 +134,14 @@
   // No offering or prospect details are sent and no inference is run.
   let readinessPromise=null;
   let readinessStarted=0;
-  async function checkServiceReady(onStage,allowReuse=false) {
+  async function checkServiceReady(onStage) {
     const now=Date.now();
-    if(readinessPromise && (now-readinessStarted<9000))return readinessPromise;
+    if(readinessPromise && now-readinessStarted<9000) {
+      const previous=await readinessPromise;
+      if(previous.ok || !onStage)return previous;
+      // A failed background warm-up must never poison the first submit.
+      // Recheck the same safe GET instead of sending a risky POST.
+    }
     readinessStarted=now;
     readinessPromise=(async()=>{
       let code='unknown';
