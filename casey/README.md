@@ -131,3 +131,17 @@ Changes:
 Mock browser tests: no GET on initialization or submit; exactly one POST for a successful briefing and for simulated network failure; progress UI and timers clean up in both cases. Syntax and all DOM references verified.
 
 The underlying first-POST transport issue has **not** been reproduced or diagnosed conclusively. If it continues, use Cloudflare Pages Functions Logs (timestamp, route, request outcome, duration) to distinguish browser/Basic Auth routing failures from model startup. Do not keep adding speculative retries or timeout increases without that evidence.
+
+## V4 lean preparation — 16 October 2026
+
+V3.5 was observed failing on first requests and sometimes rejecting two full AI drafts because either the main discovery question or the reframe failed quality checks. The product also expanded far beyond the original quick-preparation goal.
+
+V4 retains the original commercial proposition: **one possible buyer objective, natural opening, one open discovery question, short conditional listening clues, one likely pushback with a natural seller response, one actionable coaching tip**. The separate exercise/coaching tab remains.
+
+Deleted from the model output and visible result: second discovery question, three nested listening-signal cards, multiple pushback alternatives, long evidence qualification block, verification block, separate assumptions block. Unverified buyer facts remain prohibited within the main commercial angle and coaching logic.
+
+The initial AI job requests eight flat JSON strings with max_tokens 850, rather than a nested 11-part report at 2400+ tokens and repeated full generation. One small targeted repair may be attempted if the **only** invalidity is a closed/leading discovery question. No complete report retry. The first-request network instability is not proven fixed by this reduction; Cloudflare request logs remain necessary if it persists.
+
+Regressions checked: call, first email, follow-up email; email contains exactly one question and copies only the email; simulated closed discovery repaired with a short second call; client/server compile and DOM references resolve; buyer and seller pushback voices remain separate; baseline open-neutral discovery principle preserved.
+
+Use this private V4 to test speed, first-attempt success and value. Do not publish before user approval and the November covenant review. Previous full V3.5 version remains archived at `archive/casey-v3-5-pre-lean-20261016`.
