@@ -145,3 +145,11 @@ The initial AI job requests eight flat JSON strings with max_tokens 850, rather 
 Regressions checked: call, first email, follow-up email; email contains exactly one question and copies only the email; simulated closed discovery repaired with a short second call; client/server compile and DOM references resolve; buyer and seller pushback voices remain separate; baseline open-neutral discovery principle preserved.
 
 Use this private V4 to test speed, first-attempt success and value. Do not publish before user approval and the November covenant review. Previous full V3.5 version remains archived at `archive/casey-v3-5-pre-lean-20261016`.
+
+## V4.1 email subject recovery (16 October 2026)
+
+The live private preview generated an otherwise useful introductory email but omitted `subject`, resulting in `generation_quality: missing_email_subject`. The subject is presentation metadata, so it must not invalidate an otherwise safe briefing.
+
+When the model omits a subject, Casey now derives a neutral subject from a topic explicitly stated after 'about', 'regarding' or 'concerning' in the buyer context. If no such topic exists, it uses 'Your current approach'. No extra AI request and no invented urgency, buying trigger or prospect claim. Existing generated subjects are retained. Call behavior is unchanged.
+
+Mock validation: the Hall & Woodhouse printed-menu scenario succeeds on call, intro-email and follow-up paths with a missing AI subject, exactly one discovery question in each email, and one AI call per submission. Live browser verification remains required.
