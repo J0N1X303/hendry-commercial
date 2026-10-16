@@ -59,6 +59,10 @@ function normalize(raw,input){
  if(input.channel==="intro"&&/\b(as discussed|following our conversation|good to speak)\b/i.test(card.opening)
   && !/\b(discussed|talked|spoke|met|previous)\b/i.test(input.context))
   return {reason:"invented_familiarity"};
+ // Do not present a leading, closed discovery question as coaching.
+ // Graceful acknowledgement is better than an unsafe attempt to reframe.
+ if(/\b(?:are you happy|are you satisfied|do you struggle|are you struggling|would you agree|don't you think)\b/i.test(card.pushback_reply))
+  card.pushback_reply="Understood. I wouldn't presume there's a reason to change your current approach.";
  if(/\b(don't call|stop contacting|do not contact|remove me|not interested)\b/i.test(card.pushback_buyer))
   card.pushback_reply="Understood. Thanks for being clear; I'll leave it there.";
  if(input.channel==="call"){
