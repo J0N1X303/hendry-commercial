@@ -12,7 +12,7 @@ const openQuestion=q=>{
   const s=String(q||"").trim();
   return /^(what|how|which|where|when|who|describe|tell me about|walk me through)\b/i.test(s)
    && (s.match(/\?/g)||[]).length===1
-   && !/\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with|what problems|what challenges|what issues|how dissatisfied|how unhappy|how badly)\b/i.test(s);
+   && !/\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with|what problems|what challenges|what issues|how dissatisfied|how unhappy|how badly|your biggest problems|your biggest challenges|your main pain|your biggest issues)\b/i.test(s)\n   && !/^what (?:are|have been|do you see as) .{0,70}\b(?:problems|challenges|issues|pain points)\b/i.test(s);
 };
 function overlap(a,b) {
   const terms=s=>new Set(String(s||"").toLowerCase().replace(/[^a-z0-9 ]+/g," ").split(/\s+/).filter(w=>w.length>2&&!["how","what","the","your","their","you","are","does","with","about","from","for","this","that","they","currently","would"].includes(w)));
