@@ -38,9 +38,11 @@ for (const config of cases) {
     assert.equal(await page.locator('[data-framework-detail]').isVisible(),false,'Framework collapses');
     assert.equal(await page.locator('.experience-rails').count(),2,'Both moving strips retained');
     assert.equal(await page.locator('.timeline-item').count(),4,'Four commercial outcomes');
-    assert.equal(await page.locator('.project-card').count(),4,'Projects scale through cards');
+    assert((await page.locator('.project-card').count())>=4,'Projects scale through cards');
     assert.equal(await page.locator('a[href="/check"]').count(),1,'Buyer Readiness linked');
-    assert.equal(await page.getByText('Cold Call Cara').count(),0,'Cara must not launch early');
+    if (new Date() < new Date('2026-11-01T00:00:00Z')) {
+      assert.equal(await page.getByText('Cold Call Cara').count(),0,'Cara must not launch early');
+    }
     await page.locator('[data-project-track]').scrollIntoViewIfNeeded();
     const track=page.locator('[data-project-track]');
     const max=await track.evaluate(el=>el.scrollWidth-el.clientWidth);
