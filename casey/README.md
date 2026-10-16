@@ -153,3 +153,17 @@ The live private preview generated an otherwise useful introductory email but om
 When the model omits a subject, Casey now derives a neutral subject from a topic explicitly stated after 'about', 'regarding' or 'concerning' in the buyer context. If no such topic exists, it uses 'Your current approach'. No extra AI request and no invented urgency, buying trigger or prospect claim. Existing generated subjects are retained. Call behavior is unchanged.
 
 Mock validation: the Hall & Woodhouse printed-menu scenario succeeds on call, intro-email and follow-up paths with a missing AI subject, exactly one discovery question in each email, and one AI call per submission. Live browser verification remains required.
+
+## V4.2 — stronger cold-email opening and named greeting (16 October 2026)
+
+Observed user feedback: the email route read too generically, did not use a recipient name already supplied in the buyer context, and lacked a buyer-relevant hook.
+
+Changes:
+- Introductory and follow-up email prompts now open with a specific, conditional buyer-side decision, trade-off or operational tension. They should then bridge naturally to the seller's capability before ONE open discovery question. Do not invent account facts or paste the service description.
+- A conservative name extractor uses first names only when explicitly supplied in recognisable input patterns: `Rachel from Hall & Woodhouse`, `Jane Smith at ABC Foods`, `Follow up with Sam at Asweet`, or `Contact: Lucy`. If uncertain, retain `[Name]` rather than inventing a person's identity.
+- The input hint now explains that a name is optional but can personalise the email.
+- No additional model calls, data fields or nested JSON response sections; the phone route and existing coaching stay structurally unchanged.
+
+Mock end-to-end checks confirm named and unnamed email greetings, precisely one copied discovery question and one AI request on each case, plus no missing browser DOM nodes. Real generated hook quality remains to be assessed in the private preview.
+
+V4.1 is archived at `archive/casey-v4-1-before-email-quality-20261016`. No production deployment until owner approval and the agreed November launch review.
