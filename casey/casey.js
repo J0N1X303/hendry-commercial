@@ -131,15 +131,17 @@
   function validateResponse(obj) {
     if(!obj||obj.status!=='ready'||obj.mode!=='tailored'||!obj.card||typeof obj.card!=='object')return null;
     const c=obj.card;
-    const fields=['angle','angle_test','opening','question','next_question','lesson','caution','verify'];
-    if(!fields.every(k=>typeof c[k]==='string'&&c[k].trim().length>=12))return null;
+    const required=['angle','opening','question','next_question','lesson','caution'];
+    if(!required.every(k=>typeof c[k]==='string'&&c[k].trim().length>=10))return null;
     if(!checkDiscoveryQuestion(c.question).pass||!checkDiscoveryQuestion(c.next_question).pass)return null;
     if(c.question.trim().toLowerCase()===c.next_question.trim().toLowerCase())return null;
-    if(!Array.isArray(c.signals)||c.signals.length!==3||
-      !c.signals.every(item=>['cue','meaning','move'].every(k=>typeof item?.[k]==='string'&&item[k].trim().length>=12)))return null;
-    if(!Array.isArray(c.pushbacks)||c.pushbacks.length!==3||
-      !c.pushbacks.every((item,i)=>item?.type===['reframe','reconnect','respect_no'][i]&&
-        ['buyer','reply','why'].every(k=>typeof item?.[k]==='string'&&item[k].trim().length>=8)))return null;
+    if(!Array.isArray(c.signals)||c.signals.length<2||
+      !c.signals.every(item=>['cue','meaning','move'].every(k=>typeof item?.[k]==='string'&&item[k].trim().length>=9)))return null;
+    if(!Array.isArray(c.pushbacks)||c.pushbacks.length!==3||c.pushbacks[0]?.type!=='reframe')return null;
+    if(!c.pushbacks.every((item,i)=>item===null||
+      item.type===['reframe','reconnect','respect_no'][i]&&
+      ['buyer','reply','why'].every(k=>typeof item[k]==='string'&&item[k].trim().length>=8)))return null;
+    if(c.pushbacks[2]===null)return null; // Always include a safe response to explicit refusal.
     return c;
   }
   function displayCard(card,channel) {
@@ -147,40 +149,45 @@
     $('result-title').textContent=channel==='call'?'A sharper way into the call':
       channel==='intro'?'An introduction with a reason':'A follow-up worth considering';
     $('cue-angle').textContent=card.angle;
-    $('cue-angle-test').textContent=card.angle_test;
+    $('cue-angle-test').textContent=card.angle_test||'';
+    $('angle-test-block').hidden=!card.angle_test;
     $('cue-opening-title').textContent=isEmail?'Your email — ready to edit':'A natural opening';
     $('cue-opening').textContent=card.opening;
-    // The initial email already includes the first discovery question.
-    // Coaching displays only the distinct question for a later reply.
+    // Email already contains the initial discovery question exactly once.
     $('cue-question-title').textContent=isEmail?'If they reply, explore this':'Your first open question';
     $('cue-question').textContent=isEmail?card.next_question:card.question;
     $('cue-question-hint').textContent=isEmail?'A different question for a later exchange — not part of the email above.':
       'Ask it once. Listen to the actual answer rather than rushing to another question.';
     $('cue-next').hidden=isEmail;
     if(!isEmail)$('cue-next-question').textContent=card.next_question;
-    card.signals.forEach((signal,i)=>{
-      $('signal-'+i+'-cue').textContent=signal.cue;
-      $('signal-'+i+'-meaning').textContent=signal.meaning;
-      $('signal-'+i+'-move').textContent=signal.move;
-    });
-    card.pushbacks.forEach((pushback,i)=>{
-      $('push-'+i+'-buyer').textContent=pushback.buyer;
-      $('push-'+i+'-reply').textContent=pushback.reply;
-      $('push-'+i+'-why').textContent=pushback.why;
-    });
+    for(let i=0;i<3;i++) {
+      const signal=card.signals[i];
+      $('signal-row-'+i).hidden=!signal;
+      $('signal-'+i+'-cue').textContent=signal?.cue||'';
+      $('signal-'+i+'-meaning').textContent=signal?.meaning||'';
+      $('signal-'+i+'-move').textContent=signal?.move||'';
+    }
+    for(let i=0;i<3;i++) {
+      const pushback=card.pushbacks[i];
+      if(i>0)$('push-option-'+i).hidden=!pushback;
+      $('push-'+i+'-buyer').textContent=pushback?.buyer||'';
+      $('push-'+i+'-reply').textContent=pushback?.reply||'';
+      $('push-'+i+'-why').textContent=pushback?.why||'';
+    }
     $('cue-lesson').textContent=card.lesson;
     $('cue-caution').textContent=card.caution;
-    $('cue-verify').textContent=card.verify;
+    $('cue-verify').textContent=card.verify||'';
+    $('verify-block').hidden=!card.verify;
     $('copy-card').textContent=isEmail?'Copy email':'Copy preparation card';
     const signalsText=card.signals.map((x,i)=>
       (i+1)+'. '+x.cue+'\nMeaning: '+x.meaning+'\nThen: '+x.move).join('\n\n');
-    const pushbacksText=card.pushbacks.map((x,i)=>
-      ['Reframe','Reposition or reconnect','Respect a clear no'][i]+
+    const pushbacksText=card.pushbacks.filter(Boolean).map(x=>
+      ({reframe:'Reframe',reconnect:'Reposition or reconnect',respect_no:'Respect a clear no'})[x.type]+
       '\nBuyer may say: '+x.buyer+'\nYour reply: '+x.reply+'\nWhy: '+x.why).join('\n\n');
     lastCard=isEmail?card.opening:[
       'COLD CALL CASEY — CONVERSATION PREP',
       'THE COMMERCIAL OBJECTIVE\n'+card.angle,
-      'WHAT WOULD MAKE IT RELEVANT\n'+card.angle_test,
+      card.angle_test?'WHAT WOULD MAKE IT RELEVANT\n'+card.angle_test:'',
       'OPENING\n'+card.opening,
       'INITIAL DISCOVERY QUESTION\n'+card.question,
       'WHAT TO LISTEN FOR\n'+signalsText,
@@ -188,9 +195,9 @@
       'FOLLOW-UP AFTER THEIR ANSWER\n'+card.next_question,
       'IF THEY PUSH BACK\n'+pushbacksText,
       "DON'T ASSUME\n"+card.caution,
-      'HOW TO VERIFY\n'+card.verify,
+      card.verify?'HOW TO VERIFY\n'+card.verify:'',
       'Based only on your inputs. Adapt to what the buyer actually says.'
-    ].join('\n\n');
+    ].filter(Boolean).join('\n\n');
     $('preparation-result').hidden=false;
     $('reflection-message').textContent='';
     $('preparation-result').scrollIntoView({behavior:'smooth',block:'start'});
@@ -278,7 +285,7 @@
         } else if(response.status===429) {
           feedback('Casey has reached its test usage limit. Your information was accepted. Please try later.','error');
         } else if(response.status===502 && errorCode==='generation_quality') {
-          feedback('Your information is sufficient. Casey rejected its own AI draft twice because the sales advice failed quality checks. You can try again without rewriting anything.','error');
+          feedback('Your details were accepted. Casey could not assemble a safe coaching card ('+String(result?.reason||'unclassified')+'). This is a generation issue, not a problem with your description.','error');
         } else if(response.status===503 && errorCode==='ai_binding_missing') {
           feedback('Your information is sufficient. AI is not connected to this test deployment yet. This needs a site configuration fix, not a change to your prompt.','error');
         } else if(response.status===503) {
