@@ -253,9 +253,9 @@
     $('generate-button').disabled=true;
     $('generate-button').textContent='Considering the buyer situation…';
     $('preparation-result').hidden=true;
-    feedback('Looking for a useful commercial angle, a better question and one coaching insight.','info');
+    feedback('Considering the buyer decision, useful signals and the right response to pushback.','info');
     const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(),18000);
+    const timeout=setTimeout(()=>controller.abort(),28000);
     try {
       const response=await fetch('/casey/api',{
         method:'POST',
