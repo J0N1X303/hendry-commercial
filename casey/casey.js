@@ -128,18 +128,6 @@
     area.dataset.status = status;
     area.hidden = !message;
   }
-  // Best-effort page-load warm-up. Never gate the user's POST on it:
-  // the warm-up GET has timed out in real browsers even when a subsequent
-  // generation succeeds. It carries no customer input and incurs no AI use.
-  function warmServiceQuietly() {
-    const controller=new AbortController();
-    const deadline=setTimeout(()=>controller.abort(),12000);
-    void fetch('/casey/api?warm=1',{
-      method:'GET',credentials:'same-origin',cache:'no-store',
-      headers:{accept:'application/json'},signal:controller.signal
-    }).catch(()=>{}).finally(()=>clearTimeout(deadline));
-  }
-
   function validateResponse(obj) {
     if(!obj||obj.status!=='ready'||obj.mode!=='tailored'||!obj.card||typeof obj.card!=='object')return null;
     const c=obj.card;
@@ -415,6 +403,6 @@
     switchMode('coach');
   }
   renderSkills();
-  warmServiceQuietly();
+
   window.ColdCallCaseyQuality=Object.freeze({checkDiscoveryQuestion,validateResponse,skills});
 })();
