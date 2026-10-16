@@ -117,3 +117,17 @@ Changes:
 - Preserve the 70-second upper deadline, a single POST per user click, all existing sale-coaching rules, the old login credentials, and the private November release hold.
 
 Verified using mocked browser/Functions tests: first GET TypeError -> successful GET -> one successful POST; background GET failures -> fresh GET before submit; 401 -> no POST; POST TypeError -> no duplicate POST; progress starts and stops; server readiness returns 200 with an AI binding and 503 without. This is a simulated test, **not** a confirmed authenticated live invocation. Keep the feature unlaunched until the initial request succeeds reliably in a real browser.
+
+## V3.5 — removing the readiness gate after observed browser timeout
+
+User observed `readiness_timeout` before any generation. The diagnostic GET had been made a prerequisite to POST; this was a regression because the earlier actual POST could sometimes succeed after a retry. The failing GET did **not** establish that the generation endpoint was unavailable.
+
+Changes:
+- Remove all automatic browser-side readiness GETs (both blocking and background). The authenticated GET endpoint is retained only for deliberate manual diagnostics.
+- Submit exactly one POST directly when the user presses Help me prepare; retain the existing elapsed-time activity bar, request timeout, model quality checks, and explicit error messages.
+- Preserve buyer inputs in the current form, avoid retrying a POST when its delivery status is unknown, and keep the release branch private.
+- Add a new script query version to prevent stale browser JS.
+
+Mock browser tests: no GET on initialization or submit; exactly one POST for a successful briefing and for simulated network failure; progress UI and timers clean up in both cases. Syntax and all DOM references verified.
+
+The underlying first-POST transport issue has **not** been reproduced or diagnosed conclusively. If it continues, use Cloudflare Pages Functions Logs (timestamp, route, request outcome, duration) to distinguish browser/Basic Auth routing failures from model startup. Do not keep adding speculative retries or timeout increases without that evidence.
