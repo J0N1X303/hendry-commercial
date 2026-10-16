@@ -72,3 +72,20 @@ The primary response is visible, other pushback options are expandable. Outbound
 Structured regression checks cover all three channels, 3 signals, 3 pushbacks, neutral open discovery, clear refusal, copy behaviour, and client DOM references. These checks do not establish live-model quality, latency, physical phone layout or deployment authentication: those require live testing before launch.
 
 DO NOT merge or publicly launch before 1 November 2026 and owner approval.
+
+## V3.2 reliability correction — quality errors after the V3.1 expansion
+
+The live preview was reported rejecting otherwise sufficient seller and prospect inputs as 'generation_quality' after two AI drafts. Diagnosis: V3.1 demanded all 3 signals, all 3 pushback paths, exact string lengths, nested strict JSON schema and every optional field. That combination was brittle for Llama 3.3 70B on Cloudflare Workers AI.
+
+Correction:
+- Request simple JSON object rather than strict nested `json_schema` on the initial attempt; fall back to instructed plain JSON on retry.
+- Permit two substantive conditional signals rather than fail the whole card if one is missing.
+- Keep a specific model-generated reframe; omit an unavailable secondary reconnect option instead of inventing sales language.
+- Use a deterministic safe close for a missing/unsafe 'do not contact' response.
+- Do not require an `angle_test` or `verify` paragraph for the rest of a commercially useful card to be shown. Hide missing optional elements.
+- Never relax initial/follow-up open-question validation, the prohibition on leading questions in reframes, ground-to-input checks, or hallucinated buyer facts.
+- Return an error reason code without sending buyer/seller text back to logs. Do not record raw AI drafts.
+
+Regression tests cover full and partial responses, call/email duplication, closing down after clear no, direct endpoint authentication and missing browser elements. No confirmed live-authenticated model call was available to this development environment: final judgement requires using the private preview.
+
+Keep V3.1 archived on branch `archive/casey-v3-1-before-reliability-20261016`. Public production remains without Casey.
