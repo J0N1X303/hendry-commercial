@@ -196,7 +196,7 @@
       build: {
         number: '03 / BUILD',
         title: 'What makes good performance repeatable?',
-        description: 'Revenue is fragile if it depends on heroic effort, invisible know-how or systems people work around rather than with.',
+        description: 'Revenue is fragile if it depends on heroic effort or systems people work around rather than work with.',
         question: 'Which important decision or task still depends on one person’s judgement?',
         next: 'Then distinguish useful standardisation from process that merely adds work.'
       }
