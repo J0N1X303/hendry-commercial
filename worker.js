@@ -1,3 +1,8 @@
+// Cara preview is served by Workers, not Pages. Keep the authentication
+// middleware and the AI handler on the same origin and Worker deployment.
+import { onRequest as authenticateCara } from "./functions/_middleware.js";
+import { onRequestPost as prepareCara } from "./functions/api/cara-prep.js";
+
 const COMMON_LINKS = new Set([
   "home","about","about us","contact","contact us","blog","news","privacy","cookies","terms",
   "login","sign in","book","book now","get in touch","learn more","read more","our story"
@@ -186,6 +191,23 @@ async function scanSite(input){
 export default {
   async fetch(request,env){
     const url=new URL(request.url);
+    // Existing public Pages deployment is unaffected: only this holding branch
+    // uses Worker-first routing. Never serve the AI endpoint without authentication.
+    if(url.pathname==="/api/cara-prep" || url.pathname.startsWith("/api/cara-prep/")) {
+      return new Response("Not found",{status:404,headers:{"cache-control":"no-store","x-robots-tag":"noindex"}});
+    }
+    if(url.pathname==="/cara" || url.pathname.startsWith("/cara/")) {
+      return authenticateCara({
+        request,
+        next: async () => {
+          if(url.pathname==="/cara/api") {
+            if(request.method!=="POST") return new Response("Method not allowed",{status:405});
+            return prepareCara({request,env});
+          }
+          return env.ASSETS.fetch(request);
+        }
+      });
+    }
     if(url.pathname==="/api/buyer-readiness-check"){
       if(request.method!=="POST") return json({error:"method_not_allowed"},405);
       try{
