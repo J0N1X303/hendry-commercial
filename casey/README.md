@@ -1,0 +1,60 @@
+# Cold Call Casey — V3 pre-launch test
+
+**Investment decision: VALIDATE — not BUILD**  
+**Brand:** Cold Call Casey (formerly Cold Call Cara).  
+**Release:** withheld from Hendry Commercial production until 1 November 2026 and appropriate legal clearance.  
+**Private test:** `/casey/` on a Cloudflare Pages branch preview, protected by the existing Basic Auth credentials (username still `cara` by deliberate user choice; password unchanged).
+
+## What Casey does
+
+A short, context-aware coach for actual prospect calls, first emails and follow-ups. The objective is one useful behaviour change before making real contact, not roleplay and not a generic email generator.
+
+The user enters a buyer situation and a seller offering (saved only locally if requested). Casey uses Cloudflare Workers AI, not external website research, to return:
+
+1. **Commercial hypothesis:** why the contact might be relevant, with facts clearly distinguished from assumptions.
+2. **Opening:** natural spoken language for calls, or one complete email draft for an email channel.
+3. **Initial discovery:** one relevant, open, neutral question.
+4. **Intelligent follow-up:** a **different**, open question that explores a distinct dimension after the buyer responds.
+5. **Listen for:** specific unknowns or signals and their implication for relevance.
+6. **If they push back:** human, respectful handling without assuming dissatisfaction.
+7. **One thing to try:** real behavioural coaching with a reason.
+8. **Don't assume:** one explicit evidential/psychological boundary.
+
+For **calls**, initial and follow-up discovery questions are distinct on screen, and the caller gets listening cues. For **email**, the initial question is included **once** in the complete copyable email; the separately displayed question is the different, future question **only if they respond**. Do not display or duplicate the sent question elsewhere as coaching. This was a V2 failure and is a regression test.
+
+## Coaching standards
+
+- A buyer has their own reality; their priorities, constraints, supplier arrangements, buying intentions and even relevance are initially unknown.
+- Open discovery questions by default. Closed questions only for permission, clarification, verification and confirming next steps.
+- One meaningful question at a time. Follow the answer, don't interrogate or simply work through a prepared sequence.
+- Avoid leading and problem-assuming questions.
+- Translate the seller capability into a *possible*, not invented, buyer outcome.
+- Sound human and commercially competent: shorter, more relevant, less pitchy.
+- Respect their time and a clear no; qualifying out is a useful result.
+- Never claim buyer research or intelligence absent from input.
+- Do not reward pressuring for a meeting or invent performance scores.
+
+## Architecture and privacy
+
+- Pages preview requires Cloudflare `AI` binding in preview environment.
+- Backend: `functions/api/casey-prep.js`, private route `functions/casey/api.js`.
+- Private auth: `functions/_middleware.js` intercepts `/casey/*`; blocks direct unprotected API `/api/casey-prep` and old `/cara` routes.
+- Frontend: `casey/index.html`, `casey/casey.js`, `casey/casey.css`.
+- No prospect web research or permanent user submissions storage. User context is sent for inference; avoid confidential/customer personal data in tests.
+- Existing remembered seller offer migrates from Cara V1/V2 localStorage keys. User credentials unchanged.
+- Git branch `archive/cara-v2-pre-casey-20261016` retains unmodified previous version, independently of the Casey work.
+- This is NOT a zero-cost unlimited free API: Workers AI usage and quotas still apply.
+
+## Required regression tests
+
+- Hall & Woodhouse menu printing: seller offers menu printing with pre-approved templates and four-day turnaround; user merely knows prospect is linked to menus. Casey must NOT invent menu-change frequency, dissatisfaction, number of sites or a procurement project.
+- First email: output contains exactly one initial open question; output panel shows a DIFFERENT question for a later reply. Copy email must not repeat question or copy all coaching text.
+- Follow-up: do not claim a previous conversation unless the context supplies it.
+- Call: natural human opening and one separate open discovery question, with concrete listening signals and a distinct potential next question.
+- Existing supplier: accept good incumbent fit rather than seeking to undermine them.
+- Busy prospect or clear refusal: respect it, qualify out where appropriate.
+- Error responses: insufficient input, no binding, rate-limit, quality failure and service unavailable must not blame adequate inputs.
+- Mobile iPhone browser, desktop, copy, keyboard accessibility, private password gate and noindex.
+- Public `main`: no Casey/Cara files, live routes, homepage tile or sitemap entry before launch.
+
+Do not merge the test branch into production until user approval following legal review.
