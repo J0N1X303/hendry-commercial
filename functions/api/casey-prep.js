@@ -69,7 +69,11 @@ function normalize(raw,input){
   card.subject="";
   if(card.opening.includes("?"))return {reason:"call_opening_contains_question"};
  }else{
-  if(!card.subject)return {reason:"missing_email_subject"};
+  if(!card.subject){
+   const match=input.context.match(/\b(?:about|regarding|concerning)\s+(?:their|your|the|our)?\s*([^.!?]+)/i);
+   const topic=match?.[1]?.trim().replace(/[,;:]+$/,"").slice(0,60);
+   card.subject=topic?(topic[0].toUpperCase()+topic.slice(1)):"Your current approach";
+  }
   if(normal(card.opening).endsWith(normal(card.question)))
    card.opening=card.opening.slice(0,card.opening.length-card.question.length).trim();
   card.opening=card.opening.replace(/^(?:hi|hello|dear)\s+[^,\n]{1,40},?\s*/i,"")
