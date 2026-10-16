@@ -4,3 +4,31 @@
 @media(max-width:780px){.hero{grid-template-columns:1fr;gap:32px;padding:54px 0 68px}.hero h1{font-size:clamp(58px,12vw,88px)}.hero-note{max-width:500px;transform:none}.work-head{display:block}.work-head>p{margin-top:12px;max-width:unset}.workspace{padding-top:58px}.skill-layout{grid-template-columns:1fr}.skill-list{display:grid;grid-template-columns:1fr 1fr}.principles{grid-template-columns:1fr;gap:25px;padding:65px 0}.form-grid{grid-template-columns:1fr}.option-grid{grid-template-columns:1fr 1fr}.option-grid .pill-radio:last-child{grid-column:1/-1}footer{grid-template-columns:1fr;gap:12px}footer .reg-note{grid-column:1}}
 @media(max-width:520px){.site-header{width:calc(100% - 32px);height:70px}.brand{font-size:13px}.home-link{font-size:11px}.hero{width:calc(100% - 40px);padding:48px 0 58px}.hero h1{font-size:60px}.headline{font-size:22px}.intro{font-size:14px}.hero-note{display:none}.workspace{padding:48px 16px 65px}.work-head h2{font-size:32px}.mode{padding:15px 13px;gap:5px}.mode strong{font-size:14px}.mode small{font-size:10px;line-height:1.4}.panel{padding:19px 16px}.panel-top h3{font-size:27px}.pill-radio span{padding:12px 7px}.pill-radio b{font-size:11px}.skill-list{grid-template-columns:1fr 1fr;gap:6px}.skill-choice{padding:11px 10px;font-size:11px}.skill-detail{padding:19px}.result-top{padding:23px 18px}.cue{grid-template-columns:32px 1fr;gap:11px;padding:20px 15px}.cue-no{width:30px;height:30px}.cue p{font-size:14px}.lesson{margin:18px 14px 9px;padding:15px}.result-disclaimer,.result-actions{padding-left:16px;padding-right:16px}.reflection{margin-left:16px;margin-right:16px}.result-actions .btn{width:100%}.form-footer .btn{width:100%}.principles,footer{width:calc(100% - 40px)}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* Cara v2 — the buyer situation is the primary input; offering is saved once. */
+.field textarea {width:100%;resize:vertical;min-height:72px;background:#fbfcfa;border:1px solid #cbd8cf;border-radius:12px;padding:14px 15px;color:#142b1a;font:inherit;font-size:14px;line-height:1.6;}
+.field textarea:focus-visible {outline:3px solid #45a763;outline-offset:2px;}
+.field textarea::placeholder {color:#829488;}
+.buyer-field {margin-top:30px;margin-bottom:27px;}
+.buyer-field textarea {font-size:15px;min-height:110px;}
+.buyer-field label,.seller-head label {font-size:14px;font-weight:850;color:#193222;}
+.seller-head {display:flex;justify-content:space-between;gap:14px;align-items:center;border-top:1px solid #e5ece5;padding-top:24px;}
+.seller-head p {font-size:12px;color:#718273;line-height:1.55;margin-top:5px;}
+.seller-area {margin-top:14px;margin-bottom:20px;}
+.seller-area[hidden],#prepare-feedback[hidden] {display:none;}
+.small-link {border:0;background:none;color:#186b38;font-weight:850;font-size:12px;white-space:nowrap;text-decoration:underline;padding:4px;}
+.fine-tune {margin:22px 0 25px;border-top:1px solid #e5ece5;padding-top:17px;}
+.fine-tune summary {cursor:pointer;font-size:12px;font-weight:850;color:#3d6247;}
+.fine-tune label {display:block;font-weight:800;font-size:12px;margin-top:16px;margin-bottom:8px;}
+.fine-tune select {width:100%;background:#fbfcfa;border:1px solid #cbd8cf;border-radius:10px;padding:12px;font:inherit;font-size:13px;max-width:520px;}
+.privacy-prompt {font-size:11px;line-height:1.6;color:#7b897e;margin:17px 0 0;}
+.prepare-feedback {margin-top:16px;padding:13px 18px;border-radius:10px;background:#eaf1ed;color:#285236;font-size:13px;line-height:1.6;}
+.prepare-feedback[data-status="error"] {background:#fdf0eb;color:#903b24;}
+.form-footer button[disabled] {opacity:.62;cursor:progress;}
+.angle {padding:21px 26px;background:#eff8f0;border-bottom:1px solid #d5e8d8;}
+.angle-label {font-weight:850;font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:#35764b;}
+.angle p {font-size:14px;color:#28412e;line-height:1.7;margin-top:7px;}
+.caution {margin:8px 26px 0;padding:15px 18px;border:1px solid #e4e5d4;border-radius:10px;background:#fbfaf4;}
+.caution strong {font-size:12px;color:#72632e;}
+.caution p {font-size:13px;color:#514a34;line-height:1.6;margin-top:4px;}
+@media(max-width:520px){.seller-head {align-items:start;}.buyer-field textarea{min-height:130px}.angle{padding:18px}.caution{margin-left:16px;margin-right:16px}.small-link{white-space:normal;flex-shrink:0}}
