@@ -229,12 +229,37 @@
         signal:controller.signal,
         cache:'no-store'
       });
-      const result=await response.json();
+      let result;
+      try {
+        result=await response.json();
+      } catch {
+        feedback('Cara received an unexpected response from its test server (HTTP '+response.status+'). Your inputs are saved on screen; this is a technical problem, not missing information.','error');
+        return;
+      }
+      if(!response.ok) {
+        const errorCode=String(result?.error||'unknown');
+        if(response.status===400 && errorCode==='input_incomplete') {
+          feedback(result.message||'Please check the required contact and offering fields.','error');
+        } else if(response.status===429) {
+          feedback('Cara has reached its test usage limit. Your information was accepted. Please try later.','error');
+        } else if(response.status===502 && errorCode==='generation_quality') {
+          feedback('Your information is sufficient. Cara rejected its own AI draft twice because the sales advice failed quality checks. You can try again without rewriting anything.','error');
+        } else if(response.status===503 && errorCode==='ai_binding_missing') {
+          feedback('Your information is sufficient. AI is not connected to this test deployment yet. This needs a site configuration fix, not a change to your prompt.','error');
+        } else if(response.status===503) {
+          feedback('Your information is sufficient. The AI generation service is temporarily unavailable. Please try again shortly.','error');
+        } else if(response.status===401 || response.status===403) {
+          feedback('Your private preview session was not authorised. Reopen the private test link and sign in again.','error');
+        } else if(response.status===404 || response.status===405) {
+          feedback('Your information is sufficient. Cara’s preparation endpoint is missing from this preview (HTTP '+response.status+'). This needs a deployment fix.','error');
+        } else {
+          feedback('Cara encountered a technical problem (HTTP '+response.status+', '+errorCode+'). Your information was accepted; please don’t rewrite it just to fix this.','error');
+        }
+        return;
+      }
       const card=validateResponse(result);
-      if(!response.ok || !card) {
-        if(response.status===400 && result?.error) feedback(result.error,'error');
-        else if(response.status===429) feedback('Cara has reached its free AI usage limit. Please try again later or use a coaching challenge below.','error');
-        else feedback('Cara couldn’t produce a reliable, tailored briefing from that request. Try a clearer buyer situation or use a coaching challenge. I won’t substitute a generic template.','error');
+      if(!card) {
+        feedback('Your information was accepted. The generated answer did not pass Cara’s browser quality checks; please retry without changing your prompt.','error');
         return;
       }
       feedback('');
