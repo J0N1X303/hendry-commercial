@@ -4,5 +4,4 @@ wrangler.jsonc
 .gitignore
 README.md
 DOMAIN-EMAIL-SETUP.md
-cara/
 functions/
