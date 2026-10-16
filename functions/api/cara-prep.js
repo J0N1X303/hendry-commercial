@@ -133,7 +133,9 @@ export async function onRequestPost({request,env}) {
     try {
       answer=await env.AI.run(MODEL,{
         messages:modelMessages(input,attempt===1),
-        response_format:RESPONSE_FORMAT,
+        // If strict schema mode fails, try the model's simpler JSON-object mode
+        // while retaining every server-side behavioural quality check.
+        response_format:attempt===0?RESPONSE_FORMAT:{type:"json_object"},
         temperature:attempt===0?0.35:0.15,
         max_tokens:attempt===0?950:1000
       });
