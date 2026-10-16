@@ -103,7 +103,7 @@
     const text = String(question || '').trim();
     const beginsOpen = /^(what|how|which|who|where|when|describe|tell me about|walk me through)\b/i.test(text);
     const oneQuestion = (text.match(/\?/g) || []).length === 1;
-    const leading = /\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with)\b/i.test(text);
+    const leading = /\b(you must|you obviously|your problem|your struggles|why haven't you|why don't you|surely|struggling with|your biggest problems|your biggest challenges|your main pain|your biggest issues)\b/i.test(text) || /^what (?:are|have been|do you see as) .{0,70}\b(?:problems|challenges|issues|pain points)\b/i.test(text);
     return {pass: beginsOpen && oneQuestion && !leading, reason: !beginsOpen?'Not an open question':!oneQuestion?'Must be one question':leading?'Assumes a problem':'Open discovery question'};
   }
   function getInputs() {
