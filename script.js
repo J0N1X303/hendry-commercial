@@ -303,6 +303,59 @@
       projectPrev.disabled = projectTrack.scrollLeft <= 3;
       projectNext.disabled = projectTrack.scrollLeft >= projectTrack.scrollWidth - projectTrack.clientWidth - 3;
     };
+
+    // Mouse-only drag scrolling. Native touch and trackpad scrolling remain unchanged.
+    // Do not capture the pointer on mousedown: ordinary project links must still click.
+    let mouseDrag = null;
+    let suppressClickUntil = 0;
+    projectTrack.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse' || event.button !== 0) return;
+      mouseDrag = {
+        id: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        startScroll: projectTrack.scrollLeft,
+        dragging: false
+      };
+    });
+    projectTrack.addEventListener('pointermove', (event) => {
+      if (!mouseDrag || event.pointerId !== mouseDrag.id) return;
+      const dx = event.clientX - mouseDrag.startX;
+      const dy = event.clientY - mouseDrag.startY;
+      if (!mouseDrag.dragging) {
+        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy) * 1.15) return;
+        mouseDrag.dragging = true;
+        projectTrack.classList.add('is-dragging');
+        projectTrack.setPointerCapture(event.pointerId);
+      }
+      if (event.cancelable) event.preventDefault();
+      projectTrack.scrollLeft = mouseDrag.startScroll - dx;
+    });
+    const stopMouseDrag = (event) => {
+      if (!mouseDrag || event.pointerId !== mouseDrag.id) return;
+      const dragged = mouseDrag.dragging;
+      mouseDrag = null;
+      if (dragged) {
+        suppressClickUntil = performance.now() + 180;
+        projectTrack.classList.remove('is-dragging');
+        updateArrows();
+      }
+      if (projectTrack.hasPointerCapture(event.pointerId)) {
+        projectTrack.releasePointerCapture(event.pointerId);
+      }
+    };
+    projectTrack.addEventListener('pointerup', stopMouseDrag);
+    projectTrack.addEventListener('pointercancel', stopMouseDrag);
+    projectTrack.addEventListener('lostpointercapture', stopMouseDrag);
+    projectTrack.addEventListener('click', (event) => {
+      if (performance.now() >= suppressClickUntil) return;
+      // A drag beginning on a link must never navigate to that project.
+      event.preventDefault();
+      event.stopPropagation();
+      suppressClickUntil = 0;
+    }, true);
+    projectTrack.addEventListener('dragstart', (event) => event.preventDefault());
+
     projectTrack.addEventListener('scroll', updateArrows, { passive: true });
     window.addEventListener('resize', updateArrows);
     updateArrows();

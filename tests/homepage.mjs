@@ -55,6 +55,22 @@ for (const config of cases) {
     await page.locator('[data-project-prev]').click();
     await page.waitForTimeout(650);
     assert((await track.evaluate(el=>el.scrollLeft))<scrolled,'Previous arrow reverses');
+    if (!config.isMobile) {
+      await track.evaluate(el => { el.scrollLeft = 0; });
+      await page.waitForTimeout(200);
+      const start=await track.evaluate(el=>el.scrollLeft);
+      const box=await track.boundingBox();
+      const sx=box.x+Math.min(box.width-50,Math.max(100,box.width*0.7));
+      const sy=box.y+Math.min(box.height-40,95);
+      await page.mouse.move(sx,sy);
+      await page.mouse.down();
+      await page.mouse.move(sx-135,sy,{steps:8});
+      await page.mouse.up();
+      await page.waitForTimeout(300);
+      const after=await track.evaluate(el=>el.scrollLeft);
+      assert(after>start+45,'Mouse drag should scroll cards horizontally');
+      assert.equal(page.url(),'http://127.0.0.1:8765/','Mouse drag must not navigate');
+    }
     await page.locator('[data-open-cv]').click();
     assert.equal(await page.locator('[data-cv-dialog]').isVisible(),true,'CV dialog opens');
     await page.locator('[data-close-cv]').click();
