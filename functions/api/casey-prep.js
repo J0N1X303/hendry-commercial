@@ -120,6 +120,8 @@ export async function onRequestPost({request,env}){
  if(!input)return json({error:"input_incomplete",message:"Describe who you're contacting and what you offer, in a short sentence each."},400);
  if(typeof env?.AI?.run!=="function")return json({error:"ai_binding_missing"},503);
  if(!allow(request.headers.get("cf-connecting-ip")))return json({error:"rate_limited"},429);
+
+ async function produce(){
  let result;
  try{
   // One short response. No nested schema, three-scenario trees or full retries.
@@ -127,9 +129,9 @@ export async function onRequestPost({request,env}){
    messages:prompt(input),response_format:{type:"json_object"},
    temperature:0.22,max_tokens:850
   });
- }catch{return json({error:"generation_service_unavailable"},503);}
+ }catch{return {body:{error:"generation_service_unavailable"},status:503};}
  let parsed=normalize(result?.response??result,input);
- if(parsed.card)return json({status:"ready",mode:"tailored",card:parsed.card});
+ if(parsed.card)return {body:{status:"ready",mode:"tailored",card:parsed.card},status:200};
  // If the single discovery question failed, repair JUST that question.
  // No repeat of the full commercial briefing.
  if(parsed.reason==="discovery_question"&&parsed.candidate){
@@ -143,10 +145,49 @@ export async function onRequestPost({request,env}){
    const fixed=String(answer?.response??answer??"").trim().replace(/^["'\s]+|["'\s]+$/g,"");
    if(openQuestion(fixed)){
     parsed=normalize({...parsed.candidate,question:fixed},input);
-    if(parsed.card)return json({status:"ready",mode:"tailored",card:parsed.card});
+    if(parsed.card)return {body:{status:"ready",mode:"tailored",card:parsed.card},status:200};
    }
   }catch{}
  }
- return json({error:"generation_quality",reason:parsed.reason||"invalid_response"},502);
+ return {body:{error:"generation_quality",reason:parsed.reason||"invalid_response"},status:502};
+ }
+ // Streaming is opt-in, preserving JSON behavior for older clients. An
+ // immediate acknowledgement and periodic heartbeat reduce the chance that
+ // the first, slower AI call is treated as an idle connection.
+ if(!String(request.headers.get("accept")||"").includes("application/x-ndjson")){
+  const output=await produce();
+  return json(output.body,output.status);
+ }
+ const encoder=new TextEncoder();
+ let timer,active=true;
+ const stream=new ReadableStream({
+  start(controller){
+   const send=event=>{
+    if(!active)return;
+    try{controller.enqueue(encoder.encode(JSON.stringify(event)+"\n"));}
+    catch{active=false;clearInterval(timer);}
+   };
+   // This does not mean the model has started or completed, only that the
+   // authenticated endpoint received the request successfully.
+   send({event:"accepted"});
+   timer=setInterval(()=>send({event:"working"}),3000);
+   void produce().then(({body,status})=>{
+    send({event:"result",status,data:body});
+   }).catch(()=>{
+    send({event:"result",status:503,data:{error:"generation_service_unavailable"}});
+   }).finally(()=>{
+    clearInterval(timer);
+    if(active){active=false;try{controller.close();}catch{}}
+   });
+  },
+  cancel(){active=false;clearInterval(timer);}
+ });
+ return new Response(stream,{status:200,headers:{
+  "content-type":"application/x-ndjson; charset=utf-8",
+  "cache-control":"private, no-store, no-transform",
+  "x-content-type-options":"nosniff",
+  "x-robots-tag":"noindex, nofollow, noarchive"
+ }});
+
 }
 export function onRequest(){return json({error:"method_not_allowed"},405);}
