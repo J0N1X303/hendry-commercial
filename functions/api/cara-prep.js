@@ -20,7 +20,7 @@ const questionPass = (q) => {
 };
 const safe = (s, cap=850) => typeof s === "string" ? s.trim().slice(0,cap) : "";
 
-function parseOutput(raw) {
+function parseOutput(raw, channel="call") {
   let obj = raw;
   if (typeof raw === "string") {
     try { obj = JSON.parse(raw.replace(/^\x60\x60\x60(?:json)?\s*/i,"").replace(/\s*\x60\x60\x60$/,"").trim()); }
@@ -37,9 +37,12 @@ function parseOutput(raw) {
   };
   if (Object.values(result).some(v=>!v)) return null;
   if (!questionPass(result.question)) return null;
+  if (/^(what does your current approach look like|what are your thoughts|how are things going|how does it work)\??$/i.test(result.question)) return null;
+  if (channel!=="call" && result.opening.includes("?")) return null;
   if (words(result.opening) > 115) return null;
   if (words(result.complication) > 70) return null;
   if (words(result.lesson) > 70) return null;
+  if (channel!=="call") result.opening = "Hi [Name],\n\n" + result.opening.replace(/^(hi|hello|dear)\b[^\n]*[,!]?\s*/i,"").trim() + "\n\n" + result.question + "\n\nBest,\n[Your name]";
   
   return result;
 }
@@ -68,8 +71,8 @@ function allowLocalIsolate(ip) {
 
 const SYSTEM = `You are Cara, a precise British B2B pre-contact coach. Produce practical sales judgement, not formulaic scripts. The user has roughly 60 seconds before a real outreach. You get only seller and buyer information provided by user: YOU HAVE NOT RESEARCHED ANYTHING. In the JSON reply:
 - angle: one short reason this specific situation *might* justify a conversation; clearly distinguish user-reported observation from hypothesis; no invented facts, problems, growth, budgets, initiatives, quotes, customer names or personal details.
-- opening: for a phone call, natural spoken start of max 45 words, not a full script. For intro/followup, complete usable email up to 85 words, one paragraph or two, natural, calm, not salesy. Must make contact relevant to buyer and give a respectful exit. Never copy the seller's service description verbatim or prepend 'I work with businesses on [user input]'. Transform seller capabilities into possible buyer outcomes without promising them. Mention a specific supplied buying signal, when one is supplied. If not supplied, avoid 'I noticed', 'I saw', 'congratulations on', or any claim of knowledge. Do not use pseudo-personalisation or flattery.
-- question: EXACTLY one neutral, open question about the customer's specific approach or priorities, beginning with What, How, Which, Where, Who, When, Tell me about, Walk me through, or Describe. Not yes/no, not a disguised pitch, not leading or problem-assuming. One question mark. It can appear as the one question in the email, not a second stacked question.
+- opening: for a phone call, natural spoken start of max 45 words, not a full script. For intro/followup, write ONLY 1-2 highly relevant sentences (max 60 words) forming the introduction/body of an email; no greeting, sign-off or question mark. The app adds the validated open question and a sign-off. Must make contact relevant to buyer and give a respectful exit. Never copy the seller's service description verbatim or prepend 'I work with businesses on [user input]'. Transform seller capabilities into possible buyer outcomes without promising them. Mention a specific supplied buying signal, when one is supplied. If not supplied, avoid 'I noticed', 'I saw', 'congratulations on', or any claim of knowledge. Do not use pseudo-personalisation or flattery.
+- question: EXACTLY one neutral, open question about the customer's specific approach or priorities, beginning with What, How, Which, Where, Who, When, Tell me about, Walk me through, or Describe. Not yes/no, not a disguised pitch, not leading or problem-assuming. One question mark. For email, the app itself inserts the exact validated question into the email after your opening sentences. Do not insert it in the opening.
 - complication: short thoughtful suggested reaction to their likely objection or uncertainty, favour curiosity, respect for 'no', and no pressure.
 - lesson: one real skill to practise on this contact, tied to the context, not a platitude.
 - caution: one uncertainty or thing NOT to assume. Explain if the supplied background is too weak for a credible approach.
@@ -116,7 +119,7 @@ export async function onRequestPost({request,env}) {
       max_tokens:780
     });
     const raw=answer?.response ?? answer;
-    const result=parseOutput(raw);
+    const result=parseOutput(raw,input.channel);
     if (!result || !sufficientlyDifferent(result,input)) return json({error:"quality_check"},502);
     return json({status:"ready",mode:"tailored",card:result});
   } catch {
