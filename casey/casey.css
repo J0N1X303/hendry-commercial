@@ -75,3 +75,18 @@
 
 /* V3.2: incomplete optional model output must never render empty coaching cards. */
 .signal[hidden],.pushback-option[hidden],.angle-test[hidden],.verify[hidden]{display:none!important}
+
+/* V3.3: truthful progress during a non-streaming AI request. */
+.casey-progress{margin-top:19px;border:1px solid #bdd9c5;border-radius:14px;background:#eff8f1;padding:17px 19px;color:#254632}
+.casey-progress[hidden]{display:none!important}
+.progress-heading{display:flex;align-items:center;gap:14px}
+.progress-heading strong{font-size:13px;font-weight:800;color:#244e32}
+.progress-heading p{font-size:12px;color:#4d6956;line-height:1.55;margin-top:3px}
+.progress-orbit{display:block;flex-shrink:0;width:28px;height:28px;border:3px solid #c9e8d1;border-top-color:#2e854c;border-radius:50%;animation:casey-spin .9s linear infinite}
+.casey-progress-track{position:relative;height:7px;border-radius:999px;background:#d9eddf;overflow:hidden;margin-top:17px}
+.casey-progress-motion{position:absolute;left:0;top:0;bottom:0;width:38%;border-radius:999px;background:linear-gradient(90deg,#48a667,#246f44);animation:casey-indeterminate 2.1s ease-in-out infinite}
+.progress-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:10px;color:#637b69}
+@keyframes casey-spin{to{transform:rotate(360deg)}}
+@keyframes casey-indeterminate{0%{transform:translateX(-110%)}50%{transform:translateX(145%)}100%{transform:translateX(290%)}}
+@media(max-width:520px){.casey-progress{padding:14px}.progress-bottom{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.progress-orbit{animation:none;border-top-color:#206b3e}.casey-progress-motion{animation:none;width:100%;opacity:.7}}
