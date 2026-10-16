@@ -230,19 +230,45 @@ export async function onRequestPost({request,env}){
   if(!input)return json({error:"input_incomplete",message:"Describe the situation and your offer in a short sentence each."},400);
   if(typeof env?.AI?.run!=="function")return json({error:"ai_binding_missing"},503);
   if(!rateLimit(request.headers.get("cf-connecting-ip")))return json({error:"rate_limited"},429);
+  const reasons=[];
   for(let attempt=0;attempt<2;attempt++){
     let response;
     try{
-      response=await env.AI.run(MODEL,{
+      // A deeply nested strict schema made otherwise useful outputs fail in
+      // Cloudflare JSON mode. Prefer simple JSON object; retry with ordinary
+      // text JSON if provider-side format enforcement fails.
+      const options={
         messages:messages(input,attempt>0),
-        response_format:attempt===0?SCHEMA:{type:"json_object"},
-        temperature:attempt===0?0.35:0.15,
-        max_tokens:attempt===0?1850:2050
-      });
-    }catch{if(!attempt)continue;return json({error:"generation_service_unavailable"},503);}
-    const draft=parseOutput(response?.response??response,input.channel);
-    if(draft&&relevant(draft,input)&&grounded(draft,input))return json({status:"ready",mode:"tailored",card:draft});
+        temperature:attempt===0?0.3:0.2,
+        max_tokens:attempt===0?2400:2600
+      };
+      if(attempt===0)options.response_format={type:"json_object"};
+      response=await env.AI.run(MODEL,options);
+    }catch{
+      reasons.push("model_unavailable");
+      if(attempt===0)continue;
+      return json({error:"generation_service_unavailable",reason:"model_unavailable"},503);
+    }
+    const raw=response?.response??response;
+    const result=evaluateDraft(raw,input.channel);
+    if(!result.card){
+      reasons.push(result.reason||"invalid_structure");
+      continue;
+    }
+    if(!relevant(result.card,input)){
+      reasons.push("unsupported_claim_or_offer_copy");
+      continue;
+    }
+    if(!grounded(result.card,input)){
+      reasons.push("insufficient_commercial_specificity");
+      continue;
+    }
+    return json({status:"ready",mode:"tailored",card:result.card});
   }
-  return json({error:"generation_quality",message:"Your information was accepted but Casey's AI drafts did not pass its coaching standards."},502);
+  return json({
+    error:"generation_quality",
+    reason:reasons.join(",")||"unknown",
+    message:"The AI response was incomplete or failed an essential commercial quality check."
+  },502);
 }
 export function onRequest(){return json({error:"method_not_allowed"},405);}
