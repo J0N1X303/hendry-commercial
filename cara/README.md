@@ -59,3 +59,9 @@ Cloudflare Workers AI has a daily free allocation, but **a paid Workers plan cha
 ## Validation threshold
 
 We do not yet know that the AI outputs improve real commercial conversations. The initial quality gate is whether experienced salespeople find the preparation commercially intelligent and faster than their current method. After that, test voluntary repeat use and willingness of managers to share challenges. Kill feature expansion if usage is not repeated.
+
+## Private preview testing (October 2026)
+
+Use the **Workers preview hostname**, not the similarly named Pages preview. The Pages project has its own binding configuration and may lack Workers AI. On the holding branch the Worker is the entry point (`main: worker.js`); `/cara/` and `/cara/api` are protected by Basic authentication and the Workers preview has a separate `previews.ai` binding. The Worker asset-upload exclusion file must NOT exclude `cara/`. Public production remains unchanged.
+
+Do not merge this branch into main before legal clearance or 1 November. Authentication and live AI generation still require manual browser testing.
