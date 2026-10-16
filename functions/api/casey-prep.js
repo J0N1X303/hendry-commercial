@@ -22,56 +22,81 @@ function overlap(a,b) {
   let same=0;for(const w of x)if(y.has(w))same++;
   return same/Math.min(x.size,y.size);
 }
-function parseOutput(raw,channel){
-  let o=raw;
-  if(typeof o==="string"){
-    try{o=JSON.parse(o.replace(/^`{3}(?:json)?\s*/i,"").replace(/\s*`{3}$/,"").trim());}catch{return null;}
+function parseJson(raw) {
+  if(raw && typeof raw==="object" && !Array.isArray(raw)) return raw;
+  if(typeof raw!=="string") return null;
+  const s=raw.replace(/^`{3}(?:json)?\s*/i,"").replace(/\s*`{3}$/,"").trim();
+  try { return JSON.parse(s); }
+  catch {
+    const begin=s.indexOf("{"),end=s.lastIndexOf("}");
+    if(begin>=0&&end>begin)try{return JSON.parse(s.slice(begin,end+1));}catch{}
+    return null;
   }
-  if(!o||typeof o!=="object"||Array.isArray(o))return null;
-  const shortFields=["angle","angle_test","opening","question","next_question","lesson","caution","verify"];
+}
+function evaluateDraft(raw,channel) {
+  const o=parseJson(raw);
+  if(!o)return {card:null,reason:"invalid_json"};
   const card={};
-  for(const k of shortFields)card[k]=trim(o[k],k==="opening"?900:780);
+  const fields=["angle","angle_test","opening","question","next_question","lesson","caution","verify"];
+  for(const key of fields)card[key]=trim(o[key],key==="opening"?900:780);
   card.subject=trim(o.subject||"",90).replace(/[\r\n]+/g," ");
-  if(shortFields.some(k=>card[k].length<15))return null;
-  if(!openQuestion(card.question)||!openQuestion(card.next_question))return null;
-  if(card.question.toLowerCase()===card.next_question.toLowerCase()||overlap(card.question,card.next_question)>.77)return null;
-  if(/^(what does your current approach look like|what are your thoughts|how are things going|how does it work)\??$/i.test(card.question))return null;
-  if(words(card.angle)<24||words(card.angle)>90||words(card.angle_test)<12||words(card.angle_test)>52||
-     words(card.opening)>(channel==="call"?65:90)||words(card.lesson)>70||
-     words(card.caution)>75||words(card.verify)>65)return null;
-  if(!Array.isArray(o.signals)||o.signals.length!==3||!Array.isArray(o.pushbacks)||o.pushbacks.length!==3)return null;
-  card.signals=o.signals.map(signal=>({
-    cue:trim(signal?.cue,220),meaning:trim(signal?.meaning,260),move:trim(signal?.move,260)
-  }));
-  if(card.signals.some(x=>Object.values(x).some(t=>t.length<12))||
-     card.signals.some(x=>words(x.cue)>32||words(x.meaning)>45||words(x.move)>40))return null;
-  const types=["reframe","reconnect","respect_no"];
-  card.pushbacks=o.pushbacks.map((p,i)=>({
-    type:trim(p?.type,32),
-    buyer:trim(p?.buyer,180),
-    reply:trim(p?.reply,420),
-    why:trim(p?.why,240)
-  }));
-  if(card.pushbacks.some((p,i)=>p.type!==types[i]||
-    [p.buyer,p.reply,p.why].some(v=>v.length<8)||
-    words(p.buyer)>28||words(p.reply)>75||words(p.why)>40))return null;
-  // Reframing must not fall back to the weak closed discovery questions
-  // that Casey is designed to coach people away from.
-  const reframeReply=card.pushbacks[0].reply;
-  const reframeQuestions=reframeReply.split(/[.!]\s+/).map(t=>t.trim()).filter(t=>t.endsWith("?"));
-  if(reframeQuestions.length>1||reframeQuestions.some(q=>!openQuestion(q)))return null;
-  // A clear refusal is a stopping point, not an invitation to overcome an objection.
-  if(card.pushbacks[2].reply.includes("?")||/\b(reconnect|follow up|send you|check back|another time)\b/i.test(card.pushbacks[2].reply))return null;
+  if(fields.some(k=>card[k].length<10))return {card:null,reason:"missing_core"};
+  if(!openQuestion(card.question)||!openQuestion(card.next_question))return {card:null,reason:"discovery_question"};
+  if(card.question.toLowerCase()===card.next_question.toLowerCase()||overlap(card.question,card.next_question)>.77)return {card:null,reason:"duplicate_question"};
+  const rawSignals=Array.isArray(o.signals)?o.signals:[];
+  card.signals=rawSignals.slice(0,3).map(x=>({
+    cue:trim(x?.cue,220),meaning:trim(x?.meaning,260),move:trim(x?.move,260)
+  })).filter(x=>x.cue.length>=9&&x.meaning.length>=9&&x.move.length>=9);
+  if(card.signals.length<2)return {card:null,reason:"missing_signals"};
+  const rawPushbacks=Array.isArray(o.pushbacks)?o.pushbacks:[];
+  const byType={};
+  const expected=["reframe","reconnect","respect_no"];
+  for(let i=0;i<rawPushbacks.length;i++){
+    const raw=rawPushbacks[i];
+    const type=clean(raw?.type,32).toLowerCase().replace(/[\s-]+/g,"_");
+    const canonical=expected.includes(type)?type:expected[i];
+    if(!canonical||byType[canonical])continue;
+    const p={type:canonical,buyer:trim(raw?.buyer,180),reply:trim(raw?.reply,420),why:trim(raw?.why,240)};
+    if([p.buyer,p.reply,p.why].some(x=>x.length<8))continue;
+    byType[canonical]=p;
+  }
+  if(!byType.reframe)return {card:null,reason:"missing_reframe"};
+  const q=byType.reframe.reply.split(/[.!]\s+/).map(t=>t.trim()).filter(t=>t.endsWith("?"));
+  if(q.length>1||q.some(t=>!openQuestion(t)))return {card:null,reason:"reframe_question"};
+  // A clear refusal must end the conversation. Repair an unsafe or absent close
+  // using respectful language, not another call to the AI model.
+  if(!byType.respect_no || byType.respect_no.reply.includes("?")||
+    /\b(reconnect|follow up|send you|check back|another time)\b/i.test(byType.respect_no.reply)) {
+    byType.respect_no={
+      type:"respect_no",
+      buyer:"Please don't contact me again.",
+      reply:"Understood. I won't contact you again. Thank you for letting me know.",
+      why:"A clear refusal ends the conversation. Don't try to win another opportunity."
+    };
+  }
+  card.pushbacks=expected.map(type=>byType[type]).filter(Boolean);
   if(channel==="call"){
-    if(card.opening.includes("?"))return null;
+    if(card.opening.includes("?"))return {card:null,reason:"call_opening_question"};
     card.subject="";
   }else{
-    if(!card.subject||card.subject.length>75||card.opening.includes("?"))return null;
-    if(/^(hi|hello|dear)\b/i.test(card.opening)||/best regards|kind regards|yours sincerely/i.test(card.opening))return null;
+    if(!card.subject)return {card:null,reason:"email_subject"};
+    // The first discovery question belongs inside the email exactly once.
+    // Sometimes a model includes it in its opening as well; remove only a literal duplicate.
+    const normalize=t=>String(t).toLowerCase().replace(/\s+/g," ").trim();
+    const qn=normalize(card.question);
+    if(normalize(card.opening).endsWith(qn)){
+      const at=card.opening.toLowerCase().lastIndexOf(card.question.toLowerCase());
+      if(at>=0)card.opening=card.opening.slice(0,at).trim();
+    }
+    if(card.opening.includes("?"))return {card:null,reason:"email_duplicate_or_extra_question"};
+    card.opening=card.opening.replace(/^(?:hi|hello|dear)\s+[^\n,]{1,40},?\s*/i,"")
+      .replace(/\b(?:kind regards|best regards|yours sincerely)[\s\S]*$/i,"").trim();
+    if(card.opening.length<14)return {card:null,reason:"email_opening_short"};
     card.opening="Subject: "+card.subject+"\n\nHi [Name],\n\n"+card.opening+"\n\n"+card.question+"\n\nBest,\n[Your name]";
   }
-  return card;
+  return {card,reason:null};
 }
+function parseOutput(raw,channel){return evaluateDraft(raw,channel).card;}
 function relevant(card,input){
   const seller=input.seller.toLowerCase().replace(/\s+/g," ");
   if(seller.length>=32&&card.opening.toLowerCase().replace(/\s+/g," ").includes(seller))return false;
