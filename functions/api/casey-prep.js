@@ -55,6 +55,11 @@ function parseOutput(raw,channel){
   if(card.pushbacks.some((p,i)=>p.type!==types[i]||
     [p.buyer,p.reply,p.why].some(v=>v.length<8)||
     words(p.buyer)>28||words(p.reply)>75||words(p.why)>40))return null;
+  // Reframing must not fall back to the weak closed discovery questions
+  // that Casey is designed to coach people away from.
+  const reframeReply=card.pushbacks[0].reply;
+  const reframeQuestions=reframeReply.split(/[.!]\s+/).map(t=>t.trim()).filter(t=>t.endsWith("?"));
+  if(reframeQuestions.length>1||reframeQuestions.some(q=>!openQuestion(q)))return null;
   // A clear refusal is a stopping point, not an invitation to overcome an objection.
   if(card.pushbacks[2].reply.includes("?")||/\b(reconnect|follow up|send you|check back|another time)\b/i.test(card.pushbacks[2].reply))return null;
   if(channel==="call"){
