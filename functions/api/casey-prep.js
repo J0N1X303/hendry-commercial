@@ -44,15 +44,15 @@ function parse(raw){
 function recipientName(context){
  const source=String(context||"");
  const patterns=[
-  /(?:^|[.!?]\s+)(?:recipient|contact|prospect)(?:\s+name)?\s*[:=-]\s*([A-Z][a-z]{1,25})\b/,
-  /\b(?:email(?:ing)?|contact(?:ing)?|write to|reach out to|speaking with|speak to|follow up with|following up with)\s+([A-Z][a-z]{1,25})\b/,
+  /(?:^|[.!?]\s+)(?:[Rr]ecipient|[Cc]ontact|[Pp]rospect)(?:\s+[Nn]ame)?\s*[:=-]\s*([A-Z][a-z]{1,25})\b/,
+  /\b(?:[Ff]ollow up with|[Ff]ollowing up with|[Ee]mail(?:ing)?|[Cc]ontact(?:ing)?|[Ww]rit(?:e|ing) to|[Rr]each out to|[Ss]peaking with|[Ss]peak to)\s+([A-Z][a-z]{1,25})\s+(?:at|from|of)\s+[A-Z]/,
   /(?:^|[.!?]\s+)([A-Z][a-z]{1,25})(?:\s+[A-Z][a-z]{1,28})?\s+(?:at|from|of)\s+[A-Z]/,
-  /^([A-Z][a-z]{1,25})\s*[,–-]\s*(?:head|director|manager|owner|founder|buyer|contact)\b/i
+  /^([A-Z][a-z]{1,25})\s*[,–-]\s*(?:[Hh]ead|[Dd]irector|[Mm]anager|[Oo]wner|[Ff]ounder|[Bb]uyer|[Cc]ontact)\b/
  ];
  const excluded=new Set(["sales","head","director","operations","marketing","procurement","finance","customer","business","company","team","contact","recipient","prospect","buyer","account","manager","printing","menus","follow","hello","dear","meeting"]);
  for(const pattern of patterns){
   const match=source.match(pattern);
-  if(match && !excluded.has(match[1].toLowerCase()))return match[1];
+  if(match&&!excluded.has(match[1].toLowerCase()))return match[1];
  }
  return "";
 }
