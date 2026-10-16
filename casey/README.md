@@ -58,3 +58,17 @@ For **calls**, initial and follow-up discovery questions are distinct on screen,
 - Public `main`: no Casey/Cara files, live routes, homepage tile or sitemap entry before launch.
 
 Do not merge the test branch into production until user approval following legal review.
+
+## V3.1 commercial-coaching refinement (16 October 2026)
+
+Following hands-on seller testing, four output areas have been rebuilt:
+- Commercial objective: articulate the underlying conditional buyer decision or trade-off, plus the evidence that would establish relevance.
+- Listen for: exactly three conditional signals, each split into what to notice, what that could mean, and the next appropriate move.
+- Pushback: three separate pathways: reframe where receptive; reposition/reconnect with permission if timing is wrong; and respect a clear no. Buyer statements and seller responses must never be confused.
+- Don't assume: scenario-specific assumption linked to a concrete verification or open discovery method.
+
+The primary response is visible, other pushback options are expandable. Outbound email contains one question only; the other coaching questions never appear inside the copied draft.
+
+Structured regression checks cover all three channels, 3 signals, 3 pushbacks, neutral open discovery, clear refusal, copy behaviour, and client DOM references. These checks do not establish live-model quality, latency, physical phone layout or deployment authentication: those require live testing before launch.
+
+DO NOT merge or publicly launch before 1 November 2026 and owner approval.
