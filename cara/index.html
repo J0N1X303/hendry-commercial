@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08110c">
+  <meta name="description" content="Cold Call Cara is a free, 60-second preparation companion for prospect calls, introductions and follow-ups. One useful approach, one open question, one practical improvement.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://hendrycommercial.co.uk/cara/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Hendry Commercial">
+  <meta property="og:title" content="Cold Call Cara — Make the next conversation a better one">
+  <meta property="og:description" content="A free, practical pre-contact companion. Prepare a relevant opening and open question in about a minute. No account, no roleplay.">
+  <meta property="og:url" content="https://hendrycommercial.co.uk/cara/">
+  <title>Cold Call Cara | Hendry Commercial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/cara/cara.css?v=1">
+  <script src="/cara/cara.js?v=1" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Hendry Commercial home"><span class="brand-icon" aria-hidden="true">H<span>C</span></span><span class="brand-text"><strong>Hendry</strong> Commercial</span></a>
+    <a class="home-link" href="/">Hendry Commercial <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">A free Hendry Commercial tool</span>
+        <h1>Cold Call <em>Cara.</em></h1>
+        <p class="headline">Make your next conversation a better one.</p>
+        <p class="intro">Less overthinking. A better opening, a useful question and one thing to try on your next real customer contact.</p>
+        <div class="trust"><span>About a minute</span><span>No account</span><span>No roleplay</span><span>Free</span></div>
+      </div>
+      <aside class="hero-note" aria-label="How Cara works"><span class="note-icon" aria-hidden="true">↗</span><strong>Not another sales script.</strong><p>A small shift in approach can change the whole conversation. Cara gives you something worth trying, not something to memorise.</p><span class="scribble">Prepare → Contact → Learn</span></aside>
+    </section>
+
+    <section class="workspace" aria-labelledby="work-title">
+      <div class="work-head">
+        <div><p class="eyebrow">The workspace</p><h2 id="work-title">What would help you right now?</h2></div>
+        <p>Choose a real situation. Keep it practical.</p>
+      </div>
+      <div class="mode-switch" role="tablist" aria-label="Choose how Cara can help">
+        <button id="tab-prepare" class="mode active" type="button" role="tab" aria-selected="true" aria-controls="panel-prepare" data-mode="prepare"><span class="mode-mark">01</span><strong>Prepare a contact</strong><small>Know how to start, ask and respond</small></button>
+        <button id="tab-coach" class="mode" type="button" role="tab" aria-selected="false" aria-controls="panel-coach" data-mode="coach"><span class="mode-mark">02</span><strong>Improve one skill</strong><small>Try a better approach on a real call</small></button>
+      </div>
+
+      <section id="panel-prepare" class="panel" role="tabpanel" aria-labelledby="tab-prepare">
+        <div class="panel-top"><span class="step">01 / 02</span><h3>Tell Cara just enough.</h3><p>Your preparation stays on this device. Cara doesn't research or contact the prospect.</p></div>
+        <form id="prepare-form">
+          <fieldset class="format-picker"><legend>What are you about to do?</legend><div class="option-grid">
+            <label class="pill-radio"><input type="radio" name="format" value="call" checked><span>☎ <b>Make a call</b></span></label>
+            <label class="pill-radio"><input type="radio" name="format" value="intro"><span>↗ <b>Send an introduction</b></span></label>
+            <label class="pill-radio"><input type="radio" name="format" value="followup"><span>↻ <b>Follow up</b></span></label>
+          </div></fieldset>
+          <div class="form-grid">
+            <div class="field"><label for="topic">What do you want to understand or discuss? <span class="req">Required</span></label><input id="topic" name="topic" maxlength="130" placeholder="e.g. packaging for a new product range" required><small>Write the subject of a conversation, not your sales pitch.</small></div>
+            <div class="field"><label for="reason">Why this prospect, why now? <span class="optional">Optional</span></label><input id="reason" name="reason" maxlength="170" placeholder="e.g. their recently announced product launch"><small>Only enter something you actually know. Cara won't invent a reason.</small></div>
+            <div class="field"><label for="offer">What do you help customers with? <span class="optional">Optional</span></label><input id="offer" name="offer" maxlength="150" placeholder="e.g. launch-ready packaging supply"><small>Think about the outcome, rather than a feature list.</small></div>
+            <div class="field"><label for="company">Company you're contacting <span class="optional">Optional</span></label><input id="company" name="company" maxlength="100" placeholder="e.g. a food manufacturer"><small>For your context only; we won't guess what they need.</small></div>
+          </div>
+          <fieldset class="challenge-picker"><legend>What might make this tricky?</legend><div class="chip-options">
+            <label><input type="radio" name="obstacle" value="none" checked><span>Not sure yet</span></label>
+            <label><input type="radio" name="obstacle" value="incumbent"><span>Existing supplier</span></label>
+            <label><input type="radio" name="obstacle" value="busy"><span>They're busy</span></label>
+            <label><input type="radio" name="obstacle" value="send"><span>“Send an email”</span></label>
+            <label><input type="radio" name="obstacle" value="gatekeeper"><span>Gatekeeper</span></label>
+            <label><input type="radio" name="obstacle" value="silence"><span>No response yet</span></label>
+          </div></fieldset>
+          <div class="form-footer"><label class="remember"><input type="checkbox" id="remember"> Remember my offer on this device</label><button type="submit" class="btn primary">Get my preparation card <span aria-hidden="true">→</span></button></div>
+        </form>
+        <section class="result" id="preparation-result" hidden aria-live="polite">
+          <div class="result-top"><span class="step">02 / 02 · Ready to use</span><h3 id="result-title">Your conversation card</h3><p id="result-context"></p></div>
+          <div class="cue"><span class="cue-no">01</span><div><h4 id="cue-opening-title">Start here</h4><p id="cue-opening"></p></div></div>
+          <div class="cue"><span class="cue-no">02</span><div><h4>Ask this open question</h4><p id="cue-question"></p><small>Ask one question. Then give them room to answer.</small></div></div>
+          <div class="cue"><span class="cue-no">03</span><div><h4 id="cue-objection-title">If the conversation stalls</h4><p id="cue-objection"></p></div></div>
+          <div class="lesson"><span class="lesson-label">One thing to try</span><p id="cue-lesson"></p></div>
+          <p class="result-disclaimer">Starter language, not a script. Adapt it to your voice and the actual response. No claims about the prospect have been independently verified.</p>
+          <div class="result-actions"><button type="button" class="btn primary" id="copy-card">Copy my card</button><button type="button" class="btn subtle" id="start-again">Change the approach</button></div>
+          <div class="reflection"><h4>After the real contact, what happened?</h4><div class="reflection-buttons" role="group" aria-label="Record call outcome"><button type="button" data-outcome="useful">Useful conversation</button><button type="button" data-outcome="no-fit">Not a fit</button><button type="button" data-outcome="not-reached">Didn't connect</button></div><p class="reflection-message" id="reflection-message" aria-live="polite"></p></div>
+        </section>
+      </section>
+
+      <section id="panel-coach" class="panel" role="tabpanel" aria-labelledby="tab-coach" hidden>
+        <div class="panel-top"><span class="step">The coaching collection</span><h3>One skill. Your next real conversation.</h3><p>Pick an exercise, apply it on your next few relevant contacts and see what changes. Managers can share a direct link to any challenge.</p></div>
+        <div class="skill-layout">
+          <div id="skill-list" class="skill-list" aria-label="Choose a coaching challenge"></div>
+          <article class="skill-detail" id="skill-detail" aria-live="polite">
+            <span class="step">Cara's short challenge</span><h3 id="skill-title"></h3><p class="skill-premise" id="skill-premise"></p>
+            <div class="skill-piece"><h4>The trap</h4><p id="skill-trap"></p></div>
+            <div class="skill-piece"><h4>A better approach</h4><p id="skill-example"></p></div>
+            <div class="lesson"><span class="lesson-label">Try this next time</span><p id="skill-action"></p></div>
+            <div class="skill-footer"><button type="button" class="btn primary" id="share-skill">Copy challenge link</button><span>No login needed to share</span></div>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <section class="principles">
+      <div><p class="eyebrow">How Cara thinks</p><h2>Better questions. Better judgement.</h2></div>
+      <div><p>Start with relevance. Use <strong>open, neutral questions</strong> to understand the customer's world. Listen before you pitch. Don't assume there's a problem. And know when a conversation isn't worth pursuing.</p><p>Closed questions have a place for clarification, permission and agreed next steps — not as the default for discovery.</p></div>
+    </section>
+
+    <footer>
+      <p><strong>Cold Call Cara</strong> is an experimental, free coaching utility from <a href="/">Hendry Commercial</a>. It's not an AI imitation of a prospect; it helps you prepare for a real person.</p>
+      <p>We don't send your entered details to a server. The optional saved offer and simple outcome counts are stored only in this browser. Avoid entering confidential or sensitive prospect information. <button class="inline-button" type="button" id="clear-local">Clear local data</button></p>
+      <p class="reg-note">For UK outbound calls, check the applicable <a href="https://ico.org.uk/for-organisations/direct-marketing-and-privacy-and-electronic-communications/guide-to-pecr/electronic-and-telephone-marketing/telephone-marketing/" target="_blank" rel="noopener noreferrer">ICO telephone marketing guidance</a>, including TPS/CTPS screening and objections.</p>
+    </footer>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
