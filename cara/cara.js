@@ -222,7 +222,7 @@
     const controller=new AbortController();
     const timeout=setTimeout(()=>controller.abort(),18000);
     try {
-      const response=await fetch('/api/cara-prep',{
+      const response=await fetch('/cara/api',{
         method:'POST',
         headers:{'content-type':'application/json'},
         body:JSON.stringify(inputs),
