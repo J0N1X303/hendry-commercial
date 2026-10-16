@@ -89,3 +89,17 @@ Correction:
 Regression tests cover full and partial responses, call/email duplication, closing down after clear no, direct endpoint authentication and missing browser elements. No confirmed live-authenticated model call was available to this development environment: final judgement requires using the private preview.
 
 Keep V3.1 archived on branch `archive/casey-v3-1-before-reliability-20261016`. Public production remains without Casey.
+
+## V3.3 first-request reliability and progress (16 October 2026)
+
+Reported user symptoms: first submission sometimes times out at 28 seconds or suffers a brief network failure; an identical immediate retry often works. Root cause is not conclusively known (could involve slow first model invocation, network conditions or preview authentication), but the 28-second client timeout was objectively shorter than the server's possible two attempts.
+
+Changes:
+- Extend single request deadline to 70 seconds, preserving existing user inputs throughout.
+- Show a responsive, accessible **indeterminate** progress bar and elapsed time, explicitly not a made-up percent complete.
+- After 12 seconds advise that AI generation is still running; after 40 seconds explain that response is slower than normal.
+- On an early fetch-level TypeError occurring within ten seconds, automatically retry the network call **once**, after 800ms. Never repeat after lengthy generation, an HTTP response, a 429, or timeout: re-invoking the model could waste quota.
+- Keep submission disabled during work, restore it when done, stop the timers and hide progress on success/failure.
+- Preserve the current local storage behavior, unchanged preview password, and the November release hold.
+
+QA: JS compiles, every referenced DOM ID exists, one test simulates early network failure then successful retry, and the progress UI is indeterminate and respects reduced-motion settings. Live model latency and real-world iPhone testing must be observed by the user; a successful Cloudflare preview build alone does not verify them.
