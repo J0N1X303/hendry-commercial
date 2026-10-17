@@ -1,3 +1,4 @@
+import {verifyBetaUser,isConfigured,deny as denyBeta} from "./_beta/auth.js";
 // Private Casey V3 pre-launch test. This middleware exists ONLY on the holding branch.
 // Requires a high-entropy password. Never expose the unprotected buyer-prep endpoint.
 const SALT = "8302e88a76cb72ce493a290d475fd459";
@@ -33,6 +34,19 @@ async function approved(authorization) {
 }
 export async function onRequest(context) {
   const path=new URL(context.request.url).pathname;
+  // Casey invitation beta: only a verified Access identity on an explicit
+  // allowlist may see HTML, scripts or APIs. Default is closed.
+  if(path==="/casey-beta"||path.startsWith("/casey-beta/")) {
+    if(!isConfigured(context.env))return denyBeta(503);
+    const identity=await verifyBetaUser(context.request,context.env);
+    if(!identity)return denyBeta(403);
+    const result=await context.next();
+    const headers=new Headers(result.headers);
+    headers.set("Cache-Control","private, no-store, max-age=0");
+    headers.set("X-Robots-Tag","noindex, nofollow, noarchive");
+    headers.set("Referrer-Policy","no-referrer");
+    return new Response(result.body,{status:result.status,statusText:result.statusText,headers});
+  }
   // Never expose either private-generation function without authentication.
   if(path==="/api/casey-prep"||path.startsWith("/api/casey-prep/")||
      path==="/api/cara-prep"||path.startsWith("/api/cara-prep/")) {
