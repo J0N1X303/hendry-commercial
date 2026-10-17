@@ -14,6 +14,12 @@
   "vars": { "CASEY_BETA_ENABLED": "false" },
   "previews": {
     "ai": { "binding": "AI" },
+    "d1_databases": [{
+      "binding": "CASEY_BETA_DB",
+      "database_name": "casey-beta",
+      "database_id": "ede992d4-2687-44ff-be3b-032d8ea3e88d",
+      "migrations_dir": "migrations/casey-beta"
+    }],
     "vars": { "CASEY_BETA_ENABLED": "false" }
   }
 }
