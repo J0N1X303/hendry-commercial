@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import worker from '../beta-worker.js';
+const db=new DatabaseSync(':memory:');
+db.exec(readFileSync(new URL('../migrations/casey-beta/0001_beta_runs.sql',import.meta.url),'utf8'));
+const binding={prepare(sql){const s=db.prepare(sql);let args=[];const q={bind(...v){args=v;return q},async first(){return s.get(...args)||null},async all(){return {results:s.all(...args)}},async run(){return {meta:s.run(...args)}}};return q}};
+const pair=await crypto.subtle.generateKey({name:'RSASSA-PKCS1-v1_5',modulusLength:2048,publicExponent:new Uint8Array([1,0,1]),hash:'SHA-256'},true,['sign','verify']);
+const jwk=await crypto.subtle.exportKey('jwk',pair.publicKey);jwk.kid='test-key';
+globalThis.fetch=async url=>{assert.equal(String(url),'https://test.cloudflareaccess.com/cdn-cgi/access/certs');return Response.json({keys:[jwk]})};
+const env={CASEY_BETA_ENABLED:'true',CASEY_BETA_TEAM_DOMAIN:'https://test.cloudflareaccess.com',CASEY_BETA_AUD:'test-audience-123456789',CASEY_BETA_ALLOWED_EMAILS:'admin@example.com,a@example.com,b@example.com',CASEY_BETA_ADMIN_EMAILS:'admin@example.com',CASEY_BETA_DB:binding,ASSETS:{async fetch(){return new Response('private asset')}},AI:{async run(){return {response:JSON.stringify({angle:'Printed menus may be relevant when a venue plans seasonal revisions.',opening:'I help venues arrange printed materials around their update schedules.',question:'How do you arrange menu updates?',listen_for:'Listen for the timing and approval process for planned revisions.',pushback_buyer:'We already have a print supplier.',pushback_reply:'Understood. The existing process is a useful place to start.',tip:'Ask about the next planned revision before discussing a quote.'})}}}};
+const encode=o=>Buffer.from(JSON.stringify(o)).toString('base64url');
+async function token(email,extra={}){const now=Math.floor(Date.now()/1000);const input=encode({alg:'RS256',kid:jwk.kid})+'.'+encode({email,sub:'subject-'+email,type:'app',iss:env.CASEY_BETA_TEAM_DOMAIN,aud:[env.CASEY_BETA_AUD],iat:now,exp:now+300,...extra});return input+'.'+Buffer.from(await crypto.subtle.sign('RSASSA-PKCS1-v1_5',pair.privateKey,new TextEncoder().encode(input))).toString('base64url')}
+async function request(email,path='/casey-beta/api',method='GET',body,extra={}){const headers={'Cf-Access-Jwt-Assertion':await token(email,extra),Origin:'https://beta.example','Content-Type':'application/json'};return worker.fetch(new Request('https://beta.example'+path,{method,headers,body:body?JSON.stringify(body):undefined}),env)}
+for(const claims of [{exp:1},{aud:['wrong']},{iss:'https://wrong.cloudflareaccess.com'},{nbf:9999999999}])assert.equal((await request('a@example.com',undefined,undefined,undefined,claims)).status,403);
+assert.equal((await request('outsider@example.com')).status,403);
+assert.equal((await request('a@example.com','/casey-beta/api?view=admin')).status,403);
+const run=await request('a@example.com',undefined,'POST',{channel:'call',goal:'explore',seller:'We supply printed menus to local venues.',context:'A fictional hospitality business planning its seasonal menu.'});assert.equal(run.status,200);const result=await run.json();assert.equal(result.status,'ready');
+const saved=db.prepare('SELECT * FROM beta_runs').get();assert.equal(saved.user_email,'a@example.com');assert.equal(saved.status,'ready');assert.deepEqual(JSON.parse(saved.result_json),result.card);
+assert.equal((await request('b@example.com','/casey-beta/api?id='+result.id)).status,404);
+assert.equal((await (await request('b@example.com')).json()).items.length,0);
+assert.equal((await (await request('a@example.com')).json()).items.length,1);
+assert.equal((await request('admin@example.com','/casey-beta/api?id='+result.id)).status,200);
+assert.equal((await (await request('admin@example.com','/casey-beta/api?view=admin')).json()).items.length,1);
+await request('a@example.com',undefined,'PATCH',{id:result.id,feedback:'useful'});assert.equal(db.prepare('SELECT feedback FROM beta_runs').get().feedback,'useful');
+assert.equal((await request('a@example.com','/functions/_beta/auth.js')).status,404);
+assert.equal((await request('a@example.com','/casey-beta/beta.js')).status,200);
+env.AI.run=async()=>{throw Error('test service failure')};const failed=await request('a@example.com',undefined,'POST',{channel:'call',goal:'explore',seller:'We supply printed menus.',context:'A fictional venue with a seasonal menu.'});assert.equal(failed.status,503);assert.equal(db.prepare("SELECT COUNT(*) AS n FROM beta_runs WHERE status='failed'").get().n,1);
+await request('a@example.com',undefined,'DELETE');assert.equal(db.prepare('SELECT COUNT(*) AS n FROM beta_runs').get().n,0);
+console.log('PASS: signed JWT expiry/issuer/audience/allowlist checks, owner history/detail isolation, admin review, saved inputs/results, failure logging, feedback, deletion and private asset routing (local SQLite and mocked AI/JWKS).');
