@@ -9,6 +9,14 @@ async function tidy(db){await db.prepare("DELETE FROM beta_runs WHERE expires_at
 export async function onRequestGet({request,env}){
  const user=await login(request,env);if(!user)return deny();
  const url=new URL(request.url);
+ const detail=url.searchParams.get("id");
+ if(detail){
+  if(!/^[0-9a-f-]{36}$/i.test(detail))return response({error:"invalid_id"},400);
+  const row=await (user.admin?
+    env.CASEY_BETA_DB.prepare("SELECT id,user_email,created_at,channel,goal,seller_input,buyer_input,result_json,status,error_code,duration_ms,feedback,feedback_comment FROM beta_runs WHERE id=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')").bind(detail):
+    env.CASEY_BETA_DB.prepare("SELECT id,created_at,channel,goal,seller_input,buyer_input,result_json,status,error_code,duration_ms,feedback,feedback_comment FROM beta_runs WHERE id=? AND user_email=? AND expires_at>strftime('%Y-%m-%dT%H:%M:%fZ','now')").bind(detail,user.email)).first();
+  return row?response({item:{...row,card:row.result_json?JSON.parse(row.result_json):null,result_json:undefined}}):response({error:"not_found"},404);
+ }
  if(url.searchParams.get("view")==="me")return response({email:user.email,admin:user.admin,retentionDays:30});
  if(url.searchParams.get("view")==="admin"&&!user.admin)return deny();
  const admin=url.searchParams.get("view")==="admin"&&user.admin;
