@@ -8,6 +8,7 @@ async function login(request,env){if(!isConfigured(env))return null;return verif
 async function tidy(db){await db.prepare("DELETE FROM beta_runs WHERE expires_at < strftime('%Y-%m-%dT%H:%M:%fZ','now')").run();}
 export async function onRequestGet({request,env}){
  const user=await login(request,env);if(!user)return deny();
+ await tidy(env.CASEY_BETA_DB);
  const url=new URL(request.url);
  const detail=url.searchParams.get("id");
  if(detail){
@@ -31,6 +32,7 @@ export async function onRequestPost({request,env}){
  const user=await login(request,env);if(!user)return deny();
  if(!String(request.headers.get("content-type")||"").includes("application/json"))return response({error:"content_type"},415);
  let body;try{body=await request.json();}catch{return response({error:"invalid_json"},400);}
+ await tidy(env.CASEY_BETA_DB);
  const channel=bounded(body.channel,20),goal=bounded(body.goal||"explore",20),seller=bounded(body.seller,300),context=bounded(body.context,450);
  if(!allowedChannels.has(channel)||!allowedGoals.has(goal)||seller.length<10||context.length<16)return response({error:"input_incomplete"},400);
  // Invited-user request cap enforced by D1, not ephemeral isolate state.
