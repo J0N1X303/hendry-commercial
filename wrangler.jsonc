@@ -3,8 +3,9 @@
   "name": "hendry-commercial",
   "compatibility_date": "2026-09-25",
   "assets": {
-    "directory": "."
+    "directory": "dist"
   },
   "ai": {"binding": "AI"},
-  "previews": {}
+  "build": {"command": "node scripts/build-public.mjs"},
+  "previews": {"ai": {"binding": "AI"}}
 }
