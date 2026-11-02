@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="627" viewBox="0 0 1200 627">
+<defs><radialGradient id="glow"><stop stop-color="#19452d"/><stop offset="1" stop-color="#08150e"/></radialGradient><linearGradient id="card" x2="1" y2="1"><stop stop-color="#1c3c29"/><stop offset="1" stop-color="#10241a"/></linearGradient></defs>
+<rect width="1200" height="627" fill="#08150e"/><ellipse cx="1030" cy="180" rx="560" ry="540" fill="url(#glow)"/>
+<svg x="51" y="37" width="43" height="46" viewBox="0 0 455 485" xmlns="http://www.w3.org/2000/svg" focusable="false" preserveAspectRatio="xMidYMid meet">
+          <defs><linearGradient id="hc-green" x1="0.08" y1="0.9" x2="0.88" y2="0.04"><stop offset="0" stop-color="#58d691"/><stop offset="1" stop-color="#79e6a7"/></linearGradient><linearGradient id="hc-fold" x1="0.15" y1="0.85" x2="0.8" y2="0.1"><stop offset="0" stop-color="#156b45"/><stop offset="1" stop-color="#0f4d34"/></linearGradient><linearGradient id="hc-white" x1="0.08" y1="0.95" x2="0.92" y2="0.05"><stop offset="0" stop-color="#eeede7"/><stop offset="1" stop-color="#fffefa"/></linearGradient></defs>
+          <path fill="url(#hc-green)" d="M315 21L170 90C150 100 135 113 124 129L24 387L156 325C168 319 177 310 184 298C197 306 214 311 233 312L291 182C273 190 254 198 234 198C251 181 263 158 274 130Z"/><path fill="url(#hc-fold)" d="M234 198C206 208 181 229 170 256C160 282 168 303 184 314C198 324 217 328 233 322L256 270C237 278 222 274 215 263C208 252 213 232 229 217C238 208 248 201 260 196C251 198 242 199 234 198Z"/><path fill="#2ca86a" d="M229 217C242 206 260 198 291 182L278 212C259 225 246 236 240 249C234 262 238 272 256 270L244 297C224 294 211 286 207 273C202 256 211 235 229 217Z"/><path fill="url(#hc-white)" d="M430 118L284 192L176 462L338 378C348 373 356 365 360 354L430 118Z"/>
+        </svg><g font-family="Arial, sans-serif"><text x="110" y="67" fill="#f3f4ef" font-size="24" font-weight="700">Hendry <tspan font-weight="400">Commercial</tspan></text>
+<path d="M56 107H1144" stroke="#2c4937"/>
+<text x="58" y="160" fill="#a4cdb4" font-size="15" font-weight="700" letter-spacing="2.3">FREE CALL &amp; EMAIL PREPARATION</text>
+<text x="54" y="258" fill="#f5f6ef" font-size="86" font-weight="700" letter-spacing="-4">Cold Call <tspan fill="#79e6a7">Casey.</tspan></text>
+<text x="58" y="336" fill="#f5f6ef" font-size="41" font-weight="700" letter-spacing="-1.3">Start a better</text>
+<text x="58" y="389" fill="#f5f6ef" font-size="41" font-weight="700" letter-spacing="-1.3">business conversation.</text>
+<text x="59" y="442" fill="#bfd1c5" font-size="21">A little preparation. More confidence.</text>
+<rect x="790" y="151" width="354" height="331" rx="25" fill="url(#card)" stroke="#42634d"/>
+<text x="821" y="193" fill="#a6d4b7" font-size="13" font-weight="700" letter-spacing="1.3">YOUR NEXT CONVERSATION</text>
+<g fill="#79e6a7" font-size="20" font-weight="700"><text x="822" y="255">01</text><text x="822" y="330">02</text><text x="822" y="405">03</text></g>
+<g fill="#f3f4ef" font-size="21" font-weight="700"><text x="867" y="255">A relevant opening</text><text x="867" y="330">An open question</text><text x="867" y="405">Practical coaching</text></g>
+<path d="M821 281H1110M821 356H1110" stroke="#365640"/>
+<rect x="57" y="503" width="472" height="48" rx="24" fill="#163522" stroke="#3e6c4e"/>
+<text x="80" y="533" fill="#b8f0cc" font-size="18" font-weight="700">Free · No account · No email sign-up</text>
+<text x="1143" y="566" text-anchor="end" fill="#a9c6b4" font-size="18">hendrycommercial.co.uk/casey</text>
+</g></svg>
