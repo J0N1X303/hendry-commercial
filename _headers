@@ -4,3 +4,5 @@
   Cache-Control: no-store, max-age=0
 /api/*
   Cache-Control: no-store, max-age=0
+/casey/api
+  Cache-Control: private, no-store, max-age=0

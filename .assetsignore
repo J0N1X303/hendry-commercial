@@ -4,3 +4,11 @@ wrangler.jsonc
 .gitignore
 README.md
 DOMAIN-EMAIL-SETUP.md
+functions
+lib
+scripts
+migrations
+tests
+casey/README.md
+casey-beta
+beta-worker.js
