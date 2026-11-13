@@ -17,7 +17,7 @@ for(const width of [1440,820,390,320]){
    assert(Math.abs(boxes[0]-boxes[1])<=1,'Aligned actions: '+selector);
   }
  }
- const action=page.locator('.resource-close .resource-link');await action.focus();
+ const action=page.locator('.resource-close .resource-link');await action.focus();await page.keyboard.press('Shift+Tab');await page.keyboard.press('Tab');
  assert.equal(await action.evaluate(el=>getComputedStyle(el).outlineStyle),'solid');
  assert.equal(errors.length,0);await page.screenshot({path:`ui-artifacts/resources-${width}.png`,fullPage:true});
  await page.goto(base+'/');assert(await page.locator('.nav-resources').isVisible());await page.locator('.nav-resources').click();assert.equal(new URL(page.url()).pathname,'/resources/');await page.goBack();assert.equal(new URL(page.url()).pathname,'/');await page.goForward();assert.equal(new URL(page.url()).pathname,'/resources/');
