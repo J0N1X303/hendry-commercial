@@ -10,6 +10,15 @@ for(const width of [1440,820,390,320]){
  assert.equal(await page.locator('h1').count(),1);assert.equal(await page.locator('.resource-card').count(),4);assert.equal(await page.locator('.book-card').count(),2);
  for(const hash of ['commercial','career','books']){await page.locator(`.resource-jumps a[href="#${hash}"]`).click();assert.equal(new URL(page.url()).hash,'#'+hash);assert(await page.locator('#'+hash).isVisible());}
  const overflow=await page.evaluate(()=>[...document.querySelectorAll('main *,header *')].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&(r.left< -1||r.right>innerWidth+1)}).map(el=>el.className));assert.deepEqual(overflow,[]);
+ assert.equal(await page.locator('.readiness-path a,.readiness-path button').count(),0);
+ if(width>760){
+  for(const selector of ['.career-card .resource-link','.book-card .resource-link']){
+   const boxes=await page.locator(selector).evaluateAll(els=>els.map(el=>el.getBoundingClientRect().bottom));
+   assert(Math.abs(boxes[0]-boxes[1])<=1,'Aligned actions: '+selector);
+  }
+ }
+ const action=page.locator('.resource-close .resource-link');await action.focus();
+ assert.equal(await action.evaluate(el=>getComputedStyle(el).outlineStyle),'solid');
  assert.equal(errors.length,0);await page.screenshot({path:`ui-artifacts/resources-${width}.png`,fullPage:true});
  await page.goto(base+'/');assert(await page.locator('.nav-resources').isVisible());await page.locator('.nav-resources').click();assert.equal(new URL(page.url()).pathname,'/resources/');await page.goBack();assert.equal(new URL(page.url()).pathname,'/');await page.goForward();assert.equal(new URL(page.url()).pathname,'/resources/');
  console.log('PASS resources '+width+' / nav, anchors, history, overflow, page errors');await page.close();

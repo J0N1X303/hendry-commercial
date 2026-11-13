@@ -11,3 +11,22 @@
 .book-card{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:28px 0;border-top:1px solid #38503f}.book-card img{width:120px;height:auto;box-shadow:8px 12px 26px #0005}.book-card h3{font-size:24px}.book-card .paid{color:#c4c6b8!important}.book-card .resource-link{width:100%}.resource-close{border-top:1px solid #2c4033}.resource-close>p:not(.eyebrow){max-width:660px;color:var(--muted)}.resource-close>.resource-link{min-width:185px}.skip-link{position:absolute;top:-70px;left:15px;z-index:100;background:#b7f1cc;color:#07180c;padding:12px}.skip-link:focus{top:10px}a:focus-visible{outline:3px solid var(--accent);outline-offset:5px}.resources-page nav [aria-current=page]{color:var(--accent)}
 @media(max-width:760px){.section-heading{grid-template-columns:1fr;gap:16px}.resource-grid{grid-template-columns:1fr}.intro-bottom{display:block}.author-note{display:none}.resources-page .section{padding-top:46px;padding-bottom:46px}.resources-intro h1{font-size:clamp(55px,12vw,86px)}.intro-bottom>p:first-child{font-size:17px}.card-art{min-height:200px}.conversation-line{font-size:25px}.resource-jumps{gap:8px}.resource-jumps a{padding:10px 12px;font-size:12px}.resource-jumps a span{margin-left:8px}.resources-page .site-header{flex-wrap:wrap;gap:16px}.resources-page .site-header nav a{display:block!important}.resources-page .site-header nav{gap:15px}.book-card{grid-template-columns:95px 1fr;gap:20px}.book-card img{width:95px}.book-card h3{font-size:22px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Real actions look actionable; the buyer journey remains an illustration. */
+.resource-link{border:1px solid #52745e;border-radius:8px;padding:13px 17px;background:#193b28;min-height:50px;transition:background .18s ease,border-color .18s ease,color .18s ease}
+.resource-link span{transition:transform .18s ease}
+.resource-link:hover,.resource-link:focus-visible{background:#245338;border-color:#82d9a1;color:#f3fff7}
+.resource-link:hover span,.resource-link:focus-visible span{transform:translate(2px,-2px)}
+.resource-link:active{background:#102f1d}
+.secondary-resource-link{text-decoration:underline;text-underline-offset:4px;transition:color .18s ease}
+.secondary-resource-link:hover{color:var(--accent)}
+.card-actions{margin-top:auto;display:flex;flex-direction:column}
+.card-actions .resource-link{margin-top:0}
+.book-card>div{display:flex;flex-direction:column;min-width:0}
+.book-card img{align-self:start}
+.resource-close>.resource-link{margin-top:14px}
+.readiness-path{display:grid;grid-template-columns:1fr 1.45fr;gap:18px 20px;max-width:370px}
+.readiness-path span,.readiness-path span:last-child{border:0;border-radius:0;padding:0;background:transparent;color:#e2f2e7;font-size:19px;font-weight:500}
+.readiness-path small{display:inline-block;margin-right:7px;font-size:10px;letter-spacing:.06em;color:#9abca5;vertical-align:middle}
+@media(min-width:761px){.career-card .card-actions{min-height:95px}}
+@media(prefers-reduced-motion:reduce){.resource-link,.resource-link span,.secondary-resource-link{transition:none}.resource-link:hover span,.resource-link:focus-visible span{transform:none}}
