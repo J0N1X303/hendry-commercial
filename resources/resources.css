@@ -28,5 +28,5 @@
 .readiness-path{display:grid;grid-template-columns:1fr 1.45fr;gap:18px 20px;max-width:370px}
 .readiness-path span,.readiness-path span:last-child{border:0;border-radius:0;padding:0;background:transparent;color:#e2f2e7;font-size:19px;font-weight:500}
 .readiness-path small{display:inline-block;margin-right:7px;font-size:10px;letter-spacing:.06em;color:#9abca5;vertical-align:middle}
-@media(min-width:761px){.career-card .card-actions{min-height:95px}}
+@media(min-width:761px){.career-card .card-actions{display:grid;grid-template-rows:auto 35px;gap:10px}.career-card .secondary-resource-link{margin-top:0}}
 @media(prefers-reduced-motion:reduce){.resource-link,.resource-link span,.secondary-resource-link{transition:none}.resource-link:hover span,.resource-link:focus-visible span{transform:none}}
