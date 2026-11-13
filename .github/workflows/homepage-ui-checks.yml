@@ -9,6 +9,8 @@ on:
       - script.js
       - styles.css
       - tests/homepage.mjs
+      - resources/**
+      - tests/resources.mjs
       - .github/workflows/homepage-ui-checks.yml
   pull_request:
     paths:
@@ -16,6 +18,8 @@ on:
       - script.js
       - styles.css
       - tests/homepage.mjs
+      - resources/**
+      - tests/resources.mjs
       - .github/workflows/homepage-ui-checks.yml
   workflow_dispatch:
 jobs:
@@ -36,7 +40,9 @@ jobs:
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hc-server.log 2>&1 &
           sleep 2
       - name: Check desktop, tablet and mobile functionality
-        run: node tests/homepage.mjs
+        run: |
+          node tests/homepage.mjs
+          node tests/resources.mjs
       - name: Keep browser screenshots
         if: always()
         uses: actions/upload-artifact@v4
